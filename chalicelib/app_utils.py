@@ -61,7 +61,7 @@ def init_environments(env='all', envs=None):
     :param envs: allows you to specify multiple envs to be initialized
     """
     stage = get_stage_info()['stage']
-    s3_connection = S3Connection('foursight-envs')
+    s3_connection = S3Connection('foursight-cgap-envs')
     env_keys = s3_connection.list_all_keys()
     environments = {}
     if env != 'all':
@@ -79,7 +79,7 @@ def init_environments(env='all', envs=None):
                 'fourfront': env_res['fourfront'],
                 'es': env_res['es'],
                 'ff_env': env_res.get('ff_env', ''.join(['fourfront-', env_key])),
-                'bucket': ''.join(['foursight-', stage, '-', env_key])
+                'bucket': ''.join(['foursight-cgap-', stage, '-', env_key])
             }
             environments[env_key] = env_entry
     return environments
