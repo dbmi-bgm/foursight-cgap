@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "foursight"
+name = "foursight-cgap"
 version = "1.2.7"
 description = "Serverless Chalice Application for Monitoring"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
