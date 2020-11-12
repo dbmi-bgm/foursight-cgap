@@ -34,12 +34,12 @@ def get_stage_info():
     """
     # set environmental variables in .chalice/config.json
     stage = os.environ.get('chalice_stage', 'dev') # default to dev
-    queue_name = '-'.join(['foursight', stage, 'check_queue'])
+    queue_name = '-'.join(['foursight-cgap', stage, 'check_queue'])
     # when testing, use dev stage with test queue
     if stage == 'test':
         stage = 'dev'
-        queue_name = 'foursight-test-check_queue'
-    runner_name = '-'.join(['foursight', stage, 'check_runner'])
+        queue_name = 'foursight-cgap-test-check_queue'
+    runner_name = '-'.join(['foursight-cgap', stage, 'check_runner'])
     return {'stage': stage, 'queue_name': queue_name, 'runner_name': runner_name}
 
 
@@ -47,7 +47,7 @@ def list_environments():
     """
     Lists all environments in the foursight-envs s3. Returns a list of names
     """
-    s3_connection = S3Connection('foursight-envs')
+    s3_connection = S3Connection('foursight-cgap-envs')
     return s3_connection.list_all_keys()
 
 
@@ -415,7 +415,7 @@ def collect_run_info(run_uuid):
     """
     Returns a set of run checks under this run uuid
     """
-    s3_connection = S3Connection('foursight-runs')
+    s3_connection = S3Connection('foursight-cgap-runs')
     run_prefix = ''.join([run_uuid, '/'])
     complete = s3_connection.list_all_keys_w_prefix(run_prefix)
     # eliminate duplicates
