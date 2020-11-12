@@ -39,7 +39,7 @@ class FSConnection(object):
         if not test:
             self.ff_s3 = s3Utils(env=self.ff_env)
             try:  # TODO: make this configurable from env variables?
-                self.ff_keys = self.ff_s3.get_access_keys('access_key_foursight')
+                self.ff_keys = self.ff_s3.get_access_keys('access_key_foursight-cgap')
             except Exception as e:
                 raise Exception('Could not initiate connection to Fourfront; it is probably a bad ff_env. '
                       'You gave: %s. Error message: %s' % (self.ff_env, str(e)))
