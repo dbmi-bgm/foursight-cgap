@@ -6,7 +6,7 @@ import requests
 import datetime
 from chalicelib.app_utils import *
 
-app = Chalice(app_name='foursight')
+app = Chalice(app_name='foursight-cgap')
 app.debug = True
 STAGE = os.environ.get('chalice_stage', 'dev')
 DEFAULT_ENV = 'data'
