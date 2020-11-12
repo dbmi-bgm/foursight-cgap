@@ -15,7 +15,7 @@ from chalicelib.es_connection import ESConnection
 # This script reall just refactors the functionality in RunResult.delete_results
 # and calls the migration check in es_checks.py.
 
-ENVS = ['mastertest', 'hotseat', 'webdev', 'staging', 'cgap', 'data']
+ENVS = ['cgap']
 STAGES = ['dev', 'prod']
 ONE_WEEK_AGO = datetime.datetime.utcnow() - datetime.timedelta(days=7)
 MIGRATE = False # set this option based on what you want to do
@@ -37,7 +37,7 @@ def filt(k):
         return t < ONE_WEEK_AGO
 
 def clean(env, stage):
-    bucket_name = 'foursight-' + stage + '-' + env
+    bucket_name = 'foursight-cgap-' + stage + '-' + env
     bucket = boto3.resource('s3').Bucket(bucket_name)
     client = boto3.client('s3')
     keys = []
@@ -65,7 +65,7 @@ def clean(env, stage):
         client.delete_objects(Bucket=bucket_name, Delete=fmt)
 
 def migrate(env, stage):
-    index_name = 'foursight-' + stage + '-' + env
+    index_name = 'foursight-cgap-' + stage + '-' + env
 
     app.set_stage(stage)
     app.set_timeout(0)
