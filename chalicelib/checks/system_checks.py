@@ -485,32 +485,6 @@ def manage_old_filebeat_logs(connection, **kwargs):
 
 
 @check_function()
-def snapshot_rds(connection, **kwargs):
-    from ..utils import get_stage_info
-    check = CheckResult(connection, 'snapshot_rds')
-    if get_stage_info()['stage'] != 'prod':
-        check.summary = check.description = 'This check only runs on Foursight prod'
-        return check
-    # XXX: must be updated when cgap-blue/cgap-green come to fruition -will 4-1-2020
-    rds_name = 'fourfront-production' if (env_utils.is_fourfront_env(connection.ff_env) and env_utils.is_stg_or_prd_env(connection.ff_env)) else connection.ff_env
-    # snapshot ID can only have letters, numbers, and hyphens
-    snap_time = datetime.datetime.strptime(kwargs['uuid'], "%Y-%m-%dT%H:%M:%S.%f").strftime("%Y-%m-%dT%H-%M-%S")
-    snapshot_name = 'foursight-snapshot-%s-%s' % (rds_name, snap_time)
-    res = beanstalk_utils.create_db_snapshot(rds_name, snapshot_name)
-    if res == 'Deleting':  # XXX: How this^ function works should be changed - Will 6/2/2020
-        check.status = 'FAIL'
-        check.summary = check.description = 'Something went wrong during snaphot creation'
-    else:
-        check.status = 'PASS'
-        # there is a datetime in the response that must be str formatted
-        res['DBSnapshot']['InstanceCreateTime'] = str(res['DBSnapshot']['InstanceCreateTime'])
-        check.full_output = res
-        check.summary = 'Snapshot successfully created'
-        check.description = 'Snapshot succesfully created with name: %s' % snapshot_name
-    return check
-
-
-@check_function()
 def process_download_tracking_items(connection, **kwargs):
     """
     Do a few things here, and be mindful of the 5min lambda limit.
