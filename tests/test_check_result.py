@@ -1,11 +1,11 @@
 from conftest import *
 
 class TestCheckResult():
-    # use a fake check name and store on mastertest
+    # use a fake check name and store on cgapdev
     check_name = 'test_only_check'
     # another fake check, with only ERROR results
     error_check_name = 'test_only_error_check'
-    environ = 'mastertest' # hopefully this is up
+    environ = 'cgapdev' # hopefully this is up
     connection = app_utils.init_connection(environ)
 
     @pytest.mark.flaky(max_runs=4) # very flaky for some reason

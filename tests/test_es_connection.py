@@ -1,7 +1,7 @@
 from conftest import *
 
 class TestESConnection():
-    environ = 'mastertest'
+    environ = 'cgapdev'
     conn = app_utils.init_connection(environ)
     index = 'unit_test_index'
     try:

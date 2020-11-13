@@ -1,7 +1,7 @@
 from conftest import *
 
 class TestCheckUtils():
-    environ = 'mastertest'  # hopefully this is up
+    environ = 'cgapdev'  # hopefully this is up
     connection = app_utils.init_connection(environ)
 
     def test_get_check_strings(self):

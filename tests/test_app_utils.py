@@ -9,23 +9,23 @@ class TestAppUtils():
     """
     Meant for non-route utilities in chalicelib/app_utils.py
     """
-    environ = 'mastertest' # hopefully this is up
+    environ = 'cgapdev' # hopefully this is up
     conn = app_utils.init_connection(environ)
 
     def test_init_connection(self):
         # test the fs connection
-        assert (self.conn.fs_env == 'mastertest')
+        assert (self.conn.fs_env == self.environ)
         assert (self.conn.connections)
         # test the ff connection
         assert (self.conn.ff_server)
         assert (self.conn.ff_es)
-        assert (self.conn.ff_env == 'fourfront-mastertest')
+        assert (self.conn.ff_env == 'fourfront-' + self.environ)
         assert (self.conn.ff_s3 is not None)
         assert (isinstance(self.conn.ff_keys, dict))
         assert ({'key', 'secret', 'server'} <= set(self.conn.ff_keys.keys()))
 
     def test_get_favicon(self):
-        """ Tests that given 'mastertest' we get the right url for favicon """
+        """ Tests that given 'cgapdev' we get the right url for favicon """
         expected = FF_PUBLIC_URL_PRD + '/static/img/favicon-fs.ico'  # favicon acquired from prod
         actual = app_utils.get_favicon(self.conn.ff_server)
         assert expected == actual
@@ -49,8 +49,8 @@ class TestAppUtils():
             assert ('es' in env_data)
             assert ('bucket' in env_data)
             assert ('ff_env' in env_data)
-        environments = app_utils.init_environments('mastertest')
-        assert ('mastertest' in environments)
+        environments = app_utils.init_environments(self.environ)
+        assert (self.environ in environments)
         # bad environment
         bad_envs = app_utils.init_environments('not_an_environment')
         assert (bad_envs == {})
@@ -95,12 +95,12 @@ class TestAppUtils():
         }  # mock a 'correct' jwt decode
         with mock.patch('chalicelib.app_utils.get_jwt', return_value='token'):
             with mock.patch('jwt.decode', return_value=payload1):
-                auth = app_utils.check_authorization({}, env='mastertest')
+                auth = app_utils.check_authorization({}, env=self.environ)
             assert auth
         with mock.patch('chalicelib.app_utils.get_jwt', return_value='token'):
             with mock.patch('jwt.decode', return_value=payload1):
                 # test authenticating on more than one env
-                auth = app_utils.check_authorization({}, env='mastertest,cgap-dev')
+                auth = app_utils.check_authorization({}, env=self.environ)
             assert auth
         # build a 'request header' that just consists of the context we would expect
         # to see if authenticating from localhost
@@ -126,7 +126,7 @@ class TestAppUtils():
                 "iat": 1516239022
             }
             with mock.patch('jwt.decode', return_value=payload2):
-                auth = app_utils.check_authorization({}, env='mastertest')
+                auth = app_utils.check_authorization({}, env=self.environ)
             assert not auth
             # Email not found
             payload3 = {
@@ -137,7 +137,7 @@ class TestAppUtils():
                 "iat": 1516239022
             }
             with mock.patch('jwt.decode', return_value=payload3):
-                auth = app_utils.check_authorization({}, env='mastertest')
+                auth = app_utils.check_authorization({}, env=self.environ)
             assert not auth
 
 

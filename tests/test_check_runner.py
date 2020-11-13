@@ -26,7 +26,7 @@ def captured_output():
         sys.stdout, sys.stderr = old_out, old_err
 
 class TestCheckRunner():
-    environ = 'mastertest'
+    environ = 'cgapdev'
     app.set_stage('test')
     connection = app_utils.init_connection(environ)
     connection.connections['es'] = None # disable es
