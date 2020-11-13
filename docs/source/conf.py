@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'Foursight'
+project = 'Foursight-cgap'
 copyright = '2019, HMS-DBMI'
 author = 'HMS-DBMI'
 master_doc = 'index'
