@@ -255,19 +255,6 @@ def deploy_env(connection, env_to_deploy, application_name, check, **kwargs):
 
 
 @check_function()
-def deploy_ff_staging(connection, **kwargs):
-    """ Deploys Fourfront master to whoever staging is.
-        Runs as part of the 'deployment_checks' schedule on data ONLY.
-    """
-    return deploy_env(
-        connection,
-        env_to_deploy=compute_ff_stg_env(),
-        application_name="Fourfront",
-        check='deploy_ff_staging',
-        **kwargs)
-
-
-@check_function()
 def deploy_cgap_production(connection, **kwargs):
     """ Deploys CGAP portal master to production environment.
         Eventually, this ought to be deprecated in favor of a staging deploy.

@@ -331,6 +331,58 @@
             }
         }
     },
+    "indexer_server_status": {
+        "title": "Indexer Server Status",
+        "group": "Deployment Checks",
+        "schedule": {
+            "manual_checks": {
+                "cgap": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
+        }
+    },
+    "provision_indexer_environment": {
+        "title": "Provision Indexer Environment",
+        "group": "Deployment Checks",
+        "schedule": {
+            "manual_checks": {
+                "cgap": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
+        }
+    },
+    "deploy_application_to_beanstalk": {
+        "title": "Deploy Version to ElasticBeanstalk",
+        "group": "Deployment Checks",
+        "schedule": {
+            "manual_checks": {
+                "cgap": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
+        }
+    },
+    "deploy_cgap_production": {
+        "title": "Deploy CGAP-portal master to the cgap production environment",
+        "group": "Deployment Checks",
+        "schedule": {
+            "deployment_checks": {
+                "cgap": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
+        }
+    },
     "clean_s3_es_checks" : {
         "title": "Wipe Checks Older Than One Month",
         "group": "System checks",
