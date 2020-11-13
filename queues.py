@@ -2,6 +2,7 @@ import boto3
 
 
 class Queues(object):
+    """create and configure queues for foursight"""
     prefix = 'foursight-cgap'
     suffices = ['dev-check-queue', 'prod-check-queue', 'test-check-queue']
 
