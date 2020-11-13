@@ -28,6 +28,10 @@ STATUS_LEVEL = {
     'uploaded': 1,
     'upload failed': 1,
     'draft': 1,
+    'deleted': 0,
+    'replaced': 0,
+    'obsolete': 0,
+}
 
 
 @check_function()
