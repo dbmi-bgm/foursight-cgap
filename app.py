@@ -9,7 +9,7 @@ from chalicelib.app_utils import *
 app = Chalice(app_name='foursight-cgap')
 app.debug = True
 STAGE = os.environ.get('chalice_stage', 'dev')
-DEFAULT_ENV = 'data'
+DEFAULT_ENV = 'cgap'
 
 '''######### SCHEDULED FXNS #########'''
 
