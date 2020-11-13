@@ -1,7 +1,7 @@
 from conftest import *
 
 class TestUtils():
-    environ = 'mastertest' # hopefully this is up
+    environ = 'cgapdev' # hopefully this is up
     conn = app_utils.init_connection(environ)
     timestr_1 = '2017-04-09T17:34:53.423589+00:00' # UTC
     timestr_2 = '2017-04-09T17:34:53.423589+05:00' # 5 hours ahead of UTC
@@ -14,7 +14,7 @@ class TestUtils():
 
     @utils.check_function(abc=123, do_not_store=True, uuid=datetime.datetime.utcnow().isoformat())
     def test_function_dummy(*args, **kwargs):
-        connection = app_utils.init_connection('mastertest')
+        connection = app_utils.init_connection(self.environ)
         check = utils.init_check_res(connection, 'not_a_check')
         check.summary = 'A string summary'
         check.description = 'A string description'
