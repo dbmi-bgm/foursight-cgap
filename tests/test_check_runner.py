@@ -66,8 +66,8 @@ class TestCheckRunner():
 
     def test_queue_basics(self):
         # ensure we have the right queue and runner names
-        assert (self.stage_info['queue_name'] == 'foursight-test-check_queue')
-        assert (self.stage_info['runner_name'] == 'foursight-dev-check_runner')
+        assert (self.stage_info['queue_name'] == 'foursight-cgap-test-check_queue')
+        assert (self.stage_info['runner_name'] == 'foursight-cgap-dev-check_runner')
 
     def test_check_runner_manually(self):
         """

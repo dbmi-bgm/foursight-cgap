@@ -14,7 +14,6 @@ from itertools import chain
 from dateutil import tz
 from base64 import b64decode
 from dcicutils import ff_utils
-from dcicutils.env_utils import is_cgap_env, is_cgap_server
 from .fs_connection import FSConnection
 from .run_result import CheckResult, ActionResult
 from .check_utils import (
@@ -41,7 +40,6 @@ from .utils import (
 )
 from .s3_connection import S3Connection
 
-FOURFRONT_FAVICON = 'https://data.4dnucleome.org/static/img/favicon-fs.ico'
 CGAP_FAVICON = 'https://cgap.hms.harvard.edu/static/img/favicon-fs.ico'
 LAMBDA_MAX_BODY_SIZE = 5500000  # 6Mb is the "real" threshold
 
@@ -182,18 +180,13 @@ def get_jwt(request_dict):
 
 def get_favicon(server):
     """
-    Tries to grab favicon from the given server. If it's not found it will use
-    the default favicon (data)
+    Returns CGAP faviron
     """
     def favicon_is_valid(favicon):
         res = requests.head(favicon)
         return res.status_code == 200
 
-    if is_cgap_server(server):
-        favicon = CGAP_FAVICON  # want full HTTPS, so hard-coded in
-    else:
-        favicon = FOURFRONT_FAVICON  # *should* always be valid, so reasonable fallback
-    return favicon if favicon_is_valid(favicon) else FOURFRONT_FAVICON
+    return CGAP_FAVICON  # want full HTTPS, so hard-coded in
 
 
 def get_domain_and_context(request_dict):
@@ -381,7 +374,7 @@ def view_foursight(environ, is_admin=False, domain="", context="/"):
     view_envs = environments.keys() if environ == 'all' else [e.strip() for e in environ.split(',')]
     for this_environ in view_envs:
         try:
-            if is_cgap_env(this_environ) and not is_admin:  # no view permissions for non-admins on CGAP
+            if not is_admin:  # no view permissions for non-admins on CGAP
                 continue
             connection = init_connection(this_environ, _environments=environments)
         except Exception:
@@ -612,7 +605,7 @@ def view_foursight_history(environ, check, start=0, limit=25, is_admin=False,
     if server is not None:
         favicon = get_favicon(server)
     else:
-        favicon = FOURFRONT_FAVICON  # default to fourfront if no server
+        favicon = CGAP_FAVICON  # default to fourfront if no server
     html_resp.body = template.render(
         env=environ,
         check=check,
