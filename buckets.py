@@ -56,7 +56,7 @@ class Buckets(object):
             content = {"fourfront": self.ff_url(env),
                        "es": self.es_url(env),
                        "ff_env": self.ff_env(env)}
-            body = json.dumps(str(content)).encode('utf-8')
+            body = json.dumps(content).encode('utf-8')
             s3.put_object(Bucket=self.env_bucket, Key=env, Body=body)
 
 
