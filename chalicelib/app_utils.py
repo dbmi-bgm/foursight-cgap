@@ -74,6 +74,7 @@ def init_environments(env='all', envs=None):
         env_keys = envs
     for env_key in env_keys:
         env_res = s3_connection.get_object(env_key)
+        print("env_res from s3_connection = %s" % str(env_res))
         # check that the keys we need are in the object
         if isinstance(env_res, dict) and {'fourfront', 'es'} <= set(env_res):
             env_entry = {
