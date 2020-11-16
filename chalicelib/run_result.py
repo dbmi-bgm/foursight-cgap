@@ -4,6 +4,7 @@ from dateutil import tz
 from abc import abstractmethod
 import json
 from .s3_connection import S3Connection
+from .vars import FOURSIGHT_PREFIX
 
 
 class BadCheckOrAction(Exception):
@@ -161,12 +162,12 @@ class RunResult(object):
 
     def record_run_info(self):
         """
-        Add a record of the completed check to the foursight-runs bucket with name
+        Add a record of the completed check to the runs bucket with name
         equal to the dependency id. The object itself is only the status of the run.
         Returns True on success, False otherwise
         """
         run_id = self.kwargs['_run_info']['run_id']
-        s3_connection = S3Connection('foursight-runs')
+        s3_connection = S3Connection(FOURSIGHT_PREFIX + '-runs')
         record_key = '/'.join([run_id, self.name])
         resp = s3_connection.put_object(record_key, json.dumps(self.status))
         return resp is not None

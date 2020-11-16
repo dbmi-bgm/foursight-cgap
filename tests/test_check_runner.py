@@ -1,4 +1,6 @@
 from conftest import *
+from chalicelib.vars import FOURSIGHT_PREFIX, DEV_ENV
+
 
 def delay_rerun(*args):
     time.sleep(90)
@@ -26,7 +28,7 @@ def captured_output():
         sys.stdout, sys.stderr = old_out, old_err
 
 class TestCheckRunner():
-    environ = 'mastertest'
+    environ = DEV_ENV
     app.set_stage('test')
     connection = app_utils.init_connection(environ)
     connection.connections['es'] = None # disable es
@@ -66,8 +68,8 @@ class TestCheckRunner():
 
     def test_queue_basics(self):
         # ensure we have the right queue and runner names
-        assert (self.stage_info['queue_name'] == 'foursight-test-check_queue')
-        assert (self.stage_info['runner_name'] == 'foursight-dev-check_runner')
+        assert (self.stage_info['queue_name'] == FOURSIGHT_PREFIX + '-test-check_queue')
+        assert (self.stage_info['runner_name'] == FOURSIGHT_PREFIX + '-dev-check_runner')
 
     def test_check_runner_manually(self):
         """

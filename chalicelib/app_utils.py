@@ -14,7 +14,6 @@ from itertools import chain
 from dateutil import tz
 from base64 import b64decode
 from dcicutils import ff_utils
-from dcicutils.env_utils import is_cgap_env, is_cgap_server
 from .fs_connection import FSConnection
 from .run_result import CheckResult, ActionResult
 from .check_utils import (
@@ -39,9 +38,9 @@ from .utils import (
     send_sqs_messages,
     get_sqs_attributes
 )
+from .vars import FOURSIGHT_PREFIX
 from .s3_connection import S3Connection
 
-FOURFRONT_FAVICON = 'https://data.4dnucleome.org/static/img/favicon-fs.ico'
 CGAP_FAVICON = 'https://cgap.hms.harvard.edu/static/img/favicon-fs.ico'
 LAMBDA_MAX_BODY_SIZE = 5500000  # 6Mb is the "real" threshold
 
@@ -53,7 +52,7 @@ jin_env = Environment(
 
 def init_environments(env='all', envs=None):
     """
-    Generate environment information from the foursight-envs bucket in s3.
+    Generate environment information from the envs bucket in s3.
     Returns a dictionary keyed by environment name with value of a sub-dict
     with the fields needed to initiate a connection.
 
@@ -61,8 +60,9 @@ def init_environments(env='all', envs=None):
     :param envs: allows you to specify multiple envs to be initialized
     """
     stage = get_stage_info()['stage']
-    s3_connection = S3Connection('foursight-envs')
+    s3_connection = S3Connection(FOURSIGHT_PREFIX + '-envs')
     env_keys = s3_connection.list_all_keys()
+    print("env_keys=%s from bucket %s" % (env_keys, FOURSIGHT_PREFIX + '-envs'))
     environments = {}
     if env != 'all':
         if env in env_keys:
@@ -73,13 +73,14 @@ def init_environments(env='all', envs=None):
         env_keys = envs
     for env_key in env_keys:
         env_res = s3_connection.get_object(env_key)
+        print("env_res for env_key %s from s3_connection = %s" % (env_key, str(env_res)))
         # check that the keys we need are in the object
         if isinstance(env_res, dict) and {'fourfront', 'es'} <= set(env_res):
             env_entry = {
                 'fourfront': env_res['fourfront'],
                 'es': env_res['es'],
                 'ff_env': env_res.get('ff_env', ''.join(['fourfront-', env_key])),
-                'bucket': ''.join(['foursight-', stage, '-', env_key])
+                'bucket': ''.join([FOURSIGHT_PREFIX + '-', stage, '-', env_key])
             }
             environments[env_key] = env_entry
     return environments
@@ -93,6 +94,7 @@ def init_connection(environ, _environments=None):
     """
     error_res = {}
     environments = init_environments(environ) if _environments is None else _environments
+    print("environments = %s" % str(environments))
     # if still not there, return an error
     if environ not in environments:
         error_res = {
@@ -179,18 +181,13 @@ def get_jwt(request_dict):
 
 def get_favicon(server):
     """
-    Tries to grab favicon from the given server. If it's not found it will use
-    the default favicon (data)
+    Returns CGAP faviron
     """
     def favicon_is_valid(favicon):
         res = requests.head(favicon)
         return res.status_code == 200
 
-    if is_cgap_server(server):
-        favicon = CGAP_FAVICON  # want full HTTPS, so hard-coded in
-    else:
-        favicon = FOURFRONT_FAVICON  # *should* always be valid, so reasonable fallback
-    return favicon if favicon_is_valid(favicon) else FOURFRONT_FAVICON
+    return CGAP_FAVICON  # want full HTTPS, so hard-coded in
 
 
 def get_domain_and_context(request_dict):
@@ -378,7 +375,7 @@ def view_foursight(environ, is_admin=False, domain="", context="/"):
     view_envs = environments.keys() if environ == 'all' else [e.strip() for e in environ.split(',')]
     for this_environ in view_envs:
         try:
-            if is_cgap_env(this_environ) and not is_admin:  # no view permissions for non-admins on CGAP
+            if not is_admin:  # no view permissions for non-admins on CGAP
                 continue
             connection = init_connection(this_environ, _environments=environments)
         except Exception:
@@ -609,7 +606,7 @@ def view_foursight_history(environ, check, start=0, limit=25, is_admin=False,
     if server is not None:
         favicon = get_favicon(server)
     else:
-        favicon = FOURFRONT_FAVICON  # default to fourfront if no server
+        favicon = CGAP_FAVICON  # default to fourfront if no server
     html_resp.body = template.render(
         env=environ,
         check=check,
@@ -750,10 +747,10 @@ def run_put_environment(environ, env_data):
             'es': es_address,
             'ff_env': ff_env
         }
-        s3_connection = S3Connection('foursight-envs')
+        s3_connection = S3Connection(FOURSIGHT_PREFIX + '-envs')
         s3_connection.put_object(proc_environ, json.dumps(env_entry))
         stage = get_stage_info()['stage']
-        s3_bucket = ''.join(['foursight-', stage, '-', proc_environ])
+        s3_bucket = ''.join([FOURSIGHT_PREFIX + '-', stage, '-', proc_environ])
         bucket_res = s3_connection.create_bucket(s3_bucket)
         if not bucket_res:
             response = Response(
@@ -817,7 +814,7 @@ def run_get_environment(environ):
     return process_response(response)
 
 
-def run_delete_environment(environ, bucket='foursight-envs'):
+def run_delete_environment(environ, bucket=FOURSIGHT_PREFIX + '-envs'):
     """
     Removes the environ entry from the Foursight envs bucket. This effectively de-schedules all checks
     but does not remove any data.
@@ -884,13 +881,10 @@ def queue_scheduled_checks(sched_environ, schedule_name, conditions=None):
     """
     queue = get_sqs_queue()
     if schedule_name is not None:
-        if sched_environ not in ['all', 'all_4dn'] and sched_environ not in list_environments():
+        if sched_environ != 'all' and sched_environ not in list_environments():
             print('-RUN-> %s is not a valid environment. Cannot queue.' % sched_environ)
             return
-        sched_environs = list_environments() if sched_environ in ['all', 'all_4dn'] else [sched_environ]
-        # remove any environments with 'cgap' if all_4dn
-        if sched_environ == 'all_4dn':
-            sched_environs = [env for env in sched_environ if 'cgap' not in env]
+        sched_environs = list_environments() if sched_environ == 'all' else [sched_environ]
         check_schedule = get_check_schedule(schedule_name, conditions)
         if not check_schedule:
             print('-RUN-> %s is not a valid schedule. Cannot queue.' % schedule_name)
@@ -898,9 +892,6 @@ def queue_scheduled_checks(sched_environ, schedule_name, conditions=None):
         for environ in sched_environs:
             # add the run info from 'all' as well as this specific environ
             check_vals = copy.copy(check_schedule.get('all', []))
-            # also add 'all_4dn' if we are in a non-cgap environment
-            if 'cgap' not in environ:
-                check_vals.extend(check_schedule.get('all_4dn', []))
             check_vals.extend(check_schedule.get(environ, []))
             send_sqs_messages(queue, environ, check_vals)
     runner_input = {'sqs_url': queue.url}

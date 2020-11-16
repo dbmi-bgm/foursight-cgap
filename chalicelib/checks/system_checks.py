@@ -67,13 +67,6 @@ def wipe_cgap_build_indices(connection, **kwargs):
 
 
 @check_function()
-def wipe_ff_build_indices(connection, **kwargs):
-    """ Wipes build (number prefixed) indices (on fourfront-testing) """
-    check = CheckResult(connection, 'wipe_ff_build_indices')
-    return wipe_build_indices(FF_TEST_CLUSTER, check)
-
-
-@check_function()
 def elastic_search_space(connection, **kwargs):
     """ Checks that our ES nodes all have a certain amount of space remaining """
     check = CheckResult(connection, 'elastic_search_space')
@@ -279,72 +272,6 @@ def indexing_records(connection, **kwargs):
     return check
 
 
-# this is a dummy check that is not run but instead updated with put API
-# do_not_store parameter ensures running this check normally won't add to s3
-@check_function(do_not_store=True)
-def staging_deployment(connection, **kwargs):
-    check = CheckResult(connection, 'staging_deployment')
-    return check
-
-
-@check_function()
-def fourfront_performance_metrics(connection, **kwargs):
-    check = CheckResult(connection, 'fourfront_performance_metrics')
-    full_output = {}  # contains ff_env, env_health, deploy_version, num instances, and performance
-    performance = {}  # keyed by check_url
-    # get information from elastic_beanstalk_health
-    eb_check = CheckResult(connection, 'elastic_beanstalk_health')
-    eb_info = eb_check.get_primary_result()['full_output']
-    full_output['ff_env'] = connection.ff_env
-    full_output['env_health'] = eb_info.get('health_status', 'Unknown')
-    # get deploy version from the first instance
-    full_output['deploy_version'] = eb_info.get('instance_health', [{}])[0].get('deploy_version', 'Unknown')
-    full_output['num_instances'] = len(eb_info.get('instance_health', []))
-    check_urls = [
-        'counts',
-        'joint-analysis-plans',
-        'bar_plot_aggregations/type=ExperimentSetReplicate&experimentset_type=replicate/?field=experiments_in_set.experiment_type',
-        'browse/?type=ExperimentSetReplicate&experimentset_type=replicate',
-        'experiment-set-replicates/4DNESIE5R9HS/',
-        'experiment-set-replicates/4DNESIE5R9HS/?datastore=database',
-        'experiment-set-replicates/4DNESQWI9K2F/',
-        'experiment-set-replicates/4DNESQWI9K2F/?datastore=database',
-        'workflow-runs-awsem/ba50d240-5312-4aa7-b600-6b18d8230311/',
-        'workflow-runs-awsem/ba50d240-5312-4aa7-b600-6b18d8230311/?datastore=database',
-        'files-fastq/4DNFIX75FSJM/',
-        'files-fastq/4DNFIX75FSJM/?datastore=database'
-    ]
-    for check_url in check_urls:
-        performance[check_url] = {}
-        try:
-            # set timeout really high
-            ff_resp = ff_utils.authorized_request(connection.ff_server + check_url,
-                                                  auth=connection.ff_keys, timeout=1000)
-        except Exception as e:
-            performance[check_url]['error'] = str(e)
-        if ff_resp and hasattr(ff_resp, 'headers') and 'X-stats' in ff_resp.headers:
-            x_stats = ff_resp.headers['X-stats']
-            if not isinstance(x_stats, basestring):
-                performance[check_url]['error'] = 'Stats response is not a string.'
-                continue
-            # X-stats in form: 'db_count=148&db_time=1215810&es_count=4& ... '
-            split_stats = x_stats.strip().split('&')
-            parse_stats = [stat.split('=') for stat in split_stats]
-            # stats can be strings or integers
-            for stat in parse_stats:
-                if not len(stat) == 2:
-                    continue
-                try:
-                    performance[check_url][stat[0]] = int(stat[1])
-                except ValueError:
-                    performance[check_url][stat[0]] = stat[1]
-            performance[check_url]['error'] = ''
-    check.status = 'PASS'
-    full_output['performance'] = performance
-    check.full_output = full_output
-    return check
-
-
 @check_function(time_limit=480)
 def secondary_queue_deduplication(connection, **kwargs):
     from ..utils import get_stage_info
@@ -501,41 +428,6 @@ def secondary_queue_deduplication(connection, **kwargs):
 
 
 @check_function()
-def clean_up_travis_queues(connection, **kwargs):
-    """
-    Clean up old sqs queues based on the name ("travis-job")
-    and the creation date. Only run on data for now
-    """
-    from ..utils import get_stage_info
-    check = CheckResult(connection, 'clean_up_travis_queues')
-    check.status = 'PASS'
-    if connection.fs_env != 'data' or get_stage_info()['stage'] != 'prod':
-        check.summary = check.description = 'This check only runs on the data environment for Foursight prod'
-        return check
-    sqs_client = boto3.client('sqs')
-    sqs = boto3.resource('sqs')
-    queues = sqs.queues.all()
-    num_deleted = 0
-    for queue in queues:
-        if 'travis-job' in queue.url:
-            try:
-                creation = queue.attributes['CreatedTimestamp']
-            except sqs_client.exceptions.QueueDoesNotExist:
-                continue
-            if isinstance(creation, basestring):
-                creation = float(creation)
-            dt_creation = datetime.datetime.utcfromtimestamp(creation)
-            queue_age = datetime.datetime.utcnow() - dt_creation
-            # delete queues 3 days old or older
-            if queue_age > datetime.timedelta(days=3):
-                queue.delete()
-                num_deleted += 1
-    check.summary = 'Cleaned up %s old indexing queues' % num_deleted
-    check.description = 'Cleaned up all indexing queues from Travis that are 3 days old or older. %s queues deleted.' % num_deleted
-    return check
-
-
-@check_function()
 def manage_old_filebeat_logs(connection, **kwargs):
     # import curator
     check = CheckResult(connection, 'manage_old_filebeat_logs')
@@ -590,32 +482,6 @@ def manage_old_filebeat_logs(connection, **kwargs):
     # check.status = "PASS"
     # check.description = 'Performed auto-backup to repository %s' % snapshot[:-1]
     # return check
-
-
-@check_function()
-def snapshot_rds(connection, **kwargs):
-    from ..utils import get_stage_info
-    check = CheckResult(connection, 'snapshot_rds')
-    if get_stage_info()['stage'] != 'prod':
-        check.summary = check.description = 'This check only runs on Foursight prod'
-        return check
-    # XXX: must be updated when cgap-blue/cgap-green come to fruition -will 4-1-2020
-    rds_name = 'fourfront-production' if (env_utils.is_fourfront_env(connection.ff_env) and env_utils.is_stg_or_prd_env(connection.ff_env)) else connection.ff_env
-    # snapshot ID can only have letters, numbers, and hyphens
-    snap_time = datetime.datetime.strptime(kwargs['uuid'], "%Y-%m-%dT%H:%M:%S.%f").strftime("%Y-%m-%dT%H-%M-%S")
-    snapshot_name = 'foursight-snapshot-%s-%s' % (rds_name, snap_time)
-    res = beanstalk_utils.create_db_snapshot(rds_name, snapshot_name)
-    if res == 'Deleting':  # XXX: How this^ function works should be changed - Will 6/2/2020
-        check.status = 'FAIL'
-        check.summary = check.description = 'Something went wrong during snaphot creation'
-    else:
-        check.status = 'PASS'
-        # there is a datetime in the response that must be str formatted
-        res['DBSnapshot']['InstanceCreateTime'] = str(res['DBSnapshot']['InstanceCreateTime'])
-        check.full_output = res
-        check.summary = 'Snapshot successfully created'
-        check.description = 'Snapshot succesfully created with name: %s' % snapshot_name
-    return check
 
 
 @check_function()
@@ -912,28 +778,4 @@ def check_long_running_ec2s(connection, **kwargs):
     else:
         check.status = 'PASS'
         check.summary = '%s EC2s running longer than 1 week' % (len(check.full_output))
-    return check
-
-
-@check_function(FS_dev='free', FF_hotseat='free', FF_mastertest='free', FF_webdev='free')
-def say_my_name(connection, **kwargs):
-    """List the person working on each environment."""
-    check = CheckResult(connection, 'say_my_name')
-    check.description = "Enter the new name or if you are done, use 'free' to clear your name"
-    check.summary = ""
-    check.brief_output = ""
-    check.status = "PASS"
-    output = {}
-    # update with the new parameters ()
-    for a_key in ['FS_dev', 'FF_hotseat', 'FF_mastertest', 'FF_webdev']:
-        if kwargs.get(a_key):
-            val = kwargs[a_key]
-            if val.lower() == 'free':
-                val = 'free'
-            output[a_key] = val
-        else:
-            output[a_key] = 'free'
-    sum = str(output)[1:-1].replace("'", "")
-    check.summary = sum
-    check.brief_output = sum
     return check

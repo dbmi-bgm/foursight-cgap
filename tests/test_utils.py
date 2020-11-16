@@ -1,7 +1,9 @@
 from conftest import *
+from chalicelib.vars import DEV_ENV
+
 
 class TestUtils():
-    environ = 'mastertest' # hopefully this is up
+    environ = DEV_ENV # hopefully this is up
     conn = app_utils.init_connection(environ)
     timestr_1 = '2017-04-09T17:34:53.423589+00:00' # UTC
     timestr_2 = '2017-04-09T17:34:53.423589+05:00' # 5 hours ahead of UTC
@@ -13,8 +15,8 @@ class TestUtils():
     timestr_bad_3 = '2017-xxxxxT17:34:53.423589'
 
     @utils.check_function(abc=123, do_not_store=True, uuid=datetime.datetime.utcnow().isoformat())
-    def test_function_dummy(*args, **kwargs):
-        connection = app_utils.init_connection('mastertest')
+    def test_function_dummy(self, *args, **kwargs):
+        connection = app_utils.init_connection(self.environ)
         check = utils.init_check_res(connection, 'not_a_check')
         check.summary = 'A string summary'
         check.description = 'A string description'

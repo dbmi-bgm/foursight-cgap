@@ -2,31 +2,32 @@ from conftest import *
 import json
 import boto3
 from botocore.exceptions import ClientError
-from dcicutils.env_utils import FF_PUBLIC_URL_PRD
+from dcicutils.env_utils import CGAP_PUBLIC_URL_PRD
+from chalicelib.vars import FOURSIGHT_PREFIX, DEV_ENV
 
 
 class TestAppUtils():
     """
     Meant for non-route utilities in chalicelib/app_utils.py
     """
-    environ = 'mastertest' # hopefully this is up
+    environ = DEV_ENV # hopefully this is up
     conn = app_utils.init_connection(environ)
 
     def test_init_connection(self):
         # test the fs connection
-        assert (self.conn.fs_env == 'mastertest')
+        assert (self.conn.fs_env == self.environ)
         assert (self.conn.connections)
         # test the ff connection
         assert (self.conn.ff_server)
         assert (self.conn.ff_es)
-        assert (self.conn.ff_env == 'fourfront-mastertest')
+        assert (self.conn.ff_env == 'fourfront-' + self.environ)
         assert (self.conn.ff_s3 is not None)
         assert (isinstance(self.conn.ff_keys, dict))
         assert ({'key', 'secret', 'server'} <= set(self.conn.ff_keys.keys()))
 
     def test_get_favicon(self):
-        """ Tests that given 'mastertest' we get the right url for favicon """
-        expected = FF_PUBLIC_URL_PRD + '/static/img/favicon-fs.ico'  # favicon acquired from prod
+        """ Tests that given DEV_ENV we get the right url for favicon """
+        expected = CGAP_PUBLIC_URL_PRD + '/static/img/favicon-fs.ico'  # favicon acquired from prod
         actual = app_utils.get_favicon(self.conn.ff_server)
         assert expected == actual
 
@@ -49,8 +50,8 @@ class TestAppUtils():
             assert ('es' in env_data)
             assert ('bucket' in env_data)
             assert ('ff_env' in env_data)
-        environments = app_utils.init_environments('mastertest')
-        assert ('mastertest' in environments)
+        environments = app_utils.init_environments(self.environ)
+        assert (self.environ in environments)
         # bad environment
         bad_envs = app_utils.init_environments('not_an_environment')
         assert (bad_envs == {})
@@ -95,12 +96,12 @@ class TestAppUtils():
         }  # mock a 'correct' jwt decode
         with mock.patch('chalicelib.app_utils.get_jwt', return_value='token'):
             with mock.patch('jwt.decode', return_value=payload1):
-                auth = app_utils.check_authorization({}, env='mastertest')
+                auth = app_utils.check_authorization({}, env=self.environ)
             assert auth
         with mock.patch('chalicelib.app_utils.get_jwt', return_value='token'):
             with mock.patch('jwt.decode', return_value=payload1):
                 # test authenticating on more than one env
-                auth = app_utils.check_authorization({}, env='mastertest,cgap-dev')
+                auth = app_utils.check_authorization({}, env=self.environ)
             assert auth
         # build a 'request header' that just consists of the context we would expect
         # to see if authenticating from localhost
@@ -126,7 +127,7 @@ class TestAppUtils():
                 "iat": 1516239022
             }
             with mock.patch('jwt.decode', return_value=payload2):
-                auth = app_utils.check_authorization({}, env='mastertest')
+                auth = app_utils.check_authorization({}, env=self.environ)
             assert not auth
             # Email not found
             payload3 = {
@@ -137,7 +138,7 @@ class TestAppUtils():
                 "iat": 1516239022
             }
             with mock.patch('jwt.decode', return_value=payload3):
-                auth = app_utils.check_authorization({}, env='mastertest')
+                auth = app_utils.check_authorization({}, env=self.environ)
             assert not auth
 
 
@@ -206,7 +207,7 @@ class TestAppUtils():
         """ Tests the delete foursight API on real S3 using a test bucket and fake env names """
         client = boto3.client('s3', region_name='us-east-1')
         resource = boto3.resource('s3', region_name='us-east-1')
-        test_bucket = 'foursight-unit-test-envs'
+        test_bucket = FOURSIGHT_PREFIX + '-unit-test-envs'
 
         # lets give it some bucket layout that mimics ours but is not exactly the same
         resource.create_bucket(Bucket=test_bucket)
@@ -224,8 +225,8 @@ class TestAppUtils():
             assert yellow_body['test'] == 'env'
             assert pink_body['test'] == 'env'
         except Exception as e:
-            raise AssertionError('Was not able to get expected foursight-unit-test-envs configs, '
-                                 'got exception: %s' % str(e))
+            raise AssertionError('Was not able to get expected %s-unit-test-envs configs, '
+                                 'got exception: %s' % (FOURSIGHT_PREFIX, str(e)))
 
         # ensure the one we wanted to delete is actually gone
         with pytest.raises(ClientError):

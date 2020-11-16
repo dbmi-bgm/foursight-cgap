@@ -1,8 +1,10 @@
 from conftest import *
+from chalicelib.vars import DEV_ENV
+
 
 class TestActionResult():
     act_name = 'test_only_action'
-    environ = 'mastertest' # hopefully this is up
+    environ = DEV_ENV  # hopefully this is up
     connection = app_utils.init_connection(environ)
 
     def test_action_result_methods(self):

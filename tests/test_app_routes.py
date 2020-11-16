@@ -1,7 +1,9 @@
 from conftest import *
+from chalicelib.vars import DEV_ENV
+
 
 class TestAppRoutes():
-    environ = 'mastertest' # hopefully this is up
+    environ = DEV_ENV  # hopefully this is up
     conn = app_utils.init_connection(environ)
 
     def test_view_foursight(self):
@@ -48,7 +50,7 @@ class TestAppRoutes():
         assert ('<!DOCTYPE html>' in res.body)
         assert ('Foursight' in res.body)
         assert ('Not logged in as admin' in res.body)
-        assert ('History for Indexing progress (mastertest)' in res.body)
+        assert ('History for Indexing progress (%s)' % DEV_ENV in res.body)
         assert ('<td>' in res.body)
         # run with bad environ
         res = app_utils.view_foursight_history('not_an_environment', test_check)
@@ -110,7 +112,7 @@ class TestAppRoutes():
 
     def test_put_environment(self):
         # this one is interesting... will be tested by putting a clone of
-        # mastertest into itself. actual fxn run is run_put_environment
+        # DEV_ENV into itself. actual fxn run is run_put_environment
         get_res = app_utils.run_get_environment(self.environ)
         env_data = get_res.body.get('details')
         # make sure the environ we have is legit
