@@ -22,7 +22,7 @@
       },
       "backend": "api",
       "chalice_version": "1.1.0",
-      "rest_api_id": "we0v248yi4",
+      "rest_api_id": "rhu34hagp7",
       "api_gateway_stage": "api",
       "region": "us-east-1",
       "layers": [
@@ -52,7 +52,7 @@
       },
       "backend": "api",
       "chalice_version": "1.1.0",
-      "rest_api_id": "kpqxwgx646",
+      "rest_api_id": "7iasus30mj",
       "api_gateway_stage": "api",
       "region": "us-east-1",
       "layers": [
