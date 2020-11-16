@@ -94,6 +94,7 @@ def init_connection(environ, _environments=None):
     """
     error_res = {}
     environments = init_environments(environ) if _environments is None else _environments
+    print("environments = %s" % str(environments))
     # if still not there, return an error
     if environ not in environments:
         error_res = {
