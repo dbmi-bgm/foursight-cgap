@@ -7,7 +7,7 @@ install:
 - poetry install
 - pip install coveralls
 script:
-- pytest --cov chalicelib tests
+- pytest -vv --cov chalicelib tests
 after_success:
 - coveralls
 - echo $TRAVIS_PULL_REQUEST
@@ -24,5 +24,5 @@ after_success:
   fi
   if  [[ $TRAVIS_BRANCH == 'master' ]]; then
     echo 'Triggering docs build';
-    curl -X POST -d "branches=master" -d "token=$DOCS_TOKEN" https://readthedocs.org/api/v2/webhook/foursight/99531/;
+    curl -X POST -d "branches=master" -d "token=$DOCS_TOKEN" readthedocs.org/api/v2/webhook/foursight-cgap/138355/;
   fi
