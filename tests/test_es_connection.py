@@ -3,7 +3,7 @@ from chalicelib.vars import DEV_ENV
 
 
 class TestESConnection():
-    environ = DEVN_ENV
+    environ = DEV_ENV
     conn = app_utils.init_connection(environ)
     index = 'unit_test_index'
     try:
