@@ -27,7 +27,7 @@ class TestAppUtils():
 
     def test_get_favicon(self):
         """ Tests that given DEV_ENV we get the right url for favicon """
-        expected = FF_PUBLIC_URL_PRD + '/static/img/favicon-fs.ico'  # favicon acquired from prod
+        expected = CGAP_PUBLIC_URL_PRD + '/static/img/favicon-fs.ico'  # favicon acquired from prod
         actual = app_utils.get_favicon(self.conn.ff_server)
         assert expected == actual
 
