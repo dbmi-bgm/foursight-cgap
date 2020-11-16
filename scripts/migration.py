@@ -5,6 +5,7 @@ import json
 sys.path.append('..')
 import app
 from chalicelib.es_connection import ESConnection
+from chalicelib.vars import FOURSIGHT_PREFIX
 
 # XXX: To use this script, run 'python migration.py <env> <stage>' in the root
 # directory of this repository.
@@ -37,7 +38,7 @@ def filt(k):
         return t < ONE_WEEK_AGO
 
 def clean(env, stage):
-    bucket_name = 'foursight-cgap-' + stage + '-' + env
+    bucket_name = FOURSIGHT_PREFIX + '-' + stage + '-' + env
     bucket = boto3.resource('s3').Bucket(bucket_name)
     client = boto3.client('s3')
     keys = []
@@ -65,7 +66,7 @@ def clean(env, stage):
         client.delete_objects(Bucket=bucket_name, Delete=fmt)
 
 def migrate(env, stage):
-    index_name = 'foursight-cgap-' + stage + '-' + env
+    index_name = FOURSIGHT_PREFIX + '-' + stage + '-' + env
 
     app.set_stage(stage)
     app.set_timeout(0)

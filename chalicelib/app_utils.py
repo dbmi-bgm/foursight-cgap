@@ -38,6 +38,7 @@ from .utils import (
     send_sqs_messages,
     get_sqs_attributes
 )
+from .vars import FOURSIGHT_PREFIX
 from .s3_connection import S3Connection
 
 CGAP_FAVICON = 'https://cgap.hms.harvard.edu/static/img/favicon-fs.ico'
@@ -51,7 +52,7 @@ jin_env = Environment(
 
 def init_environments(env='all', envs=None):
     """
-    Generate environment information from the foursight-cgap-envs bucket in s3.
+    Generate environment information from the envs bucket in s3.
     Returns a dictionary keyed by environment name with value of a sub-dict
     with the fields needed to initiate a connection.
 
@@ -59,9 +60,9 @@ def init_environments(env='all', envs=None):
     :param envs: allows you to specify multiple envs to be initialized
     """
     stage = get_stage_info()['stage']
-    s3_connection = S3Connection('foursight-cgap-envs')
+    s3_connection = S3Connection(FOURSIGHT_PREFIX + '-envs')
     env_keys = s3_connection.list_all_keys()
-    print("env_keys=%s from bucket %s" % (env_keys, 'foursight-cgap-envs'))
+    print("env_keys=%s from bucket %s" % (env_keys, FOURSIGHT_PREFIX + '-envs'))
     environments = {}
     if env != 'all':
         if env in env_keys:
@@ -79,7 +80,7 @@ def init_environments(env='all', envs=None):
                 'fourfront': env_res['fourfront'],
                 'es': env_res['es'],
                 'ff_env': env_res.get('ff_env', ''.join(['fourfront-', env_key])),
-                'bucket': ''.join(['foursight-cgap-', stage, '-', env_key])
+                'bucket': ''.join([FOURSIGHT_PREFIX + '-', stage, '-', env_key])
             }
             environments[env_key] = env_entry
     return environments
@@ -746,10 +747,10 @@ def run_put_environment(environ, env_data):
             'es': es_address,
             'ff_env': ff_env
         }
-        s3_connection = S3Connection('foursight-cgap-envs')
+        s3_connection = S3Connection(FOURSIGHT_PREFIX + '-envs')
         s3_connection.put_object(proc_environ, json.dumps(env_entry))
         stage = get_stage_info()['stage']
-        s3_bucket = ''.join(['foursight-cgap-', stage, '-', proc_environ])
+        s3_bucket = ''.join([FOURSIGHT_PREFIX + '-', stage, '-', proc_environ])
         bucket_res = s3_connection.create_bucket(s3_bucket)
         if not bucket_res:
             response = Response(
@@ -813,7 +814,7 @@ def run_get_environment(environ):
     return process_response(response)
 
 
-def run_delete_environment(environ, bucket='foursight-cgap-envs'):
+def run_delete_environment(environ, bucket=FOURSIGHT_PREFIX + '-envs'):
     """
     Removes the environ entry from the Foursight envs bucket. This effectively de-schedules all checks
     but does not remove any data.

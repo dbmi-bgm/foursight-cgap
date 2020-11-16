@@ -7,6 +7,7 @@ from git import Repo
 
 from ..run_result import CheckResult, ActionResult
 from ..utils import check_function, action_function
+from ..vars import FOURSIGHT_PREFIX
 from dcicutils.ff_utils import get_metadata
 from dcicutils.deployment_utils import EBDeployer
 from dcicutils.beanstalk_utils import compute_ff_stg_env
@@ -191,7 +192,7 @@ def _deploy_application_to_beanstalk(connection, **kwargs):
         return check
 
     if application_version_name is None:  # if not specified, use branch+timestamp
-        application_version_name = 'foursight-cgap-package-%s-%s' % (branch, datetime.datetime.utcnow())
+        application_version_name = FOURSIGHT_PREFIX + '-package-%s-%s' % (branch, datetime.datetime.utcnow())
 
     if repo is not None:  # NOTE: if you specify this, assume a CGAP deployment
         repo_location = clone_repo_to_temporary_dir(repo, name='cgap-portal')

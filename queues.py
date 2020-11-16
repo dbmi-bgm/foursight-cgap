@@ -1,9 +1,9 @@
 import boto3
-
+from chalicelib.vars import FOURSIGHT_PREFIX
 
 class Queues(object):
     """create and configure queues for foursight"""
-    prefix = 'foursight-cgap'
+    prefix = FOURSIGHT_PREFIX
     suffices = ['dev-check-queue', 'prod-check-queue', 'test-check-queue']
 
     def __init__(self):
