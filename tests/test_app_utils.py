@@ -2,7 +2,7 @@ from conftest import *
 import json
 import boto3
 from botocore.exceptions import ClientError
-from dcicutils.env_utils import FF_PUBLIC_URL_PRD
+from dcicutils.env_utils import CGAP_PUBLIC_URL_PRD
 from chalicelib.vars import FOURSIGHT_PREFIX, DEV_ENV
 
 
