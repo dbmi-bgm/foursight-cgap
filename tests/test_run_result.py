@@ -2,7 +2,7 @@ from conftest import *
 
 class TestRunResult():
     check_name = 'test_only_check'
-    environ = 'mastertest'
+    environ = 'cgapdev'
     connection = app_utils.init_connection(environ)
     run = run_result.RunResult(connection, check_name)
 

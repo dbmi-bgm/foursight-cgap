@@ -1,7 +1,7 @@
 from conftest import *
 
 class TestS3Connection():
-    environ = 'mastertest'
+    environ = 'cgapdev'
     conn = app_utils.init_connection(environ)
 
     def test_s3_conn_fields(self):
