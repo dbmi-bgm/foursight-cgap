@@ -51,7 +51,7 @@ jin_env = Environment(
 
 def init_environments(env='all', envs=None):
     """
-    Generate environment information from the foursight-envs bucket in s3.
+    Generate environment information from the foursight-cgap-envs bucket in s3.
     Returns a dictionary keyed by environment name with value of a sub-dict
     with the fields needed to initiate a connection.
 
@@ -746,10 +746,10 @@ def run_put_environment(environ, env_data):
             'es': es_address,
             'ff_env': ff_env
         }
-        s3_connection = S3Connection('foursight-envs')
+        s3_connection = S3Connection('foursight-cgap-envs')
         s3_connection.put_object(proc_environ, json.dumps(env_entry))
         stage = get_stage_info()['stage']
-        s3_bucket = ''.join(['foursight-', stage, '-', proc_environ])
+        s3_bucket = ''.join(['foursight-cgap-', stage, '-', proc_environ])
         bucket_res = s3_connection.create_bucket(s3_bucket)
         if not bucket_res:
             response = Response(
@@ -813,7 +813,7 @@ def run_get_environment(environ):
     return process_response(response)
 
 
-def run_delete_environment(environ, bucket='foursight-envs'):
+def run_delete_environment(environ, bucket='foursight-cgap-envs'):
     """
     Removes the environ entry from the Foursight envs bucket. This effectively de-schedules all checks
     but does not remove any data.

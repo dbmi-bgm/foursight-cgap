@@ -24,7 +24,7 @@ def setup_stage(stage):
 
 def setup_env(env):
     if not env:
-        connection = app.init_connection('mastertest')
+        connection = app.init_connection('cgapdev')
     else:
         if env not in ENVS:
             print('Bad env')
@@ -44,7 +44,7 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument('check', help='full check name')
-    parser.add_argument('--env', help='env name, mastertest by default')
+    parser.add_argument('--env', help='env name, cgapdev by default')
     parser.add_argument('--stage', help='stage, dev or prod, dev by default')
     args = parser.parse_args()
 

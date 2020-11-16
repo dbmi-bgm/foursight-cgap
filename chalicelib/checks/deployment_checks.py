@@ -179,7 +179,7 @@ def _deploy_application_to_beanstalk(connection, **kwargs):
         fixed by refactoring "store_formatted_result". - Will 05/28/2020
     """
     check = CheckResult(connection, 'deploy_application_to_beanstalk')
-    env = kwargs.get('env', 'fourfront-mastertest')  # by default
+    env = kwargs.get('env', 'fourfront-cgapdev')  # by default
     branch = kwargs.get('branch', 'master')  # by default deploy master
     application_version_name = kwargs.get('application_version_name', None)
     repo = kwargs.get('repo', None)
@@ -191,7 +191,7 @@ def _deploy_application_to_beanstalk(connection, **kwargs):
         return check
 
     if application_version_name is None:  # if not specified, use branch+timestamp
-        application_version_name = 'foursight-package-%s-%s' % (branch, datetime.datetime.utcnow())
+        application_version_name = 'foursight-cgap-package-%s-%s' % (branch, datetime.datetime.utcnow())
 
     if repo is not None:  # NOTE: if you specify this, assume a CGAP deployment
         repo_location = clone_repo_to_temporary_dir(repo, name='cgap-portal')
@@ -222,7 +222,7 @@ def _deploy_application_to_beanstalk(connection, **kwargs):
     return check
 
 
-@check_function(env='fourfront-mastertest',
+@check_function(env='fourfront-cgapdev',
                 branch='master',
                 application_version_name=None, repo=None)
 def deploy_application_to_beanstalk(connection, **kwargs):

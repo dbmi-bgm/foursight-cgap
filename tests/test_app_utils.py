@@ -206,7 +206,7 @@ class TestAppUtils():
         """ Tests the delete foursight API on real S3 using a test bucket and fake env names """
         client = boto3.client('s3', region_name='us-east-1')
         resource = boto3.resource('s3', region_name='us-east-1')
-        test_bucket = 'foursight-unit-test-envs'
+        test_bucket = 'foursight-cgap-unit-test-envs'
 
         # lets give it some bucket layout that mimics ours but is not exactly the same
         resource.create_bucket(Bucket=test_bucket)
@@ -224,7 +224,7 @@ class TestAppUtils():
             assert yellow_body['test'] == 'env'
             assert pink_body['test'] == 'env'
         except Exception as e:
-            raise AssertionError('Was not able to get expected foursight-unit-test-envs configs, '
+            raise AssertionError('Was not able to get expected foursight-cgap-unit-test-envs configs, '
                                  'got exception: %s' % str(e))
 
         # ensure the one we wanted to delete is actually gone

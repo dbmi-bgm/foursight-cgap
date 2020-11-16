@@ -12,7 +12,7 @@ class TestS3Connection():
 
     def test_test_s3_conn_methods(self):
         # clean up after yourself
-        test_s3_conn = s3_connection.S3Connection('foursight-test-s3')
+        test_s3_conn = s3_connection.S3Connection('foursight-cgap-test-s3')
         test_key = 'test/' + ff_utils.generate_rand_accession()
         test_value = {'abc': 123}
         assert (test_s3_conn.status_code != 404)
