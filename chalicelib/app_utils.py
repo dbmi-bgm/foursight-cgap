@@ -63,6 +63,7 @@ def init_environments(env='all', envs=None):
     stage = get_stage_info()['stage']
     s3_connection = S3Connection('foursight-cgap-envs')
     env_keys = s3_connection.list_all_keys()
+    print("env_keys=%s from bucket %s" % (env_keys, 'foursight-cgap-envs'))
     environments = {}
     if env != 'all':
         if env in env_keys:
