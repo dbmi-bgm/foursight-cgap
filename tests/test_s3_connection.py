@@ -1,8 +1,9 @@
 from conftest import *
-from chalicelib.vars import FOURSIGHT_PREFIX
+from chalicelib.vars import FOURSIGHT_PREFIX, DEV_ENV
+
 
 class TestS3Connection():
-    environ = 'cgapdev'
+    environ = DEV_ENV
     conn = app_utils.init_connection(environ)
 
     def test_s3_conn_fields(self):

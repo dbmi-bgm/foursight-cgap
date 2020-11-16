@@ -1,5 +1,5 @@
 from conftest import *
-from chalicelib.vars import FOURSIGHT_PREFIX
+from chalicelib.vars import FOURSIGHT_PREFIX, DEV_ENV
 
 
 def delay_rerun(*args):
@@ -28,7 +28,7 @@ def captured_output():
         sys.stdout, sys.stderr = old_out, old_err
 
 class TestCheckRunner():
-    environ = 'cgapdev'
+    environ = DEV_ENV
     app.set_stage('test')
     connection = app_utils.init_connection(environ)
     connection.connections['es'] = None # disable es

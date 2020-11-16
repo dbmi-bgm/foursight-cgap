@@ -4,16 +4,14 @@ import shutil
 import datetime
 import tempfile
 from git import Repo
-
 from ..run_result import CheckResult, ActionResult
 from ..utils import check_function, action_function
-from ..vars import FOURSIGHT_PREFIX
+from ..vars import FOURSIGHT_PREFIX, DEV_ENV
 from dcicutils.ff_utils import get_metadata
 from dcicutils.deployment_utils import EBDeployer
 from dcicutils.beanstalk_utils import compute_ff_stg_env
 from dcicutils.env_utils import (
     FF_ENV_INDEXER, CGAP_ENV_INDEXER, is_fourfront_env, is_cgap_env,
-
 )
 from dcicutils.beanstalk_utils import (
     compute_cgap_prd_env, compute_ff_prd_env, beanstalk_info, is_indexing_finished
@@ -180,7 +178,7 @@ def _deploy_application_to_beanstalk(connection, **kwargs):
         fixed by refactoring "store_formatted_result". - Will 05/28/2020
     """
     check = CheckResult(connection, 'deploy_application_to_beanstalk')
-    env = kwargs.get('env', 'fourfront-cgapdev')  # by default
+    env = kwargs.get('env', 'fourfront-' + DEV_ENV)  # by default
     branch = kwargs.get('branch', 'master')  # by default deploy master
     application_version_name = kwargs.get('application_version_name', None)
     repo = kwargs.get('repo', None)
@@ -223,7 +221,7 @@ def _deploy_application_to_beanstalk(connection, **kwargs):
     return check
 
 
-@check_function(env='fourfront-cgapdev',
+@check_function(env='fourfront-' + DEV_ENV,
                 branch='master',
                 application_version_name=None, repo=None)
 def deploy_application_to_beanstalk(connection, **kwargs):

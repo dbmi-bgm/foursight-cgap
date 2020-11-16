@@ -1,7 +1,9 @@
 from conftest import *
+from chalicelib.vars import DEV_ENV
+
 
 class TestUtils():
-    environ = 'cgapdev' # hopefully this is up
+    environ = DEV_ENV # hopefully this is up
     conn = app_utils.init_connection(environ)
     timestr_1 = '2017-04-09T17:34:53.423589+00:00' # UTC
     timestr_2 = '2017-04-09T17:34:53.423589+05:00' # 5 hours ahead of UTC

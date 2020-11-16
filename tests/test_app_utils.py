@@ -3,14 +3,14 @@ import json
 import boto3
 from botocore.exceptions import ClientError
 from dcicutils.env_utils import FF_PUBLIC_URL_PRD
-from chalicelib.vars import FOURSIGHT_PREFIX
+from chalicelib.vars import FOURSIGHT_PREFIX, DEV_ENV
 
 
 class TestAppUtils():
     """
     Meant for non-route utilities in chalicelib/app_utils.py
     """
-    environ = 'cgapdev' # hopefully this is up
+    environ = DEV_ENV # hopefully this is up
     conn = app_utils.init_connection(environ)
 
     def test_init_connection(self):
@@ -26,7 +26,7 @@ class TestAppUtils():
         assert ({'key', 'secret', 'server'} <= set(self.conn.ff_keys.keys()))
 
     def test_get_favicon(self):
-        """ Tests that given 'cgapdev' we get the right url for favicon """
+        """ Tests that given DEV_ENV we get the right url for favicon """
         expected = FF_PUBLIC_URL_PRD + '/static/img/favicon-fs.ico'  # favicon acquired from prod
         actual = app_utils.get_favicon(self.conn.ff_server)
         assert expected == actual

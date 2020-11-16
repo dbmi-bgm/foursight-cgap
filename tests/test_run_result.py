@@ -1,8 +1,10 @@
 from conftest import *
+from chalicelib.vars import DEV_ENV
+
 
 class TestRunResult():
     check_name = 'test_only_check'
-    environ = 'cgapdev'
+    environ = DEV_ENV
     connection = app_utils.init_connection(environ)
     run = run_result.RunResult(connection, check_name)
 
