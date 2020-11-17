@@ -1,5 +1,4 @@
 from conftest import *
-from chalicelib.vars import DEV_ENV
 
 
 class TestRunResult():

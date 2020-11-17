@@ -1,5 +1,4 @@
 from conftest import *
-from chalicelib.vars import FOURSIGHT_PREFIX, DEV_ENV
 
 
 def delay_rerun(*args):

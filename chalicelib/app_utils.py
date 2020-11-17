@@ -14,9 +14,9 @@ from itertools import chain
 from dateutil import tz
 from base64 import b64decode
 from dcicutils import ff_utils
-from .fs_connection import FSConnection
+from foursight_core.chalicelib.fs_connection import FSConnection
 from .run_result import CheckResult, ActionResult
-from .check_utils import (
+from foursight_core.chalicelib.check_utils import (
     get_grouped_check_results,
     get_check_strings,
     get_action_strings,
@@ -39,7 +39,7 @@ from .utils import (
     get_sqs_attributes
 )
 from .vars import FOURSIGHT_PREFIX
-from .s3_connection import S3Connection
+from foursight_core.chalicelib.s3_connection import S3Connection
 
 CGAP_FAVICON = 'https://cgap.hms.harvard.edu/static/img/favicon-fs.ico'
 LAMBDA_MAX_BODY_SIZE = 5500000  # 6Mb is the "real" threshold

@@ -12,7 +12,7 @@ import json
 import re
 from functools import wraps, partial
 from .run_result import CheckResult, ActionResult, BadCheckOrAction
-from .s3_connection import S3Connection
+from foursight_core.chalicelib.s3_connection import S3Connection
 from .vars import FOURSIGHT_PREFIX
 
 CHECK_DECO = 'check_function'

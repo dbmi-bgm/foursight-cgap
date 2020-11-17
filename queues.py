@@ -1,22 +1,10 @@
 import boto3
-from chalicelib.vars import FOURSIGHT_PREFIX
+from .chalicelib.vars import FOURSIGHT_PREFIX
+from foursight_core.queues import Queues as _Queues
 
-class Queues(object):
+class Queues(_Queues):
     """create and configure queues for foursight"""
     prefix = FOURSIGHT_PREFIX
-    suffices = ['dev-check-queue', 'prod-check-queue', 'test-check-queue']
-
-    def __init__(self):
-        pass
-
-    @property
-    def queue_names(self):
-        return [self.prefix + '-' + suffix for suffix in self.suffices]
-
-    def create_queues(self):
-        sqs = boto3.client('sqs')
-        for queue in self.queue_names:
-            sqs.create_queue(QueueName=queue)
 
 
 def main():
