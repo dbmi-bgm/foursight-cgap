@@ -13,7 +13,7 @@ from foursight_core.chalicelib import (
     fs_connection,
     s3_connection,
     es_connection,
-    exception
+    exceptions
 )
 from foursight_core.chalicelib.utils import *
 from chalicelib import (
