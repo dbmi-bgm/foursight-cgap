@@ -347,7 +347,7 @@ def set_stage(stage):
 
 
 def set_timeout(timeout):
-    from .chalicelib.utils import CHECK_TIMEOUT
+    from foursight_core.chalicelib.utils import CHECK_TIMEOUT
     try:
         timeout = int(timeout)
     except ValueError:
