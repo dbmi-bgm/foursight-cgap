@@ -4,7 +4,7 @@ import json
 import os
 import requests
 import datetime
-from .chalicelib.app_utils import AppUtils
+from chalicelib.app_utils import AppUtils
 
 app = Chalice(app_name='foursight-cgap')
 app.debug = True
