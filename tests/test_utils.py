@@ -3,7 +3,7 @@ from conftest import *
 
 class TestUtils():
     environ = DEV_ENV # hopefully this is up
-    conn = app_utils.init_connection(environ)
+    conn = app_utils.AppUtils.init_connection(environ)
     timestr_1 = '2017-04-09T17:34:53.423589+00:00' # UTC
     timestr_2 = '2017-04-09T17:34:53.423589+05:00' # 5 hours ahead of UTC
     timestr_3 = '2017-04-09T17:34:53.423589-05:00' # 5 hours behind of UTC
@@ -15,8 +15,8 @@ class TestUtils():
 
     @utils.check_function(abc=123, do_not_store=True, uuid=datetime.datetime.utcnow().isoformat())
     def test_function_dummy(self, *args, **kwargs):
-        connection = app_utils.init_connection(self.environ)
-        check = utils.init_check_res(connection, 'not_a_check')
+        connection = app_utils.AppUtils.init_connection(self.environ)
+        check = run_result.CheckResult(connection, 'not_a_check')
         check.summary = 'A string summary'
         check.description = 'A string description'
         check.ff_link = 'A string link'
@@ -26,26 +26,26 @@ class TestUtils():
 
     def test_get_stage_info(self):
         # after using app.set_stage('test')
-        info = utils.get_stage_info()
+        info = config.Config.get_stage_info()
         assert ({'stage', 'runner_name', 'queue_name'} <= set(info.keys()))
         assert (info['stage'] == 'dev')
         assert ('dev' in info['runner_name'])
         assert ('test' in info['queue_name'])
 
     def test_check_timeout(self):
-        assert (isinstance(utils.CHECK_TIMEOUT, int))
+        assert (isinstance(CHECK_TIMEOUT, int))
 
     @pytest.mark.skip  # Works but does not behave correctly with pytest
     def test_check_times_out(self):
         # set to one second, which is slower than test check
-        utils.CHECK_TIMEOUT = 1
+        CHECK_TIMEOUT = 1
         with pytest.raises(SystemExit) as exc:
-            check_utils.run_check_or_action(self.conn, 'test_checks/test_random_nums', {})
+            check_utils.CheckHandler.run_check_or_action(self.conn, 'test_checks/test_random_nums', {})
         assert ('-RUN-> TIMEOUT' in str(exc.value))
-        utils.CHECK_TIMEOUT = 870
+        CHECK_TIMEOUT = 870
 
     def test_list_environments(self):
-        env_list = utils.list_environments()
+        env_list = config.Config.list_environments()
         # assume we have at least one environments
         assert (isinstance(env_list, list))
         assert (self.environ in env_list)
@@ -72,26 +72,16 @@ class TestUtils():
 
     def test_handle_kwargs(self):
         default_kwargs = {'abc': 123, 'bcd': 234}
-        kwargs = utils.handle_kwargs({'abc': 345}, default_kwargs)
+        kwargs = decorators.Decorators.handle_kwargs({'abc': 345}, default_kwargs)
         assert (kwargs.get('abc') == 345)
         assert (kwargs.get('bcd') == 234)
         assert (kwargs.get('uuid').startswith('20'))
         assert (kwargs.get('primary') == False)
 
-    def test_init_check_res(self):
-        check = utils.init_check_res(self.conn, 'test_check')
-        assert (check.name == 'test_check')
-        assert (check.connections['s3'] is not None)
-
-    def test_init_action_res(self):
-        action = utils.init_action_res(self.conn, 'test_action')
-        assert (action.name == 'test_action')
-        assert (action.connections['s3'] is not None)
-
     def test_parse_datetime_to_utc(self):
         [dt_tz_a, dt_tz_b, dt_tz_c] = ['None'] * 3
         for t_str in [self.timestr_1, self.timestr_2, self.timestr_3, self.timestr_4]:
-            dt = utils.parse_datetime_to_utc(t_str)
+            dt = sys_utils.parse_datetime_to_utc(t_str)
             assert (dt is not None)
             assert (dt.tzinfo is not None and dt.tzinfo == tz.tzutc())
             if t_str == self.timestr_1:
@@ -102,25 +92,20 @@ class TestUtils():
                 dt_tz_c = dt
         assert (dt_tz_c > dt_tz_a > dt_tz_b)
         for bad_tstr in [self.timestr_bad_1, self.timestr_bad_2, self.timestr_bad_3]:
-            dt_bad = utils.parse_datetime_to_utc(bad_tstr)
+            dt_bad = sys_utils.parse_datetime_to_utc(bad_tstr)
             assert (dt_bad is None)
         # use a manual format
-        dt_5_man = utils.parse_datetime_to_utc(self.timestr_5, manual_format="%Y-%m-%dT%H:%M:%S")
-        dt_5_auto = utils.parse_datetime_to_utc(self.timestr_5)
+        dt_5_man = sys_utils.parse_datetime_to_utc(self.timestr_5, manual_format="%Y-%m-%dT%H:%M:%S")
+        dt_5_auto = sys_utils.parse_datetime_to_utc(self.timestr_5)
         assert (dt_5_auto == dt_5_man)
-
-    def test_camel_case_to_snake(self):
-        camel_test = 'SomeCamelCaseString'
-        snake_res = utils.convert_camel_to_snake(camel_test)
-        assert snake_res == 'some_camel_case_string'
 
     def test_get_s3_utils(self):
         """
         Sanity test for s3 utils for all envs
         """
-        environments = [env for env in app_utils.init_environments() if 'cgap' not in env]
+        environments = [env for env in app_utils.AppUtils.init_environments() if 'cgap' not in env]
         for env in environments:
-            conn = app_utils.init_connection(env)
+            conn = app_utils.AppUtils.init_connection(env)
             s3_obj = s3_utils.s3Utils(env=conn.ff_env)
             assert (s3_obj.sys_bucket is not None)
             assert (s3_obj.outfile_bucket is not None)
@@ -129,12 +114,3 @@ class TestUtils():
             assert ({'server', 'key', 'secret'} <= set(ff_keys.keys()))
             hg_keys = s3_obj.get_higlass_key()
             assert ({'server', 'key', 'secret'} <= set(hg_keys.keys()))
-
-    def test_load_store_json(self):
-        """ Loads JSON, stores it in temp, re-loads to see if its the same """
-        import os
-        j = utils.load_json(__file__, './test_checks/check1.json')
-        utils.store_json(__file__, './test_checks/test.json', j)
-        reloaded = utils.load_json(__file__, './test_checks/test.json')
-        assert j == reloaded
-        os.remove(os.path.join(os.path.dirname(__file__), './test_checks/test.json'))

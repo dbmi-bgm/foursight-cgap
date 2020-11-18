@@ -9,14 +9,17 @@ import time
 import boto3
 import app
 from foursight_core.chalicelib import (
+    sys_utils,
+    sqs_utils,
     fs_connection,
     s3_connection,
-    es_connection,
-    check_utils,
+    es_connection
 )
+from foursight_core.chalicelib.utils import *
 from chalicelib import (
     app_utils,
-    utils,
+    check_utils,
+    decorators,
     run_result,
 )
 from chalicelib.vars import *
@@ -29,7 +32,7 @@ import pytest
 def setup():
     app.set_stage('test')  # set the stage info for tests
     test_client = boto3.client('sqs')  # purge test queue
-    queue_url = utils.get_sqs_queue().url
+    queue_url = sqs_utils.get_sqs_queue().url
     try:
         test_client.purge_queue(
             QueueUrl=queue_url

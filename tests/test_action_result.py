@@ -4,7 +4,7 @@ from conftest import *
 class TestActionResult():
     act_name = 'test_only_action'
     environ = DEV_ENV  # hopefully this is up
-    connection = app_utils.init_connection(environ)
+    connection = app_utils.AppUtils.init_connection(environ)
 
     def test_action_result_methods(self):
         action = run_result.ActionResult(self.connection, self.act_name)

@@ -4,7 +4,7 @@ from conftest import *
 class TestRunResult():
     check_name = 'test_only_check'
     environ = DEV_ENV
-    connection = app_utils.init_connection(environ)
+    connection = app_utils.AppUtils.init_connection(environ)
     run = run_result.RunResult(connection, check_name)
 
     def setup_valid_check(self):

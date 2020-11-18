@@ -3,7 +3,7 @@ from conftest import *
 
 class TestS3Connection():
     environ = DEV_ENV
-    conn = app_utils.init_connection(environ)
+    conn = app_utils.AppUtils.init_connection(environ)
 
     def test_s3_conn_fields(self):
         s3_conn = self.conn.connections['s3']

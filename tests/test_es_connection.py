@@ -3,10 +3,10 @@ from conftest import *
 
 class TestESConnection():
     environ = DEV_ENV
-    conn = app_utils.init_connection(environ)
+    conn = app_utils.AppUtils.init_connection(environ)
     index = 'unit_test_index'
     try:
-        es = es_connection.ESConnection(index)
+        es = es_connection.ESConnection(index, host=HOST)
         es.delete_index(index)
     except:
         es = None # tests should be marked as skip

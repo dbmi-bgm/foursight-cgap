@@ -7,7 +7,7 @@ class TestCheckResult():
     # another fake check, with only ERROR results
     error_check_name = 'test_only_error_check'
     environ = DEV_ENV  # hopefully this is up
-    connection = app_utils.init_connection(environ)
+    connection = app_utils.AppUtils.init_connection(environ)
 
     @pytest.mark.flaky(max_runs=4) # very flaky for some reason
     @pytest.mark.parametrize('use_es', [True, False])

@@ -3,14 +3,14 @@ from conftest import *
 
 class TestCheckUtils():
     environ = DEV_ENV  # hopefully this is up
-    connection = app_utils.init_connection(environ)
+    connection = app_utils.AppUtils.init_connection(environ)
 
     def test_get_check_strings(self):
         # do this for every check
         all_check_strs = check_utils.get_check_strings()
         for check_str in all_check_strs:
             get_check = check_str.split('/')[1]
-            chalice_resp = app_utils.run_get_check(self.environ, get_check)
+            chalice_resp = app_utils.AppUtils.run_get_check(self.environ, get_check)
             body = chalice_resp.body
             if body.get('status') == 'success':
                 assert (chalice_resp.status_code == 200)

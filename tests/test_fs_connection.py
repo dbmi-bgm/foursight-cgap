@@ -7,7 +7,7 @@ class TestFSConnection():
         'bucket': None,
         'ff_env': 'test3'
     }
-    connection = fs_connection.FSConnection('test', environ_info, test=True)
+    connection = fs_connection.FSConnection('test', environ_info, test=True, host=HOST)
 
     def test_connection_fields(self):
         assert (self.connection.fs_env == 'test')
@@ -25,7 +25,7 @@ class TestFSConnection():
         assert (check_res.get('name') == 'item_counts_by_type')
 
     def test_check_result_basics(self):
-        test_check = utils.init_check_res(self.connection, 'test_check')
+        test_check = run_result.CheckResult(self.connection, 'test_check')
         test_check.summary = 'Unittest check'
         test_check.ff_link = 'not_a_real_http_link'
         assert (test_check.connections['s3'].status_code == 404)
@@ -50,5 +50,5 @@ class TestFSConnection():
     def test_bad_ff_connection_in_fs_connection(self):
         # do not set test=True, should raise because it's not a real FF
         with pytest.raises(Exception) as exec_info:
-            bad_connection = fs_connection.FSConnection('test', self.environ_info)
+            bad_connection = fs_connection.FSConnection('test', self.environ_info, host=HOST)
         assert ('Could not initiate connection to Fourfront' in str(exec_info.value))
