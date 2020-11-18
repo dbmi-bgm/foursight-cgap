@@ -55,9 +55,9 @@ class TestRunResult():
         assert ("is not of type <class 'str'>" in str(exc.value))
 
     def test_BadCheckOrAction(self):
-        test_exc = utils.BadCheckOrAction()
+        test_exc = run_result.BadCheckOrAction()
         assert (str(test_exc) == 'Check or action function seems to be malformed.')
-        test_exc = utils.BadCheckOrAction('Abcd')
+        test_exc = run_result.BadCheckOrAction('Abcd')
         assert (str(test_exc) == 'Abcd')
 
     @pytest.mark.flaky

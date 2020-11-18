@@ -19,7 +19,8 @@ class TestFSConnection():
         assert (self.connection.ff_keys is None)
 
     def test_run_check_with_bad_connection(self):
-        check_res = check_utils.run_check_or_action(self.connection, 'wrangler_checks/item_counts_by_type', {})
+        check_handler = check_utils.CheckHandler()
+        check_res = check_handler.run_check_or_action(self.connection, 'wrangler_checks/item_counts_by_type', {})
         # run_check_or_action returns a dict with results
         assert (check_res.get('status') == 'ERROR')
         assert (check_res.get('name') == 'item_counts_by_type')
