@@ -1,13 +1,15 @@
 import json
 from datetime import datetime
-from ..utils import (
-    check_function,
-    action_function,
-)
 from ..run_result import CheckResult, ActionResult
 from dcicutils import ff_utils, s3Utils
 from .helpers import cgap_utils, wfrset_cgap_utils
+from ..decorators import Decorators
+check_function = Decorators.check_function
+action_function = Decorators.action_function
+
+
 lambda_limit = cgap_utils.lambda_limit
+
 
 # list of acceptible version
 cgap_partI_version = ['WGS_partI_V11', 'WGS_partI_V12', 'WGS_partI_V13', 'WGS_partI_V15', 'WGS_partI_V16', 'WGS_partI_V17']

@@ -1,11 +1,4 @@
 from __future__ import print_function, unicode_literals
-from ..utils import (
-    check_function,
-    action_function,
-)
-from ..run_result import CheckResult, ActionResult
-from dcicutils import ff_utils
-from dcicutils.env_utils import FF_PROD_BUCKET_ENV
 import re
 import requests
 import json
@@ -15,8 +8,15 @@ import itertools
 import random
 from fuzzywuzzy import fuzz
 import boto3
-from .helpers import wrangler_utils
 from collections import Counter
+from dcicutils import ff_utils
+from dcicutils.env_utils import FF_PROD_BUCKET_ENV
+from .helpers import wrangler_utils
+from ..run_result import CheckResult, ActionResult
+from ..decorators import Decorators
+check_function = Decorators.check_function
+action_function = Decorators.action_function
+
 
 # use a random number to stagger checks
 random_wait = 20

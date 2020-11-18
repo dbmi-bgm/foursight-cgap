@@ -1,11 +1,10 @@
 from __future__ import print_function, unicode_literals
-from ..utils import (
-    check_function,
-    action_function,
-)
-from ..run_result import CheckResult, ActionResult
 import random
 import time
+from ..run_result import CheckResult, ActionResult
+from ..decorators import Decorators
+check_function = Decorators.check_function
+action_function = Decorators.action_function
 
 
 def test_function_unused():

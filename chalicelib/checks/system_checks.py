@@ -1,7 +1,15 @@
 from __future__ import print_function, unicode_literals
-from ..utils import (
-    check_function,
+import re
+import requests
+import json
+import datetime
+import boto3
+import time
+from dcicutils.misc_utils import Retry
+from foursight_core.chalicelib.utils import (
     basestring,
+)
+from foursight_core.chalicelib.sys_utils import (
     cat_indices
 )
 from ..run_result import CheckResult
@@ -11,13 +19,9 @@ from dcicutils import (
     beanstalk_utils,
     env_utils
 )
-from dcicutils.misc_utils import Retry
-import re
-import requests
-import json
-import datetime
-import boto3
-import time
+from ..decorators import Decorators
+check_function = Decorators.check_function
+action_function = Decorators.action_function
 
 
 # XXX: put into utils?
