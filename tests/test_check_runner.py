@@ -33,7 +33,7 @@ class TestCheckRunner():
     connection.connections['es'] = None # disable es
     # set up a queue for test checks
     stage_info = config.Config.get_stage_info()
-    queue = sqs_utils.get_sqs_queue()
+    queue = sqs_utils.SQS.get_sqs_queue()
 
     def clear_queue_and_runners(self):
         """
@@ -43,7 +43,7 @@ class TestCheckRunner():
         tries = 0
         found_clear = True
         while tries < 10:
-            sqs_attrs = sqs_utils.get_sqs_attributes(self.queue.url)
+            sqs_attrs = sqs_utils.SQS.get_sqs_attributes(self.queue.url)
             vis_messages = int(sqs_attrs.get('ApproximateNumberOfMessages'))
             invis_messages = int(sqs_attrs.get('ApproximateNumberOfMessagesNotVisible'))
             if vis_messages == 0 and invis_messages == 0:
@@ -192,7 +192,7 @@ class TestCheckRunner():
         # wait for queue to empty
         while finished_count < 2:
             time.sleep(1)
-            sqs_attrs = sqs_utils.get_sqs_attributes(run_input.get('sqs_url'))
+            sqs_attrs = sqs_utils.SQS.get_sqs_attributes(run_input.get('sqs_url'))
             vis_messages = int(sqs_attrs.get('ApproximateNumberOfMessages'))
             invis_messages = int(sqs_attrs.get('ApproximateNumberOfMessagesNotVisible'))
             if vis_messages == 0 and invis_messages == 0:
@@ -261,7 +261,7 @@ class TestCheckRunner():
 
     def test_get_sqs_attributes(self):
         # bad sqs url
-        bad_sqs_attrs = sqs_utils.get_sqs_attributes('not_a_queue')
+        bad_sqs_attrs = sqs_utils.SQS.get_sqs_attributes('not_a_queue')
         assert (bad_sqs_attrs.get('ApproximateNumberOfMessages') == bad_sqs_attrs.get('ApproximateNumberOfMessagesNotVisible') == 'ERROR')
 
     def test_record_and_collect_run_info(self):

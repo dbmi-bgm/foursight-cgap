@@ -10,6 +10,7 @@ from .vars import (
 from foursight_core.chalicelib.app_utils import AppUtils as _AppUtils
 from .run_result import CheckResult, ActionResult
 from .check_utils import CheckHandler
+from .sqs_utils import SQS
 from .config import Config
 
 
@@ -22,6 +23,7 @@ class AppUtils(_AppUtils):
     CheckHandler = CheckHandler
     CheckResult = CheckResult
     ActionResult = ActionResult
+    SQS = SQS
     host = HOST
 
     @classmethod
