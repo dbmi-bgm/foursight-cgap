@@ -21,6 +21,7 @@ from chalicelib import (
     check_utils,
     decorators,
     run_result,
+    config,
 )
 from chalicelib.vars import *
 from dcicutils import s3_utils, ff_utils
