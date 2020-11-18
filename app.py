@@ -340,9 +340,9 @@ def check_runner(event, context):
 
 
 def set_stage(stage):
-    from foursight_core.deploy import CONFIG_BASE
-    if stage != 'test' and stage not in CONFIG_BASE['stages']:
-        print('ERROR! Input stage is not valid. Must be one of: %s' % str(list(CONFIG_BASE['stages'].keys()).extend('test')))
+    from deploy import Deploy
+    if stage != 'test' and stage not in Deploy.CONFIG_BASE['stages']:
+        print('ERROR! Input stage is not valid. Must be one of: %s' % str(list(Deploy.CONFIG_BASE['stages'].keys()).extend('test')))
     os.environ['chalice_stage'] = stage
 
 
