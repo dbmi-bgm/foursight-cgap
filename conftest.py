@@ -28,6 +28,9 @@ from dateutil import tz
 from contextlib import contextmanager
 import pytest
 
+check_function = decorators.Decorators.check_function
+action_function = decorators.Decorators.action_function
+
 @pytest.fixture(scope='session', autouse=True)
 def setup():
     app.set_stage('test')  # set the stage info for tests

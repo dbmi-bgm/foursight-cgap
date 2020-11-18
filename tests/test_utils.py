@@ -13,7 +13,7 @@ class TestUtils():
     timestr_bad_2 = '2017-xxxxxT17:34:53.423589+00:00'
     timestr_bad_3 = '2017-xxxxxT17:34:53.423589'
 
-    @utils.check_function(abc=123, do_not_store=True, uuid=datetime.datetime.utcnow().isoformat())
+    @check_function(abc=123, do_not_store=True, uuid=datetime.datetime.utcnow().isoformat())
     def test_function_dummy(self, *args, **kwargs):
         connection = app_utils.AppUtils.init_connection(self.environ)
         check = run_result.CheckResult(connection, 'not_a_check')
