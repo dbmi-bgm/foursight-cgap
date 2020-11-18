@@ -14,7 +14,7 @@ from foursight_core.deploy import Deploy as _Deploy
 class Deploy(_Deploy):
 
     CONFIG_BASE = _Deploy.CONFIG_BASE
-    CONFIG_BASE{'app_name'} = 'foursight-cgap'
+    CONFIG_BASE['app_name'] = 'foursight-cgap'
 
 
 def main():
