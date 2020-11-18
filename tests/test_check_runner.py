@@ -32,7 +32,7 @@ class TestCheckRunner():
     connection = app_utils.AppUtils.init_connection(environ)
     connection.connections['es'] = None # disable es
     # set up a queue for test checks
-    stage_info = utils.get_stage_info()
+    stage_info = config.Config.get_stage_info()
     queue = sqs_utils.get_sqs_queue()
 
     def clear_queue_and_runners(self):
