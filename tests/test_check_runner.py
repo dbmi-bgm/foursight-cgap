@@ -122,9 +122,9 @@ class TestCheckRunner():
         # queue a check with queue_action="dev" kwarg, meaning the associated
         # action will automatically be queued after completion
         check = run_result.CheckResult(self.connection, 'test_random_nums')
-        print("CheckResult run finished)
+        print("CheckResult run finished")
         action = run_result.ActionResult(self.connection, 'add_random_test_nums')
-        print("ActionResult run finished)
+        print("ActionResult run finished")
         to_send = ['test_checks/test_random_nums', {'primary': True, 'queue_action': 'dev'}, []]
         # send the check to the queue; the action will be queue automatically
         run_uuid = app_utils.AppUtils.send_single_to_queue(self.environ, to_send, None, invoke_runner=False)
