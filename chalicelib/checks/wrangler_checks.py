@@ -223,7 +223,7 @@ def change_in_item_counts(connection, **kwargs):
             _entry['ES'] += 1
 
     check.ff_link = ''.join([connection.ff_server, 'search/?type=Item&',
-                             'type=OntologyTerm&type=TrackingItem&date_created.from=',
+                             'type=TrackingItem&date_created.from=',
                              from_date, '&date_created.to=', to_date])
     check.brief_output = diff_counts
 
