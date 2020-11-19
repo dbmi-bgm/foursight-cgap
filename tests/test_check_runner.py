@@ -115,12 +115,16 @@ class TestCheckRunner():
         assert (post_res['kwargs']['_run_info']['run_id'] == run_uuid)
 
     def test_check_runner_manually_with_associated_action(self):
+        print("Clearing queue..")
         cleared = self.clear_queue_and_runners()
         assert (cleared)
+        print("Queue cleared")
         # queue a check with queue_action="dev" kwarg, meaning the associated
         # action will automatically be queued after completion
         check = run_result.CheckResult(self.connection, 'test_random_nums')
+        print("CheckResult run finished)
         action = run_result.ActionResult(self.connection, 'add_random_test_nums')
+        print("ActionResult run finished)
         to_send = ['test_checks/test_random_nums', {'primary': True, 'queue_action': 'dev'}, []]
         # send the check to the queue; the action will be queue automatically
         run_uuid = app_utils.AppUtils.send_single_to_queue(self.environ, to_send, None, invoke_runner=False)
@@ -131,6 +135,7 @@ class TestCheckRunner():
         while (not check_done or not action_done) and tries < 20:
             tries += 1
             time.sleep(1)
+            print("try %d" % tries)
             app_utils.AppUtils.run_check_runner({'sqs_url': self.queue.url}, propogate=False)
             if not check_done:
                 latest_check_res = check.get_latest_result()
