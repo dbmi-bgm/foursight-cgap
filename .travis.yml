@@ -7,7 +7,7 @@ install:
 - poetry install
 - pip install coveralls
 script:
-- pytest -vv --cov chalicelib tests/test_app_routes.py
+- pytest -vv --cov chalicelib tests
 after_success:
 - coveralls
 - echo $TRAVIS_PULL_REQUEST
