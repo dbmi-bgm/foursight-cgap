@@ -3,7 +3,6 @@ Generate gitignored .chalice/config.json for deploy and then run deploy.
 Takes on parameter for now: stage (either "dev" or "prod")
 """
 
-from __future__ import print_function, unicode_literals
 import os
 import sys
 import argparse

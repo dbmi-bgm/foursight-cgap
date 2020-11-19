@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 from os.path import dirname
 from foursight_core.chalicelib.check_utils import CheckHandler as _CheckHandler
 from .config import Config
@@ -11,6 +10,7 @@ class CheckHandler(_CheckHandler):
     setup_dir = dirname(__file__)
     CheckResult = CheckResult
     ActionResult = ActionResult
+    Config = Config
     check_package_name = 'chalicelib'
 
     @classmethod

@@ -1,4 +1,3 @@
-from __future__ import print_function, unicode_literals
 import random
 import time
 from ..run_result import CheckResult, ActionResult

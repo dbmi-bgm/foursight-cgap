@@ -1,4 +1,3 @@
-from __future__ import print_function, unicode_literals
 import re
 import requests
 import json
@@ -6,9 +5,6 @@ import datetime
 import boto3
 import time
 from dcicutils.misc_utils import Retry
-from foursight_core.chalicelib.utils import (
-    basestring,
-)
 from foursight_core.chalicelib.sys_utils import (
     cat_indices
 )

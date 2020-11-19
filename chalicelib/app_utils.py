@@ -1,8 +1,4 @@
-from __future__ import print_function, unicode_literals
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from foursight_core.chalicelib.utils import (
-    basestring,
-)
 from .vars import (
     FOURSIGHT_PREFIX,
     HOST

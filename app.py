@@ -1,4 +1,3 @@
-from __future__ import print_function, unicode_literals
 from chalice import Chalice, Cron, Rate, Response
 import json
 import os

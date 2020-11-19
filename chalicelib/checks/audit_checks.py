@@ -1,4 +1,3 @@
-from __future__ import print_function, unicode_literals
 from ..run_result import CheckResult, ActionResult
 from dcicutils import ff_utils
 import re
