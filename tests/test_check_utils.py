@@ -7,7 +7,7 @@ class TestCheckUtils():
 
     def test_get_check_strings(self):
         # do this for every check
-        all_check_strs = check_utils.get_check_strings()
+        all_check_strs = check_utils.CheckHandler.get_check_strings()
         for check_str in all_check_strs:
             get_check = check_str.split('/')[1]
             chalice_resp = app_utils.AppUtils.run_get_check(self.environ, get_check)
@@ -22,11 +22,11 @@ class TestCheckUtils():
                 error_msg = "Not a valid check or action."
                 assert (body.get('description') == error_msg)
         # test a specific check
-        one_check_str = check_utils.get_check_strings('indexing_progress')
+        one_check_str = check_utils.CheckHandler.get_check_strings('indexing_progress')
         assert (one_check_str == 'system_checks/indexing_progress')
         assert (one_check_str in all_check_strs)
         # test a specific check that doesn't exist
-        bad_check_str = check_utils.get_check_strings('not_a_real_check')
+        bad_check_str = check_utils.CheckHandler.get_check_strings('not_a_real_check')
         assert (bad_check_str is None)
 
     def test_validate_check_setup(self):
@@ -281,7 +281,7 @@ class TestCheckUtils():
 
     def test_create_placeholder_check(self):
         """ Tests that placeholder checks are properly generated """
-        placeholder = utils.create_placeholder_check('test_check')
+        placeholder = create_placeholder_check('test_check')
         assert placeholder['name'] == 'test_check'
         assert placeholder['status'] == 'PASS'
         assert placeholder['description'] == 'If queued, this check will run with default arguments'

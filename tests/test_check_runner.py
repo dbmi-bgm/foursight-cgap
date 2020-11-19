@@ -181,10 +181,11 @@ class TestCheckRunner():
     def test_queue_check_group(self):
         # find the checks we will be using
         use_schedule = 'ten_min_checks'
-        check_schedule = check_utils.get_check_schedule(use_schedule)
+        check_handler = check_utils.CheckHandler()
+        check_schedule = check_handler.get_check_schedule(use_schedule)
         use_checks = [cs[0].split('/')[1] for env in check_schedule for cs in check_schedule[env]]
         # get a reference point for check results
-        prior_res = check_utils.get_check_results(self.connection, checks=use_checks, use_latest=True)
+        prior_res = check_handler.get_check_results(self.connection, checks=use_checks, use_latest=True)
         run_input = app_utils.AppUtils.queue_scheduled_checks(self.environ, 'ten_min_checks')
         assert (self.stage_info['queue_name'] in run_input.get('sqs_url'))
         finished_count = 0  # since queue attrs are approximate
@@ -205,7 +206,7 @@ class TestCheckRunner():
                 print('Did not locate result.')
                 assert (False)
         # queue should be empty. check results
-        post_res = check_utils.get_check_results(self.connection, checks=use_checks, use_latest=True)
+        post_res = check_handler.get_check_results(self.connection, checks=use_checks, use_latest=True)
         # compare the runtimes to ensure checks have run
         res_compare = {}
         for check_res in post_res:

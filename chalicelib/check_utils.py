@@ -11,7 +11,7 @@ class CheckHandler(_CheckHandler):
     setup_dir = dirname(__file__)
     CheckResult = CheckResult
     ActionResult = ActionResult
-    check_package_name = ''
+    check_package_name = 'chalicelib'
 
     @classmethod
     def get_module_names(cls):
