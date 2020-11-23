@@ -5,7 +5,7 @@ import datetime
 import boto3
 import time
 from dcicutils.misc_utils import Retry
-from foursight_core.chalice.checks.helper.sys_utils import (
+from foursight_core.checks.helper.sys_utils import (
     parse_datetime_to_utc,
     cat_indices
 )
@@ -495,7 +495,6 @@ def process_download_tracking_items(connection, **kwargs):
     - Change unused range query items to status=deleted
     """
     from ..config import Config
-    from foursight_core.chalicelib.sys_utils import parse_datetime_to_utc
     import geocoder
     check = CheckResult(connection, 'process_download_tracking_items')
     # maybe handle this in check_setup.json

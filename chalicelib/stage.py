@@ -1,4 +1,4 @@
-from foursight_core.chalice.stage import Stage as Stage_from_core
+from foursight_core.stage import Stage as Stage_from_core
 from .vars import FOURSIGHT_PREFIX
 
 

@@ -1,4 +1,4 @@
-from foursight_core.chalicelib.run_result import (
+from foursight_core.run_result import (
     CheckResult as CheckResult_from_core,
     ActionResult as ActionResult_from_core,
     BadCheckOrAction

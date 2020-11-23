@@ -1,4 +1,4 @@
-from foursight_core.chalice.environment import Environment as Environment_from_core
+from foursight_core.environment import Environment as Environment_from_core
 from .vars import FOURSIGHT_PREFIX
 
 

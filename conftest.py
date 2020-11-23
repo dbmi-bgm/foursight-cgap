@@ -7,7 +7,7 @@ import sys
 import time
 import boto3
 import app
-from foursight_core.chalicelib import (
+from foursight_core import (
     fs_connection,
     s3_connection,
     es_connection,

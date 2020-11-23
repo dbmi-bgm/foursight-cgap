@@ -4,7 +4,7 @@ from .vars import (
     FAVICON as CurrentFavicon,
     HOST as CurrentHost
 )
-from foursight_core.chalicelib.app_utils import AppUtils as AppUtils_from_core
+from foursight_core.app_utils import AppUtils as AppUtils_from_core
 from .run_result import (
     CheckResult as CurrentCheckResultClass,
     ActionResult as CurrentActionResultClass

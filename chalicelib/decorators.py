@@ -1,4 +1,4 @@
-from foursight_core.chalicelib.decorators import Decorators as Decorators_from_core
+from foursight_core.decorators import Decorators as Decorators_from_core
 from .run_result import (
     CheckResult as CurrentCheckResultClass,
     ActionResult as CurrentActionResultClass,

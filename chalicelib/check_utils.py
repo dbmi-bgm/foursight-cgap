@@ -1,5 +1,5 @@
 from os.path import dirname
-from foursight_core.chalicelib.check_utils import CheckHandler as CheckHandler_from_core
+from foursight_core.check_utils import CheckHandler as CheckHandler_from_core
 from .environment import Environment as CurrentEnvironmentClass
 from .run_result import (
     CheckResult as CurrentCheckResultClass,
