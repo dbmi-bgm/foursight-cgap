@@ -6,7 +6,7 @@ from .vars import (
 )
 from foursight_core.chalicelib.app_utils import AppUtils as AppUtils_from_core
 from .run_result import (
-    Checkresult as CurrentCheckResultClass,
+    CheckResult as CurrentCheckResultClass,
     ActionResult as CurrentActionResultClass
 )
 from .check_utils import CheckHandler as CurrentCheckHandlerClass
