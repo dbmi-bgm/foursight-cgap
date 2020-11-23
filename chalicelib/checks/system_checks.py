@@ -5,7 +5,7 @@ import datetime
 import boto3
 import time
 from dcicutils.misc_utils import Retry
-from foursight_core.checks.helper.sys_utils import (
+from foursight_core.checks.helpers.sys_utils import (
     parse_datetime_to_utc,
     cat_indices
 )
