@@ -24,7 +24,6 @@ from chalicelib import (
 )
 from chalicelib.vars import *
 from dcicutils import s3_utils, ff_utils
-from dateutil import tz
 from contextlib import contextmanager
 import pytest
 

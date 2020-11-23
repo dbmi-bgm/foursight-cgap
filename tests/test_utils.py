@@ -4,14 +4,6 @@ from conftest import *
 class TestUtils():
     environ = DEV_ENV # hopefully this is up
     conn = app_utils.AppUtils.init_connection(environ)
-    timestr_1 = '2017-04-09T17:34:53.423589+00:00' # UTC
-    timestr_2 = '2017-04-09T17:34:53.423589+05:00' # 5 hours ahead of UTC
-    timestr_3 = '2017-04-09T17:34:53.423589-05:00' # 5 hours behind of UTC
-    timestr_4 = '2017-04-09T17:34:53.423589'
-    timestr_5 = '2017-04-09T17:34:53'
-    timestr_bad_1 = '2017-04-0589+00:00'
-    timestr_bad_2 = '2017-xxxxxT17:34:53.423589+00:00'
-    timestr_bad_3 = '2017-xxxxxT17:34:53.423589'
 
     @check_function(abc=123, do_not_store=True, uuid=datetime.datetime.utcnow().isoformat())
     def test_function_dummy(self, *args, **kwargs):
