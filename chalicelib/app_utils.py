@@ -26,7 +26,7 @@ class AppUtils(AppUtils_from_core):
     CheckResult = CurrentCheckResultClass
     ActionResult = CurrentActionResultClass
     SQS = CurrentSQSClass
-    host = CurrentHOST
+    host = CurrentHost
 
     @classmethod
     def jin_env(cls):
