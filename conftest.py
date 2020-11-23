@@ -20,7 +20,7 @@ from chalicelib import (
     decorators,
     run_result,
     stage,
-    environments,
+    environment,
 )
 from chalicelib.vars import *
 from dcicutils import s3_utils, ff_utils
