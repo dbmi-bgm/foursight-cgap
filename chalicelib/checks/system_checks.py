@@ -5,7 +5,8 @@ import datetime
 import boto3
 import time
 from dcicutils.misc_utils import Retry
-from foursight_core.chalicelib.sys_utils import (
+from foursight_core.chalice.checks.helper.sys_utils import (
+    parse_datetime_to_utc,
     cat_indices
 )
 from ..run_result import CheckResult
@@ -16,8 +17,8 @@ from dcicutils import (
     env_utils
 )
 from ..decorators import Decorators
-check_function = Decorators.check_function
-action_function = Decorators.action_function
+check_function = Decorators().check_function
+action_function = Decorators().action_function
 
 
 # XXX: put into utils?

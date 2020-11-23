@@ -1,8 +1,13 @@
-from foursight_core.chalicelib.decorators import Decorators as _Decorators
-from .run_result import CheckResult, ActionResult
+from foursight_core.chalicelib.decorators import Decorators as Decorators_from_core
+from .run_result import (
+    CheckResult as CurrentCheckResultClass,
+    ActionResult as CurrentActionResultClass,
+)
+from .sqs_utils import SQS as CurrentSQSClass
 
 
-class Decorators(_Decorators):
+class Decorators(Decorators_from_core):
 
-    CheckResult = CheckResult
-    ActionResult = ActionResult
+    CheckResult = CurrentCheckResultClass
+    ActionResult = CurrentActionResultClass
+    SQS = CurrentSQSClass

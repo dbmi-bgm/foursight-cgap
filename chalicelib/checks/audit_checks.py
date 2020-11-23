@@ -4,8 +4,8 @@ import re
 import requests
 from .helpers import wrangler_utils
 from ..decorators import Decorators
-check_function = Decorators.check_function
-action_function = Decorators.action_function
+check_function = Decorators().check_function
+action_function = Decorators().action_function
 
 
 STATUS_LEVEL = {

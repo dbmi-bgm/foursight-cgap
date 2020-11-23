@@ -16,8 +16,8 @@ from dcicutils.beanstalk_utils import (
 from ..run_result import CheckResult, ActionResult
 from ..vars import FOURSIGHT_PREFIX, DEV_ENV
 from ..decorators import Decorators
-check_function = Decorators.check_function
-action_function = Decorators.action_function
+check_function = Decorators().check_function
+action_function = Decorators().action_function
 
 
 def try_to_describe_indexer_env(env):

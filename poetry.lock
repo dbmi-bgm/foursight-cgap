@@ -48,20 +48,20 @@ lxml = ["lxml"]
 
 [[package]]
 name = "boto3"
-version = "1.16.22"
+version = "1.16.24"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
-botocore = ">=1.19.22,<1.20.0"
+botocore = ">=1.19.24,<1.20.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.3.0,<0.4.0"
 
 [[package]]
 name = "botocore"
-version = "1.19.22"
+version = "1.19.24"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -221,7 +221,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "0.0.1b25"
+version = "0.0.1b29"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -361,11 +361,11 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "importlib-metadata"
-version = "2.0.0"
+version = "3.0.0"
 description = "Read metadata from Python packages"
 category = "dev"
 optional = false
-python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
+python-versions = ">=3.6"
 
 [package.dependencies]
 zipp = ">=0.5"
@@ -744,7 +744,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.7"
-content-hash = "5307f1a4cfd1d4ad9df171a927a3c602fa2931b2c9f0261d506a23a2c6f072fc"
+content-hash = "8e8e31ca208b653b77cb9fcf63d7818b10e547849ae6712da1079a7f138ba9fe"
 
 [metadata.files]
 atomicwrites = [
@@ -765,12 +765,12 @@ beautifulsoup4 = [
     {file = "beautifulsoup4-4.9.3.tar.gz", hash = "sha256:84729e322ad1d5b4d25f805bfa05b902dd96450f43842c4e99067d5e1369eb25"},
 ]
 boto3 = [
-    {file = "boto3-1.16.22-py2.py3-none-any.whl", hash = "sha256:bb8ecadd1c8dc8b27c72642567adcd910b2fc3c2fe95b5df3796b647dc47abb9"},
-    {file = "boto3-1.16.22.tar.gz", hash = "sha256:066b9dfd466e42c206dbbd282da030a6d5cade4ef7e9f1c90a79ebde1310b217"},
+    {file = "boto3-1.16.24-py2.py3-none-any.whl", hash = "sha256:f12fc470d170b283dcea921f0ae3744dd8d0fc5263dcc8974c891edefb008a17"},
+    {file = "boto3-1.16.24.tar.gz", hash = "sha256:7a76e9012bd7a47da0f75671d98a6cc2db0734b6f3ca17b34acfd381ebca2fb9"},
 ]
 botocore = [
-    {file = "botocore-1.19.22-py2.py3-none-any.whl", hash = "sha256:5cee9d02d335a0c43d225da6595e6f95970a01ecaebeba757ac22130f2d31495"},
-    {file = "botocore-1.19.22.tar.gz", hash = "sha256:87d77925ea8d35898ff1627f6f97d396bed44d37fff960daae181a76ba413546"},
+    {file = "botocore-1.19.24-py2.py3-none-any.whl", hash = "sha256:7d4efbc621e3fe17226b356a65526210c9284f9a823ce7be7209108644823c40"},
+    {file = "botocore-1.19.24.tar.gz", hash = "sha256:5975b10dbc6a70c6789b95d083fbb93e4191f13afe25cd7a834cf2168fddbcd8"},
 ]
 cachetools = [
     {file = "cachetools-4.1.1-py3-none-any.whl", hash = "sha256:513d4ff98dd27f85743a8dc0e92f55ddb1b49e060c2d5961512855cda2c01a98"},
@@ -857,8 +857,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight_core-0.0.1b25-py3-none-any.whl", hash = "sha256:75958fb0cdd7bdb77093dcedc43abc00b5402de90ecefe590ae6f4b3d89b8305"},
-    {file = "foursight_core-0.0.1b25.tar.gz", hash = "sha256:d0325783d8497337fbd169a7d1d0a7be4ac90c06994b32dc1d9316ee269b543e"},
+    {file = "foursight_core-0.0.1b29-py3-none-any.whl", hash = "sha256:7ea595206466df8cde9401a488455489323b630e22cd71a0a7ab52b951c4dbe7"},
+    {file = "foursight_core-0.0.1b29.tar.gz", hash = "sha256:670b60fbf4808da77afab30edf0c9125b602b3847cf7cd9c8f50c54110cc20a0"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
@@ -900,8 +900,8 @@ idna = [
     {file = "idna-2.10.tar.gz", hash = "sha256:b307872f855b18632ce0c21c5e45be78c0ea7ae4c15c828c20788b26921eb3f6"},
 ]
 importlib-metadata = [
-    {file = "importlib_metadata-2.0.0-py2.py3-none-any.whl", hash = "sha256:cefa1a2f919b866c5beb7c9f7b0ebb4061f30a8a9bf16d609b000e2dfaceb9c3"},
-    {file = "importlib_metadata-2.0.0.tar.gz", hash = "sha256:77a540690e24b0305878c37ffd421785a6f7e53c8b5720d211b211de8d0e95da"},
+    {file = "importlib_metadata-3.0.0-py2.py3-none-any.whl", hash = "sha256:fc3b3f9697703d3833d2803162d60cbe8b9f57b5da5e6496ac81e3cb82bd8d9c"},
+    {file = "importlib_metadata-3.0.0.tar.gz", hash = "sha256:d582eb5c35b2f16c78e365e0f89e369f36af38fdaad0146208aa973c693ba247"},
 ]
 jinja2 = [
     {file = "Jinja2-2.10.1-py2.py3-none-any.whl", hash = "sha256:14dd6caf1527abb21f08f86c784eac40853ba93edb79552aa1e4b8aef1b61c7b"},

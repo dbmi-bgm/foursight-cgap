@@ -1,26 +1,32 @@
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from .vars import (
     FOURSIGHT_PREFIX,
-    HOST
+    FAVICON as CurrentFavicon,
+    HOST as CurrentHost
 )
-from foursight_core.chalicelib.app_utils import AppUtils as _AppUtils
-from .run_result import CheckResult, ActionResult
-from .check_utils import CheckHandler
-from .sqs_utils import SQS
-from .config import Config
+from foursight_core.chalicelib.app_utils import AppUtils as AppUtils_from_core
+from .run_result import
+    Checkresult as CurrentCheckResultClass,
+    ActionResult as CurrentActionResultClass
+)
+from .check_utils import CheckHandler as CurrentCheckHandlerClass
+from .sqs_utils import SQS as CurrentSQSClass
+from .stage import Stage as CurrentStageClass
+from .environment import Environment as CurrentEnvironmentClass
 
 
-class AppUtils(_AppUtils):
+class AppUtils(AppUtils_from_core):
     
     # these must be overwritten in inherited classes
     prefix = FOURSIGHT_PREFIX
-    FAVICON = 'https://cgap.hms.harvard.edu/static/img/favicon-fs.ico'
-    Config = Config
-    CheckHandler = CheckHandler
-    CheckResult = CheckResult
-    ActionResult = ActionResult
-    SQS = SQS
-    host = HOST
+    FAVICON = CurrentFavicon
+    Stage = CurrentStageClass
+    Environment = CurrentEnvironmentClass
+    CheckHandler = CurrentCheckHandlerClass
+    CheckResult = CurrentCheckResultClass
+    ActionResult = CurrentActionResultClass
+    SQS = CurrentSQSClass
+    host = CurrentHOST
 
     @classmethod
     def jin_env(cls):

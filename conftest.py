@@ -8,20 +8,19 @@ import time
 import boto3
 import app
 from foursight_core.chalicelib import (
-    sys_utils,
     fs_connection,
     s3_connection,
     es_connection,
-    exceptions
+    exceptions,
 )
-from foursight_core.chalicelib.utils import *
 from chalicelib import (
     sqs_utils,
     app_utils,
     check_utils,
     decorators,
     run_result,
-    config,
+    stage,
+    environments,
 )
 from chalicelib.vars import *
 from dcicutils import s3_utils, ff_utils

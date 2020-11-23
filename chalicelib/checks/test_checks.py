@@ -2,8 +2,8 @@ import random
 import time
 from ..run_result import CheckResult, ActionResult
 from ..decorators import Decorators
-check_function = Decorators.check_function
-action_function = Decorators.action_function
+check_function = Decorators().check_function
+action_function = Decorators().action_function
 
 
 def test_function_unused():

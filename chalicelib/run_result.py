@@ -1,23 +1,14 @@
 from foursight_core.chalicelib.run_result import (
-    RunResult as _RunResult,
-    CheckResult as _CheckResult,
-    ActionResult as _ActionResult,
+    CheckResult as CheckResult_from_core,
+    ActionResult as ActionResult_from_core,
     BadCheckOrAction
 )
 from .vars import FOURSIGHT_PREFIX
 
 
-class RunResult(_RunResult):
+class CheckResult(CheckResult_from_core):
     """
-    Generic class for CheckResult and ActionResult. Contains methods common
-    to both.
-    """
-    prefix = FOURSIGHT_PREFIX
-
-
-class CheckResult(_CheckResult):
-    """
-    Inherits from RunResult and is meant to be used with checks.
+    Inherits from CheckResult from core and is meant to be used with checks.
 
     Usage:
     check = CheckResult(connection, <name>)
@@ -28,8 +19,8 @@ class CheckResult(_CheckResult):
     prefix = FOURSIGHT_PREFIX
 
 
-class ActionResult(_ActionResult):
+class ActionResult(ActionResult_from_core):
     """
-    Inherits from RunResult and is meant to be used with actions
+    Inherits from ActionResult from foursight_core and is meant to be used with actions
     """
     prefix = FOURSIGHT_PREFIX

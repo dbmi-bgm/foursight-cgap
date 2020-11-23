@@ -24,14 +24,6 @@ class TestUtils():
         check.kwargs = {}
         return check
 
-    def test_get_stage_info(self):
-        # after using app.set_stage('test')
-        info = config.Config.get_stage_info()
-        assert ({'stage', 'runner_name', 'queue_name'} <= set(info.keys()))
-        assert (info['stage'] == 'dev')
-        assert ('dev' in info['runner_name'])
-        assert ('test' in info['queue_name'])
-
     def test_check_timeout(self):
         assert (isinstance(CHECK_TIMEOUT, int))
 
@@ -43,12 +35,6 @@ class TestUtils():
             check_utils.CheckHandler.run_check_or_action(self.conn, 'test_checks/test_random_nums', {})
         assert ('-RUN-> TIMEOUT' in str(exc.value))
         CHECK_TIMEOUT = 870
-
-    def test_list_environments(self):
-        env_list = config.Config.list_environments()
-        # assume we have at least one environments
-        assert (isinstance(env_list, list))
-        assert (self.environ in env_list)
 
     def test_check_function_deco_default_kwargs(self):
         # test to see if the check_function decorator correctly overrides
@@ -77,27 +63,6 @@ class TestUtils():
         assert (kwargs.get('bcd') == 234)
         assert (kwargs.get('uuid').startswith('20'))
         assert (kwargs.get('primary') == False)
-
-    def test_parse_datetime_to_utc(self):
-        [dt_tz_a, dt_tz_b, dt_tz_c] = ['None'] * 3
-        for t_str in [self.timestr_1, self.timestr_2, self.timestr_3, self.timestr_4]:
-            dt = sys_utils.parse_datetime_to_utc(t_str)
-            assert (dt is not None)
-            assert (dt.tzinfo is not None and dt.tzinfo == tz.tzutc())
-            if t_str == self.timestr_1:
-                dt_tz_a = dt
-            elif t_str == self.timestr_2:
-                dt_tz_b = dt
-            elif t_str == self.timestr_3:
-                dt_tz_c = dt
-        assert (dt_tz_c > dt_tz_a > dt_tz_b)
-        for bad_tstr in [self.timestr_bad_1, self.timestr_bad_2, self.timestr_bad_3]:
-            dt_bad = sys_utils.parse_datetime_to_utc(bad_tstr)
-            assert (dt_bad is None)
-        # use a manual format
-        dt_5_man = sys_utils.parse_datetime_to_utc(self.timestr_5, manual_format="%Y-%m-%dT%H:%M:%S")
-        dt_5_auto = sys_utils.parse_datetime_to_utc(self.timestr_5)
-        assert (dt_5_auto == dt_5_man)
 
     def test_get_s3_utils(self):
         """
