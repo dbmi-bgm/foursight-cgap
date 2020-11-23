@@ -1,4 +1,4 @@
-from conftests import *
+from conftest import *
 
 
 class TestEnvironment():
