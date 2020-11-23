@@ -5,7 +5,7 @@ from .vars import (
     HOST as CurrentHost
 )
 from foursight_core.chalicelib.app_utils import AppUtils as AppUtils_from_core
-from .run_result import
+from .run_result import (
     Checkresult as CurrentCheckResultClass,
     ActionResult as CurrentActionResultClass
 )
