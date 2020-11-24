@@ -8,12 +8,18 @@ import sys
 import argparse
 import json
 import subprocess
-from foursight_core.deploy import Deploy as _Deploy
+from foursight_core.deploy import Deploy as Deploy_from_core
 
-class Deploy(_Deploy):
 
-    CONFIG_BASE = _Deploy.CONFIG_BASE
+class Deploy(Deploy_from_core):
+
+    CONFIG_BASE = Deploy_from_core.CONFIG_BASE
     CONFIG_BASE['app_name'] = 'foursight-cgap'
+
+    @classmethod
+    def get_config_filename(cls):
+        file_dir, _ = os.path.split(os.path.abspath(__file__))
+        return os.path.join(file_dir, '.chalice/config.json')
 
 
 def main():

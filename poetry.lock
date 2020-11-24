@@ -221,11 +221,12 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "0.0.1b38"
+version = "0.0.1b39"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
 python-versions = ">=3.6,<3.7"
+develop = false
 
 [package.dependencies]
 click = "6.7"
@@ -234,13 +235,19 @@ elasticsearch = "6.4.0"
 elasticsearch-dsl = "6.4.0"
 fuzzywuzzy = "0.17.0"
 geocoder = "1.38.1"
-gitpython = ">=3.1.2,<4.0.0"
+gitpython = "^3.1.2"
 google-api-python-client = "1.7.4"
 Jinja2 = "2.10.1"
 MarkupSafe = "1.1.1"
 PyJWT = "1.5.3"
 python-Levenshtein = "0.12.0"
-pytz = ">=2020.1,<2021.0"
+pytz = "^2020.1"
+
+[package.source]
+type = "git"
+url = "https://github.com/4dn-dcic/foursight-core.git"
+reference = "master"
+resolved_reference = "fa641404c4b809dc0f27bdff38235a7656b6874f"
 
 [[package]]
 name = "future"
@@ -744,7 +751,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.7"
-content-hash = "62bc0b20963dd5d461e9f5e1b9e2640361a08db6fb71119b09600f6a792c0c06"
+content-hash = "2fea11ea68d9ad76c1a6b991fd632bfc0ff98fb4bbe1179c11b8b32229a1ebb5"
 
 [metadata.files]
 atomicwrites = [
@@ -856,10 +863,7 @@ flaky = [
     {file = "flaky-3.6.1-py2.py3-none-any.whl", hash = "sha256:5471615b32b0f8086573de924475b1f0d31e0e8655a089eb9c38a0fbff3f11aa"},
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
-foursight-core = [
-    {file = "foursight_core-0.0.1b38-py3-none-any.whl", hash = "sha256:256ef975b7d10b0cb92b37f2b5f2faa949a5d4e24ea37b128a1551765aa16225"},
-    {file = "foursight_core-0.0.1b38.tar.gz", hash = "sha256:7438a6173f3ad151685e7fd5e564aa16c7e50e7a1d8f4496b7014e8b4c207a10"},
-]
+foursight-core = []
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
 ]
