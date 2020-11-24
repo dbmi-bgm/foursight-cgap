@@ -27,8 +27,8 @@ from dcicutils import s3_utils, ff_utils
 from contextlib import contextmanager
 import pytest
 
-check_function = decorators.Decorators.check_function
-action_function = decorators.Decorators.action_function
+check_function = decorators.Decorators().check_function
+action_function = decorators.Decorators().action_function
 
 @pytest.fixture(scope='session', autouse=True)
 def setup():

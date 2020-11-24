@@ -5,7 +5,7 @@ class TestRunResult():
     check_name = 'test_only_check'
     environ = DEV_ENV
     connection = app_utils.AppUtils.init_connection(environ)
-    run = run_result.RunResult(connection, check_name)
+    run = run_result.CheckResult(connection, check_name)  # test RunResult using the inherited class
 
     def setup_valid_check(self):
         """ Sets up a 'valid' check according to ES """

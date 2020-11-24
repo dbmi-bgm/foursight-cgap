@@ -32,7 +32,8 @@ class TestCheckRunner():
     connection = app_utils.AppUtils.init_connection(environ)
     connection.connections['es'] = None # disable es
     # set up a queue for test checks
-    stage_info = config.Config.get_stage_info()
+    queue_name = stage.Stage.get_queue_name()
+    runner_name = stage.Stage.get_runner_name()
     queue = sqs_utils.SQS.get_sqs_queue()
 
     def clear_queue_and_runners(self):
@@ -67,8 +68,8 @@ class TestCheckRunner():
 
     def test_queue_basics(self):
         # ensure we have the right queue and runner names
-        assert (self.stage_info['queue_name'] == FOURSIGHT_PREFIX + '-test-check_queue')
-        assert (self.stage_info['runner_name'] == FOURSIGHT_PREFIX + '-dev-check_runner')
+        assert (self.queue_name == FOURSIGHT_PREFIX + '-test-check_queue')
+        assert (self.runner_name == FOURSIGHT_PREFIX + '-dev-check_runner')
 
     def test_check_runner_manually(self):
         """
@@ -193,7 +194,7 @@ class TestCheckRunner():
         # get a reference point for check results
         prior_res = check_handler.get_check_results(self.connection, checks=use_checks, use_latest=True)
         run_input = app_utils.AppUtils.queue_scheduled_checks(self.environ, 'ten_min_checks')
-        assert (self.stage_info['queue_name'] in run_input.get('sqs_url'))
+        assert (self.queue_name in run_input.get('sqs_url'))
         finished_count = 0  # since queue attrs are approximate
         error_count = 0
         # wait for queue to empty
