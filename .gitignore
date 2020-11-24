@@ -12,6 +12,7 @@ htmlcov/
 coverage.xml
 *.ipynb
 !*LocalTest.ipynb
+requirements.txt
 
 # Virtual environments
 *env/

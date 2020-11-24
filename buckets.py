@@ -1,9 +1,9 @@
 import boto3
 import json
 from .chalicelib.vars import FOURSIGHT_PREFIX
-from foursight_core.buckets import Buckets as _Buckets
+from foursight_core.buckets import Buckets as Buckets_from_core
 
-class Buckets(_Buckets):
+class Buckets(Buckets_from_core):
     """create and configure buckets for foursight"""
 
     prefix = FOURSIGHT_PREFIX

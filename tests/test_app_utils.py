@@ -7,7 +7,7 @@ from dcicutils.env_utils import CGAP_PUBLIC_URL_PRD
 
 class TestAppUtils():
     """
-    Meant for non-route utilities in chalicelib/app_utils.AppUtils.py
+    Meant for non-route utilities in chalicelib/app_utils.py
     """
     environ = DEV_ENV # hopefully this is up
     conn = app_utils.AppUtils.init_connection(environ)

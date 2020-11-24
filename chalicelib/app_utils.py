@@ -1,4 +1,4 @@
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+from os.path import dirname
 from .vars import (
     FOURSIGHT_PREFIX,
     FAVICON as CurrentFavicon,
@@ -28,9 +28,4 @@ class AppUtils(AppUtils_from_core):
     SQS = CurrentSQSClass
     host = CurrentHost
 
-    @classmethod
-    def jin_env(cls):
-        return Environment(
-            loader=FileSystemLoader('chalicelib/templates'),
-            autoescape=select_autoescape(['html', 'xml'])
-        )
+    template_dir = dirname(__file__)

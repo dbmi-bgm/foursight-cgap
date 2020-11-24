@@ -348,4 +348,4 @@ def set_stage(stage):
 
 
 def set_timeout(timeout):
-    app_utils_ojb.set_timeout(timeout)
+    app_utils_obj.set_timeout(timeout)
