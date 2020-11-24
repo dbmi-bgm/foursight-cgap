@@ -7,7 +7,7 @@ install:
 - poetry install
 - pip install coveralls
 script:
-- pytest -vv --cov chalicelib tests
+- pytest -vv --cov chalicelib tests/test_check_runner.py::test_check_runner_manually_with_associated_action
 after_success:
 - coveralls
 - echo $TRAVIS_PULL_REQUEST
