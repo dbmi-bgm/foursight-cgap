@@ -10,7 +10,7 @@ import boto3
 from collections import Counter
 from dcicutils import ff_utils
 from dcicutils.env_utils import FF_PROD_BUCKET_ENV
-from .helpers import wrangler_utils
+from foursight_core.checks.helpers import wrangler_utils
 from ..run_result import CheckResult, ActionResult
 from ..decorators import Decorators
 check_function = Decorators().check_function
