@@ -56,12 +56,14 @@ class TestCheckRunner():
                 found_clear = True
             elif invis_messages > 0:
                 # if orphaned messages are in the queue, eat them up
+                print("%d orphaned messages at in the queue" % invis_messages)
                 self.app_utils_obj.run_check_runner({'sqs_url': self.queue.url}, propogate=False)
                 tries += 1
                 found_clear = False
                 time.sleep(2)
             else:
                 # wait less time to see if processing is finished
+                print("%d visible messages at in the queue" % vis_messages)
                 tries += 1
                 found_clear = False
                 time.sleep(2)
