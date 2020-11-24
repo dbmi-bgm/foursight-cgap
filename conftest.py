@@ -12,6 +12,7 @@ from foursight_core import (
     s3_connection,
     es_connection,
     exceptions,
+    check_schema,
 )
 from chalicelib import (
     sqs_utils,

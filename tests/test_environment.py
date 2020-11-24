@@ -2,6 +2,8 @@ from conftest import *
 
 
 class TestEnvironment():
+    environ = DEV_ENV
+
     def test_list_environments(self):
         env_list = environment.Environment().list_environment_names()
         # assume we have at least one environments

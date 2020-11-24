@@ -221,7 +221,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "0.0.1b36"
+version = "0.0.1b38"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -361,7 +361,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "importlib-metadata"
-version = "3.0.0"
+version = "3.1.0"
 description = "Read metadata from Python packages"
 category = "dev"
 optional = false
@@ -372,7 +372,7 @@ zipp = ">=0.5"
 
 [package.extras]
 docs = ["sphinx", "rst.linker"]
-testing = ["packaging", "pep517", "importlib-resources (>=1.3)"]
+testing = ["packaging", "pep517", "unittest2", "importlib-resources (>=1.3)"]
 
 [[package]]
 name = "jinja2"
@@ -744,7 +744,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.7"
-content-hash = "cbcf750eca0145784da447e8a52a0d96c8226333ad2bb705fe4a472125afb184"
+content-hash = "62bc0b20963dd5d461e9f5e1b9e2640361a08db6fb71119b09600f6a792c0c06"
 
 [metadata.files]
 atomicwrites = [
@@ -857,8 +857,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight_core-0.0.1b36-py3-none-any.whl", hash = "sha256:ac52e4a7e31cc4b05f8a1251fd9cb70c3489aaa8581064b76d87eb39e5617bd1"},
-    {file = "foursight_core-0.0.1b36.tar.gz", hash = "sha256:cdc547c127f52231437836a9860dc4f516c6a4645cd2f4ec6bef94ce9fff57ae"},
+    {file = "foursight_core-0.0.1b38-py3-none-any.whl", hash = "sha256:256ef975b7d10b0cb92b37f2b5f2faa949a5d4e24ea37b128a1551765aa16225"},
+    {file = "foursight_core-0.0.1b38.tar.gz", hash = "sha256:7438a6173f3ad151685e7fd5e564aa16c7e50e7a1d8f4496b7014e8b4c207a10"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
@@ -900,8 +900,8 @@ idna = [
     {file = "idna-2.10.tar.gz", hash = "sha256:b307872f855b18632ce0c21c5e45be78c0ea7ae4c15c828c20788b26921eb3f6"},
 ]
 importlib-metadata = [
-    {file = "importlib_metadata-3.0.0-py2.py3-none-any.whl", hash = "sha256:fc3b3f9697703d3833d2803162d60cbe8b9f57b5da5e6496ac81e3cb82bd8d9c"},
-    {file = "importlib_metadata-3.0.0.tar.gz", hash = "sha256:d582eb5c35b2f16c78e365e0f89e369f36af38fdaad0146208aa973c693ba247"},
+    {file = "importlib_metadata-3.1.0-py2.py3-none-any.whl", hash = "sha256:590690d61efdd716ff82c39ca9a9d4209252adfe288a4b5721181050acbd4175"},
+    {file = "importlib_metadata-3.1.0.tar.gz", hash = "sha256:d9b8a46a0885337627a6430db287176970fff18ad421becec1d64cfc763c2099"},
 ]
 jinja2 = [
     {file = "Jinja2-2.10.1-py2.py3-none-any.whl", hash = "sha256:14dd6caf1527abb21f08f86c784eac40853ba93edb79552aa1e4b8aef1b61c7b"},

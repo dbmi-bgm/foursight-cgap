@@ -3,14 +3,15 @@ from conftest import *
 
 class TestCheckUtils():
     environ = DEV_ENV  # hopefully this is up
-    connection = app_utils.AppUtils.init_connection(environ)
+    app_utils_obj = app_utils.AppUtils()
+    connection = app_utils_obj.init_connection(environ)
 
     def test_get_check_strings(self):
         # do this for every check
         all_check_strs = check_utils.CheckHandler.get_check_strings()
         for check_str in all_check_strs:
             get_check = check_str.split('/')[1]
-            chalice_resp = app_utils.AppUtils.run_get_check(self.environ, get_check)
+            chalice_resp = self.app_utils_obj.run_get_check(self.environ, get_check)
             body = chalice_resp.body
             if body.get('status') == 'success':
                 assert (chalice_resp.status_code == 200)
@@ -281,7 +282,7 @@ class TestCheckUtils():
 
     def test_create_placeholder_check(self):
         """ Tests that placeholder checks are properly generated """
-        placeholder = create_placeholder_check('test_check')
+        placeholder = check_schema.CheckSchema().create_placeholder_check('test_check')
         assert placeholder['name'] == 'test_check'
         assert placeholder['status'] == 'PASS'
         assert placeholder['description'] == 'If queued, this check will run with default arguments'

@@ -17,16 +17,16 @@ class TestUtils():
         return check
 
     def test_check_timeout(self):
-        assert (isinstance(CHECK_TIMEOUT, int))
+        assert (isinstance(decorators.Decorators().CHECK_TIMEOUT, int))
 
     @pytest.mark.skip  # Works but does not behave correctly with pytest
     def test_check_times_out(self):
         # set to one second, which is slower than test check
-        CHECK_TIMEOUT = 1
+        os.environ['CHECK_TIMEOUT'] = 1
         with pytest.raises(SystemExit) as exc:
             check_utils.CheckHandler.run_check_or_action(self.conn, 'test_checks/test_random_nums', {})
         assert ('-RUN-> TIMEOUT' in str(exc.value))
-        CHECK_TIMEOUT = 870
+        os.environ['CHECK_TIMEOUT'] = 870
 
     def test_check_function_deco_default_kwargs(self):
         # test to see if the check_function decorator correctly overrides
