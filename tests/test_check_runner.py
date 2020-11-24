@@ -134,7 +134,6 @@ class TestCheckRunner():
         check_done = False
         action_done = False
         tries = 0
-        assert False  # intentional fail to check log
         while (not check_done or not action_done) and tries < 20:
             tries += 1
             time.sleep(1)
