@@ -166,7 +166,7 @@ def index():
     Redirect with 302 to view page of DEFAULT_ENV
     Non-protected route
     """
-    domain, context = get_domain_and_context(app.current_request.to_dict())
+    domain, context = app_utils_obj.get_domain_and_context(app.current_request.to_dict())
     resp_headers = {'Location': context + 'view/' + DEFAULT_ENV}
     return Response(status_code=302, body=json.dumps(resp_headers),
                     headers=resp_headers)
@@ -190,7 +190,7 @@ def view_run_route(environ, check, method):
     Protected route
     """
     req_dict = app.current_request.to_dict()
-    domain, context = get_domain_and_context(req_dict)
+    domain, context = app_utils_obj.get_domain_and_context(req_dict)
     query_params = req_dict.get('query_params', {})
     if app_utils_obj.check_authorization(req_dict, environ):
         if method == 'action':
@@ -207,7 +207,7 @@ def view_route(environ):
     Non-protected route
     """
     req_dict = app.current_request.to_dict()
-    domain, context = get_domain_and_context(req_dict)
+    domain, context = app_utils_obj.get_domain_and_context(req_dict)
     return app_utils_obj.view_foursight(environ, app_utils_obj.check_authorization(req_dict, environ), domain, context)
 
 
@@ -217,7 +217,7 @@ def view_check_route(environ, check, uuid):
     Protected route
     """
     req_dict = app.current_request.to_dict()
-    domain, context = get_domain_and_context(req_dict)
+    domain, context = app_utils_obj.get_domain_and_context(req_dict)
     if app_utils_obj.check_authorization(req_dict, environ):
         return app_utils_obj.view_foursight_check(environ, check, uuid, True, domain, context)
     else:
@@ -234,7 +234,7 @@ def history_route(environ, check):
     query_params = req_dict.get('query_params')
     start = int(query_params.get('start', '0')) if query_params else 0
     limit = int(query_params.get('limit', '25')) if query_params else 25
-    domain, context = get_domain_and_context(req_dict)
+    domain, context = app_utils_obj.get_domain_and_context(req_dict)
     return app_utils_obj.view_foursight_history(environ, check, start, limit,
                                   app_utils_obj.check_authorization(req_dict, environ), domain, context)
 
