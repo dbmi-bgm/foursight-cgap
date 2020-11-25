@@ -1,6 +1,6 @@
 #### Here are the common steps for adding a new workflow to wfr_cgap_checks.py
 
-1. on cgap_utils.py,  add your workflow to the workflow_details dictionary.
+1. on wfr_utils.py,  add your workflow to the workflow_details dictionary.
 
 ```python
 'app_name' : {
@@ -17,7 +17,7 @@ for example
 }
 ```
 
-2. on wfrset_cgap_utils.py add your workflow specs using the following template
+2. on wfrset_utils.py add your workflow specs using the following template
 
 ```python
 {
@@ -49,7 +49,7 @@ You can look at the examples in the wfr_cgap_checks.py. There is a function call
 
 
 ```python
-cgap_utils.stepper(
+wfr_utils.stepper(
     library,
     keep,
     step_tag, # if multi step pipeline, add step ie step1
@@ -74,7 +74,7 @@ keep['problematic_run']
 keep['missing_run']
 
 # returns
-keep, this_runs_status, this_runs_output = cgap_utils.stepper()
+keep, this_runs_status, this_runs_output = wfr_utils.stepper()
 ```
 
 

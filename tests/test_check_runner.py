@@ -1,5 +1,4 @@
 from conftest import *
-from chalicelib.vars import FOURSIGHT_PREFIX, DEV_ENV
 
 
 def delay_rerun(*args):
@@ -30,11 +29,13 @@ def captured_output():
 class TestCheckRunner():
     environ = DEV_ENV
     app.set_stage('test')
-    connection = app_utils.init_connection(environ)
+    app_utils_obj = app_utils.AppUtils()
+    connection = app_utils_obj.init_connection(environ)
     connection.connections['es'] = None # disable es
     # set up a queue for test checks
-    stage_info = utils.get_stage_info()
-    queue = utils.get_sqs_queue()
+    queue_name = stage.Stage.get_queue_name()
+    runner_name = stage.Stage.get_runner_name()
+    queue = sqs_utils.SQS.get_sqs_queue()
 
     def clear_queue_and_runners(self):
         """
@@ -44,7 +45,7 @@ class TestCheckRunner():
         tries = 0
         found_clear = True
         while tries < 10:
-            sqs_attrs = utils.get_sqs_attributes(self.queue.url)
+            sqs_attrs = sqs_utils.SQS.get_sqs_attributes(self.queue.url)
             vis_messages = int(sqs_attrs.get('ApproximateNumberOfMessages'))
             invis_messages = int(sqs_attrs.get('ApproximateNumberOfMessagesNotVisible'))
             if vis_messages == 0 and invis_messages == 0:
@@ -55,12 +56,14 @@ class TestCheckRunner():
                 found_clear = True
             elif invis_messages > 0:
                 # if orphaned messages are in the queue, eat them up
-                app_utils.run_check_runner({'sqs_url': self.queue.url}, propogate=False)
+                print("%d orphaned messages at in the queue" % invis_messages)
+                self.app_utils_obj.run_check_runner({'sqs_url': self.queue.url}, propogate=False)
                 tries += 1
                 found_clear = False
                 time.sleep(2)
             else:
                 # wait less time to see if processing is finished
+                print("%d visible messages at in the queue" % vis_messages)
                 tries += 1
                 found_clear = False
                 time.sleep(2)
@@ -68,8 +71,8 @@ class TestCheckRunner():
 
     def test_queue_basics(self):
         # ensure we have the right queue and runner names
-        assert (self.stage_info['queue_name'] == FOURSIGHT_PREFIX + '-test-check_queue')
-        assert (self.stage_info['runner_name'] == FOURSIGHT_PREFIX + '-dev-check_runner')
+        assert (self.queue_name == FOURSIGHT_PREFIX + '-test-check_queue')
+        assert (self.runner_name == FOURSIGHT_PREFIX + '-dev-check_runner')
 
     def test_check_runner_manually(self):
         """
@@ -83,7 +86,7 @@ class TestCheckRunner():
         check = run_result.CheckResult(self.connection, 'test_random_nums')
         prior_res = check.get_latest_result()
         # first, bad input
-        bad_res = app_utils.run_check_runner({'sqs_url': None})
+        bad_res = self.app_utils_obj.run_check_runner({'sqs_url': None})
         assert (bad_res is None)
         # queue a check without invoking runner. Get resulting run uuid
         to_send = ['test_checks/test_random_nums', {}, []]
@@ -91,11 +94,11 @@ class TestCheckRunner():
         test_success = False
         while tries < 10 and not test_success:
             tries += 1
-            run_uuid = app_utils.send_single_to_queue(self.environ, to_send, None, invoke_runner=False)
+            run_uuid = self.app_utils_obj.send_single_to_queue(self.environ, to_send, None, invoke_runner=False)
             time.sleep(1)
             with captured_output() as (out, err):
                 # invoke runner manually (without a lamba)
-                res = app_utils.run_check_runner({'sqs_url': self.queue.url}, propogate=False)
+                res = self.app_utils_obj.run_check_runner({'sqs_url': self.queue.url}, propogate=False)
             read_out = out.getvalue().strip()
             if res and res.get('uuid') == run_uuid:
                 # check the result from run_check_runner
@@ -116,15 +119,19 @@ class TestCheckRunner():
         assert (post_res['kwargs']['_run_info']['run_id'] == run_uuid)
 
     def test_check_runner_manually_with_associated_action(self):
+        print("Clearing queue..")
         cleared = self.clear_queue_and_runners()
         assert (cleared)
+        print("Queue cleared")
         # queue a check with queue_action="dev" kwarg, meaning the associated
         # action will automatically be queued after completion
         check = run_result.CheckResult(self.connection, 'test_random_nums')
+        print("CheckResult run finished")
         action = run_result.ActionResult(self.connection, 'add_random_test_nums')
+        print("ActionResult run finished")
         to_send = ['test_checks/test_random_nums', {'primary': True, 'queue_action': 'dev'}, []]
         # send the check to the queue; the action will be queue automatically
-        run_uuid = app_utils.send_single_to_queue(self.environ, to_send, None, invoke_runner=False)
+        run_uuid = self.app_utils_obj.send_single_to_queue(self.environ, to_send, None, invoke_runner=False)
         # both check and action separately must make it through queue
         check_done = False
         action_done = False
@@ -132,7 +139,8 @@ class TestCheckRunner():
         while (not check_done or not action_done) and tries < 20:
             tries += 1
             time.sleep(1)
-            app_utils.run_check_runner({'sqs_url': self.queue.url}, propogate=False)
+            print("try %d" % tries)
+            self.app_utils_obj.run_check_runner({'sqs_url': self.queue.url}, propogate=False)
             if not check_done:
                 latest_check_res = check.get_latest_result()
                 if latest_check_res and latest_check_res['uuid'] >= run_uuid:
@@ -167,11 +175,11 @@ class TestCheckRunner():
         while tries < 10 and not test_success:
             tries += 1
             to_send = ['test_checks/add_random_test_nums', act_kwargs, []]
-            app_utils.send_single_to_queue(self.environ, to_send, None, invoke_runner=False)
+            self.app_utils_obj.send_single_to_queue(self.environ, to_send, None, invoke_runner=False)
             time.sleep(1)
             with captured_output() as (out, err):
                 # invoke runner manually (without a lamba) and do not propogate
-                runner_res = app_utils.run_check_runner({'sqs_url': self.queue.url},
+                runner_res = self.app_utils_obj.run_check_runner({'sqs_url': self.queue.url},
                                                         propogate=False)
             read_out = out.getvalue().strip()
             if 'Found existing action record' in read_out:
@@ -182,18 +190,19 @@ class TestCheckRunner():
     def test_queue_check_group(self):
         # find the checks we will be using
         use_schedule = 'ten_min_checks'
-        check_schedule = check_utils.get_check_schedule(use_schedule)
+        check_handler = check_utils.CheckHandler()
+        check_schedule = check_handler.get_check_schedule(use_schedule)
         use_checks = [cs[0].split('/')[1] for env in check_schedule for cs in check_schedule[env]]
         # get a reference point for check results
-        prior_res = check_utils.get_check_results(self.connection, checks=use_checks, use_latest=True)
-        run_input = app_utils.queue_scheduled_checks(self.environ, 'ten_min_checks')
-        assert (self.stage_info['queue_name'] in run_input.get('sqs_url'))
+        prior_res = check_handler.get_check_results(self.connection, checks=use_checks, use_latest=True)
+        run_input = self.app_utils_obj.queue_scheduled_checks(self.environ, 'ten_min_checks')
+        assert (self.queue_name in run_input.get('sqs_url'))
         finished_count = 0  # since queue attrs are approximate
         error_count = 0
         # wait for queue to empty
         while finished_count < 2:
             time.sleep(1)
-            sqs_attrs = utils.get_sqs_attributes(run_input.get('sqs_url'))
+            sqs_attrs = sqs_utils.SQS.get_sqs_attributes(run_input.get('sqs_url'))
             vis_messages = int(sqs_attrs.get('ApproximateNumberOfMessages'))
             invis_messages = int(sqs_attrs.get('ApproximateNumberOfMessagesNotVisible'))
             if vis_messages == 0 and invis_messages == 0:
@@ -201,12 +210,12 @@ class TestCheckRunner():
             else:
                 error_count += 1
                 # eat up residual messages
-                app_utils.run_check_runner({'sqs_url': self.queue.url}, propogate=False)
+                self.app_utils_obj.run_check_runner({'sqs_url': self.queue.url}, propogate=False)
             if error_count > 60:  # test should fail
                 print('Did not locate result.')
                 assert (False)
         # queue should be empty. check results
-        post_res = check_utils.get_check_results(self.connection, checks=use_checks, use_latest=True)
+        post_res = check_handler.get_check_results(self.connection, checks=use_checks, use_latest=True)
         # compare the runtimes to ensure checks have run
         res_compare = {}
         for check_res in post_res:
@@ -219,7 +228,7 @@ class TestCheckRunner():
 
     def test_queue_check(self):
         check = run_result.CheckResult(self.connection, 'test_random_nums')
-        run_uuid = app_utils.queue_check(self.environ, 'test_random_nums')
+        run_uuid = self.app_utils_obj.queue_check(self.environ, 'test_random_nums')
         # both check and action separately must make it through queue
         tries = 0
         while True:
@@ -240,7 +249,7 @@ class TestCheckRunner():
     def test_queue_action(self):
         # this action will fail because it has no check-related kwargs
         action = run_result.ActionResult(self.connection, 'add_random_test_nums')
-        run_uuid = app_utils.queue_action(self.environ, 'add_random_test_nums')
+        run_uuid = self.app_utils_obj.queue_action(self.environ, 'add_random_test_nums')
         # both check and action separately must make it through queue
         tries = 0
         while True:
@@ -262,13 +271,13 @@ class TestCheckRunner():
 
     def test_get_sqs_attributes(self):
         # bad sqs url
-        bad_sqs_attrs = utils.get_sqs_attributes('not_a_queue')
+        bad_sqs_attrs = sqs_utils.SQS.get_sqs_attributes('not_a_queue')
         assert (bad_sqs_attrs.get('ApproximateNumberOfMessages') == bad_sqs_attrs.get('ApproximateNumberOfMessagesNotVisible') == 'ERROR')
 
     def test_record_and_collect_run_info(self):
-        check = utils.init_check_res(self.connection, 'not_a_real_check')
+        check = run_result.CheckResult(self.connection, 'not_a_real_check')
         check.kwargs['_run_info'] = {'run_id': 'test_run_uuid'}
         resp = check.record_run_info()
         assert (resp is not None)
-        found_ids = utils.collect_run_info('test_run_uuid')
+        found_ids = self.app_utils_obj.collect_run_info('test_run_uuid')
         assert (set(['test_run_uuid/not_a_real_check']) <= found_ids)

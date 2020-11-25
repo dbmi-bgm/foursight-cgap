@@ -1,10 +1,10 @@
 import time
 import datetime
 from ..run_result import CheckResult, ActionResult
-from ..utils import (
-    check_function,
-    action_function,
-)
+from ..decorators import Decorators
+check_function = Decorators().check_function
+action_function = Decorators().action_function
+
 
 @check_function()
 def elasticsearch_s3_count_diff(connection, **kwargs):

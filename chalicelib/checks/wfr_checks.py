@@ -1,13 +1,17 @@
 import json
 from datetime import datetime
-from ..utils import (
-    check_function,
-    action_function,
-)
 from ..run_result import CheckResult, ActionResult
 from dcicutils import ff_utils, s3Utils
-from .helpers import cgap_utils, wfrset_cgap_utils
-lambda_limit = cgap_utils.lambda_limit
+from foursight_core.checks.helpers.wfr_utils import (
+    check_runs_without_output,
+    lambda_limit
+)
+from .helpers import wfr_utils
+from .helpers.wfrset_utils import step_settings
+from ..decorators import Decorators
+check_function = Decorators().check_function
+action_function = Decorators().action_function
+
 
 # list of acceptible version
 cgap_partI_version = ['WGS_partI_V11', 'WGS_partI_V12', 'WGS_partI_V13', 'WGS_partI_V15', 'WGS_partI_V16', 'WGS_partI_V17']
@@ -89,7 +93,7 @@ def md5runCGAP_status(connection, **kwargs):
         if not head_info:
             no_s3_file.append(file_id)
             continue
-        md5_report = cgap_utils.get_wfr_out(a_file, "md5", key=my_auth, md_qc=True)
+        md5_report = wfr_utils.get_wfr_out(a_file, "md5", key=my_auth, md_qc=True)
         if md5_report['status'] == 'running':
             running.append(file_id)
         elif md5_report['status'].startswith("no complete run, too many"):
@@ -157,12 +161,12 @@ def md5runCGAP_start(connection, **kwargs):
             action.description = 'Did not complete action due to time limitations'
             break
         a_file = ff_utils.get_metadata(a_target, key=my_auth)
-        attributions = cgap_utils.get_attribution(a_file)
+        attributions = wfr_utils.get_attribution(a_file)
         inp_f = {'input_file': a_file['@id'],
                  'additional_file_parameters': {'input_file': {'mount': True}}}
-        wfr_setup = wfrset_cgap_utils.step_settings('md5', 'no_organism', attributions)
+        wfr_setup = step_settings('md5', 'no_organism', attributions)
 
-        url = cgap_utils.run_missing_wfr(wfr_setup, inp_f, a_file['accession'], connection.ff_keys, connection.ff_env)
+        url = wfr_utils.run_missing_wfr(wfr_setup, inp_f, a_file['accession'], connection.ff_keys, connection.ff_env)
         # aws run url
         if url.startswith('http'):
             action_logs['runs_started'].append(url)
@@ -215,14 +219,14 @@ def fastqcCGAP_status(connection, **kwargs):
     res = []
     # check if the qc_metric is in the file
     for a_file in results:
-        qc_metric = cgap_utils.is_there_my_qc_metric(a_file, 'QualityMetricFastqc', my_auth)
+        qc_metric = wfr_utils.is_there_my_qc_metric(a_file, 'QualityMetricFastqc', my_auth)
         if not qc_metric:
             res.append(a_file)
 
     if not res:
         check.summary = 'All Good!'
         return check
-    check = cgap_utils.check_runs_without_output(res, check, 'fastqc', my_auth, start)
+    check = check_runs_without_output(res, check, 'fastqc', my_auth, start)
     return check
 
 
@@ -245,11 +249,11 @@ def fastqcCGAP_start(connection, **kwargs):
             action.description = 'Did not complete action due to time limitations'
             break
         a_file = ff_utils.get_metadata(a_target, key=my_auth)
-        attributions = cgap_utils.get_attribution(a_file)
+        attributions = wfr_utils.get_attribution(a_file)
         inp_f = {'input_fastq': a_file['@id'],
                  'additional_file_parameters': {'input_fastq': {'mount': True}}}
-        wfr_setup = wfrset_cgap_utils.step_settings('fastqc', 'no_organism', attributions)
-        url = cgap_utils.run_missing_wfr(wfr_setup, inp_f, a_file['accession'], connection.ff_keys, connection.ff_env)
+        wfr_setup = step_settings('fastqc', 'no_organism', attributions)
+        url = wfr_utils.run_missing_wfr(wfr_setup, inp_f, a_file['accession'], connection.ff_keys, connection.ff_env)
         # aws run url
         if url.startswith('http'):
             action_logs['runs_started'].append(url)
@@ -318,7 +322,7 @@ def cgap_status(connection, **kwargs):
 
     # collect all wf for wf version check
     all_system_wfs = ff_utils.search_metadata('/search/?type=Workflow&status=released', my_auth)
-    wf_errs = cgap_utils.check_latest_workflow_version(all_system_wfs)
+    wf_errs = wfr_utils.check_latest_workflow_version(all_system_wfs)
     if wf_errs:
         check.summary = 'Error, problem with latest workflow versions'
         check.brief_output.extend(wf_errs)
@@ -377,7 +381,7 @@ def cgap_status(connection, **kwargs):
             check.full_output['skipped'].append({a_sample['accession']: 'files status uploading'})
             continue
 
-        sample_raw_files, refs = cgap_utils.find_fastq_info(a_sample, fastq_files)
+        sample_raw_files, refs = wfr_utils.find_fastq_info(a_sample, fastq_files)
         keep = {'missing_run': [], 'running': [], 'problematic_run': []}
         s3_input_bams = []
         stop_level_2 = False
@@ -399,7 +403,7 @@ def cgap_status(connection, **kwargs):
             # RUN STEP 1
             s1_input_files = {'fastq_R1': pair[0], 'fastq_R2': pair[1], 'reference': refs['bwa_ref']}
             s1_tag = 'step1_' + a_sample['accession'] + '_' + pair[0].split('/')[2] + '_' + pair[1].split('/')[2]
-            keep, step1_status, step1_output = cgap_utils.stepper(library, keep, s1_tag, pair,
+            keep, step1_status, step1_output = wfr_utils.stepper(library, keep, s1_tag, pair,
                                                                   s1_input_files,  step1_name, 'raw_bam')
             # RUN STEP 2
             if step1_status != 'complete':
@@ -409,7 +413,7 @@ def cgap_status(connection, **kwargs):
                 s2_input_files = {'input_bam': step1_output}
                 s2_tag = 'step2_' + a_sample['accession'] + '_' + step1_output.split('/')[2]
                 add_par = {"parameters": {"sample_name": bam_sample_id}}
-                keep, step2_status, step2_output = cgap_utils.stepper(library, keep, s2_tag, step1_output,
+                keep, step2_status, step2_output = wfr_utils.stepper(library, keep, s2_tag, step1_output,
                                                                       s2_input_files,  step2_name, 'bam_w_readgroups',
                                                                       add_par)
             if step2_status != 'complete':
@@ -427,7 +431,7 @@ def cgap_status(connection, **kwargs):
             else:
                 s3_input_files = {'input_bams': s3_input_bams}
                 s3_tag = 'step3_' + a_sample['accession']
-                keep, step3_status, step3_output = cgap_utils.stepper(library, keep, s3_tag, s3_input_bams,
+                keep, step3_status, step3_output = wfr_utils.stepper(library, keep, s3_tag, s3_input_bams,
                                                                       s3_input_files,  step3_name, 'merged_bam')
         # RUN STEP 4
         if step3_status != 'complete':
@@ -435,7 +439,7 @@ def cgap_status(connection, **kwargs):
         else:
             s4_input_files = {'input_bam': step3_output}
             s4_tag = 'step4_' + a_sample['accession']
-            keep, step4_status, step4_output = cgap_utils.stepper(library, keep, s4_tag, step3_output,
+            keep, step4_status, step4_output = wfr_utils.stepper(library, keep, s4_tag, step3_output,
                                                                   s4_input_files,  step4_name, 'dupmarked_bam')
         # RUN STEP 5
         if step4_status != 'complete':
@@ -443,7 +447,7 @@ def cgap_status(connection, **kwargs):
         else:
             s5_input_files = {'input_bam': step4_output}
             s5_tag = 'step5_' + a_sample['accession']
-            keep, step5_status, step5_output = cgap_utils.stepper(library, keep, s5_tag, step4_output,
+            keep, step5_status, step5_output = wfr_utils.stepper(library, keep, s5_tag, step4_output,
                                                                   s5_input_files,  step5_name, 'sorted_bam')
         # RUN STEP 6
         if step5_status != 'complete':
@@ -454,7 +458,7 @@ def cgap_status(connection, **kwargs):
                               'known-sites-indels': '/files-reference/GAPFIAX2PPYB/',
                               'reference': '/files-reference/GAPFIXRDPDK5/'}
             s6_tag = 'step6_' + a_sample['accession']
-            keep, step6_status, step6_output = cgap_utils.stepper(library, keep, s6_tag, step5_output,
+            keep, step6_status, step6_output = wfr_utils.stepper(library, keep, s6_tag, step5_output,
                                                                   s6_input_files,  step6_name, 'recalibration_report')
         # RUN STEP 7
         if step6_status != 'complete':
@@ -464,7 +468,7 @@ def cgap_status(connection, **kwargs):
                               'reference': '/files-reference/GAPFIXRDPDK5/',
                               'recalibration_report': step6_output}
             s7_tag = 'step7_' + a_sample['accession']
-            keep, step7_status, step7_output = cgap_utils.stepper(library, keep, s7_tag, step6_output,
+            keep, step7_status, step7_output = wfr_utils.stepper(library, keep, s7_tag, step6_output,
                                                                   s7_input_files,  step7_name, 'recalibrated_bam')
         # RUN STEP 8 - only run if will_go_to_part_3 is True
         if will_go_to_part_3:
@@ -477,7 +481,7 @@ def cgap_status(connection, **kwargs):
                                   'reference': '/files-reference/GAPFIXRDPDK5/',
                                   'additional_file_parameters': {'input_bam': {"mount": True}}}
                 s8_tag = 'step8_' + a_sample['accession']
-                keep, step8_status, step8_output = cgap_utils.stepper(library, keep, s8_tag, step7_output,
+                keep, step8_status, step8_output = wfr_utils.stepper(library, keep, s8_tag, step7_output,
                                                                       s8_input_files,  step8_name, 'rck')
         else:
             step8_status = 'complete'
@@ -491,7 +495,7 @@ def cgap_status(connection, **kwargs):
                               'regions': '/files-reference/GAPFIBGEOI72/',
                               'reference': '/files-reference/GAPFIXRDPDK5/'}
             s9_tag = 'step9_' + a_sample['accession']
-            keep, step9_status, step9_output = cgap_utils.stepper(library, keep, s9_tag, step7_output,
+            keep, step9_status, step9_output = wfr_utils.stepper(library, keep, s9_tag, step7_output,
                                                                   s9_input_files,  step9_name, 'gvcf')
 
         # step10 bamqc
@@ -504,7 +508,7 @@ def cgap_status(connection, **kwargs):
                                }
             update_pars = {"parameters": {'sample': bam_sample_id}}
             s10_tag = 'step10_' + a_sample['accession']
-            keep, step10_status, step10_output = cgap_utils.stepper(library, keep, s10_tag, step7_output,
+            keep, step10_status, step10_output = wfr_utils.stepper(library, keep, s10_tag, step7_output,
                                                                     s10_input_files,  step10_name, '',
                                                                     additional_input=update_pars, no_output=True)
         # are all runs done
@@ -592,7 +596,7 @@ def cgap_start(connection, **kwargs):
         missing_runs = cgap_check_result.get('needs_runs')
     if kwargs.get('patch_completed'):
         patch_meta = cgap_check_result.get('completed_runs')
-    action = cgap_utils.start_tasks(missing_runs, patch_meta, action, my_auth, my_env, start)
+    action = wfr_utils.start_tasks(missing_runs, patch_meta, action, my_auth, my_env, start)
     return action
 
 
@@ -646,7 +650,7 @@ def cgapS2_status(connection, **kwargs):
 
     # collect all wf for wf version check
     all_system_wfs = ff_utils.search_metadata('/search/?type=Workflow&status=released', my_auth)
-    wf_errs = cgap_utils.check_latest_workflow_version(all_system_wfs)
+    wf_errs = wfr_utils.check_latest_workflow_version(all_system_wfs)
     if wf_errs:
         final_status = 'Error, workflow versions'
         check.brief_output.extend(wf_errs)
@@ -691,7 +695,7 @@ def cgapS2_status(connection, **kwargs):
             continue
         # get variables used by vcfqc
         samples_pedigree = an_msa['samples_pedigree']
-        vcfqc_input_samples, qc_pedigree, run_mode, error = cgap_utils.analyze_pedigree(samples_pedigree, all_samples)
+        vcfqc_input_samples, qc_pedigree, run_mode, error = wfr_utils.analyze_pedigree(samples_pedigree, all_samples)
         if error:
             error_msg = print_id + " " + error
             check.brief_output.extend(error_msg)
@@ -740,7 +744,7 @@ def cgapS2_status(connection, **kwargs):
                 ebs_size = str(10 + len(input_samples) - 3) + 'x'
             update_pars = {"config": {"ebs_size": ebs_size}}
             s1_tag = print_id + '_combineGVCF_' + input_vcfs[0].split('/')[2]
-            keep, step1_status, step1_output = cgap_utils.stepper(library, keep,
+            keep, step1_status, step1_output = wfr_utils.stepper(library, keep,
                                                                   s1_tag, input_vcfs,
                                                                   s1_input_files,  step1_name, 'combined_gvcf',
                                                                   additional_input=update_pars)
@@ -757,7 +761,7 @@ def cgapS2_status(connection, **kwargs):
                               "known-sites-snp": "/files-reference/GAPFI4LJRN98/",
                               'chromosomes': '/files-reference/GAPFIGJVJDUY/'}
             s2_tag = print_id + '_GenotypeGVCF_' + step1_output.split('/')[2]
-            keep, step2_status, step2_output = cgap_utils.stepper(library, keep,
+            keep, step2_status, step2_output = wfr_utils.stepper(library, keep,
                                                                   s2_tag, step1_output,
                                                                   s2_input_files,  step2_name, 'vcf')
 
@@ -777,7 +781,7 @@ def cgapS2_status(connection, **kwargs):
                               }
             s3_tag = print_id + '_VEP_' + step2_output.split('/')[2]
             # there are 2 files we need, one to use in the next step
-            keep, step3_status, step3_outputs = cgap_utils.stepper(library, keep,
+            keep, step3_status, step3_outputs = wfr_utils.stepper(library, keep,
                                                                    s3_tag, step2_output,
                                                                    s3_input_files,  step3_name, ['microannot_mti', 'annot_mti'])
 
@@ -801,7 +805,7 @@ def cgapS2_status(connection, **kwargs):
             # workflow app name and input files, but also the tag on workflow run items
             # since we differentiate sample processings at this step, downsteam will be separated
             # no need for tagging them too
-            keep, step4_status, step4_output = cgap_utils.stepper(library, keep,
+            keep, step4_status, step4_output = wfr_utils.stepper(library, keep,
                                                                   s4_tag, step3_output_micro,
                                                                   s4_input_files,  step4_name, 'annotated_vcf',
                                                                   tag=an_msa['uuid'])
@@ -821,7 +825,7 @@ def cgapS2_status(connection, **kwargs):
                                           "het_hom": True,
                                           "ti_tv": True}}
             s5_tag = print_id + '_micro_vcfqc_' + step4_output.split('/')[2]
-            keep, step5_status, step5_output = cgap_utils.stepper(library, keep,
+            keep, step5_status, step5_output = wfr_utils.stepper(library, keep,
                                                                   s5_tag, step4_output,
                                                                   s5_input_files,  step5_name, '',
                                                                   additional_input=update_pars, no_output=True)
@@ -880,7 +884,7 @@ def cgapS2_status(connection, **kwargs):
         # example is a quad analyzed for 2 different probands. In this case you want a single
         # combineGVCF step, but 2 sample_processings will be generated trying to run same job,
         # identify and remove duplicates
-        check.full_output['needs_runs'] = cgap_utils.remove_duplicate_need_runs(check.full_output['needs_runs'])
+        check.full_output['needs_runs'] = wfr_utils.remove_duplicate_need_runs(check.full_output['needs_runs'])
         check.summary += str(len(check.full_output['needs_runs'])) + ' missing|'
         check.status = 'WARN'
         check.allow_action = True
@@ -908,7 +912,7 @@ def cgapS2_start(connection, **kwargs):
         missing_runs = cgapS2_check_result.get('needs_runs')
     if kwargs.get('patch_completed'):
         patch_meta = cgapS2_check_result.get('completed_runs')
-    action = cgap_utils.start_tasks(missing_runs, patch_meta, action, my_auth, my_env, start)
+    action = wfr_utils.start_tasks(missing_runs, patch_meta, action, my_auth, my_env, start)
     return action
 
 
@@ -962,7 +966,7 @@ def cgapS3_status(connection, **kwargs):
     step6_name = 'bamsnap'
     # collect all wf for wf version check
     all_system_wfs = ff_utils.search_metadata('/search/?type=Workflow&status=released', my_auth)
-    wf_errs = cgap_utils.check_latest_workflow_version(all_system_wfs)
+    wf_errs = wfr_utils.check_latest_workflow_version(all_system_wfs)
     if wf_errs:
         final_status = 'Error, workflow versions'
         check.brief_output.extend(wf_errs)
@@ -1008,7 +1012,7 @@ def cgapS3_status(connection, **kwargs):
         samples_pedigree = an_msa['samples_pedigree']
 
         # return input samples for trio/proband in sequence father,mother,proband
-        input_samples, qc_pedigree, run_mode, error = cgap_utils.analyze_pedigree(samples_pedigree, all_samples)
+        input_samples, qc_pedigree, run_mode, error = wfr_utils.analyze_pedigree(samples_pedigree, all_samples)
         if error:
             error_msg = print_id + " " + error
             check.brief_output.extend(error_msg)
@@ -1055,7 +1059,7 @@ def cgapS3_status(connection, **kwargs):
         input_bams = []  # used by bamsnap
         input_titles = []  # used by bamsnap
         # return bams and titles for all samples in sample_proessing starting with proband-mother-father-sibling
-        input_bams, input_titles = cgap_utils.get_bamsnap_parameters(samples_pedigree, all_samples)
+        input_bams, input_titles = wfr_utils.get_bamsnap_parameters(samples_pedigree, all_samples)
 
         # we need the vep and micro vcf in the processed_files field of sample_processing
         if len(an_msa.get('processed_files', [])) != 2:
@@ -1076,7 +1080,7 @@ def cgapS3_status(connection, **kwargs):
                               'additional_file_parameters': {'input_rcks': {"rename": new_names}}
                               }
             s1_tag = print_id + '_rck-tar'
-            keep, step1_status, step1_output = cgap_utils.stepper(library, keep,
+            keep, step1_status, step1_output = wfr_utils.stepper(library, keep,
                                                                   s1_tag, input_rcks,
                                                                   s1_input_files,  step1_name, 'rck_tar')
         else:
@@ -1093,7 +1097,7 @@ def cgapS3_status(connection, **kwargs):
                               'additional_file_parameters': {'input_vcf': {"unzip": "gz"}}
                               }
             s2_tag = print_id + '_filtering'
-            keep, step2_status, step2_output = cgap_utils.stepper(library, keep,
+            keep, step2_status, step2_output = wfr_utils.stepper(library, keep,
                                                                   s2_tag, input_vcf,
                                                                   s2_input_files,  step2_name, 'merged_vcf')
 
@@ -1111,7 +1115,7 @@ def cgapS3_status(connection, **kwargs):
                                                                  }
                                   }
                 s3_tag = print_id + '_novocaller'
-                keep, step3_status, step3_output = cgap_utils.stepper(library, keep,
+                keep, step3_status, step3_output = wfr_utils.stepper(library, keep,
                                                                       s3_tag, step2_output,
                                                                       s3_input_files,  step3_name, 'novoCaller_vcf')
             else:
@@ -1129,7 +1133,7 @@ def cgapS3_status(connection, **kwargs):
             proband_first_sample_list = list(reversed(sample_ids))  # proband first sample ids
             update_pars = {"parameters": {"trio": proband_first_sample_list}}
             s4_tag = print_id + '_comhet'
-            keep, step4_status, step4_output = cgap_utils.stepper(library, keep,
+            keep, step4_status, step4_output = wfr_utils.stepper(library, keep,
                                                                   s4_tag, step3_output,
                                                                   s4_input_files,  step4_name, 'comHet_vcf',
                                                                   additional_input=update_pars)
@@ -1154,7 +1158,7 @@ def cgapS3_status(connection, **kwargs):
                 update_file_metadata = {}
 
             s5_tag = print_id + '_full_ann'
-            keep, step5_status, step5_output = cgap_utils.stepper(library, keep,
+            keep, step5_status, step5_output = wfr_utils.stepper(library, keep,
                                                                   s5_tag, step4_output,
                                                                   s5_input_files,  step5_name, 'annotated_vcf',
                                                                   additional_input=update_file_metadata)
@@ -1179,7 +1183,7 @@ def cgapS3_status(connection, **kwargs):
                                                 }
                            }
             s5a_tag = print_id + '_full_vcfqc'
-            keep, step5a_status, step5a_output = cgap_utils.stepper(library, keep,
+            keep, step5a_status, step5a_output = wfr_utils.stepper(library, keep,
                                                                     s5a_tag, step5_output,
                                                                     s5a_input_files,  step5a_name, '',
                                                                     additional_input=update_pars, no_output=True)
@@ -1202,7 +1206,7 @@ def cgapS3_status(connection, **kwargs):
                               }
             s6_tag = print_id + '_bamsnap'
             update_pars = {"parameters": {"titles": input_titles}}
-            keep, step6_status, step6_output = cgap_utils.stepper(library, keep,
+            keep, step6_status, step6_output = wfr_utils.stepper(library, keep,
                                                                   s6_tag, step5_output,
                                                                   s6_input_files,  step6_name, '',
                                                                   additional_input=update_pars, no_output=True)
@@ -1285,7 +1289,7 @@ def cgapS3_start(connection, **kwargs):
         missing_runs = cgapS3_check_result.get('needs_runs')
     if kwargs.get('patch_completed'):
         patch_meta = cgapS3_check_result.get('completed_runs')
-    action = cgap_utils.start_tasks(missing_runs, patch_meta, action, my_auth, my_env, start)
+    action = wfr_utils.start_tasks(missing_runs, patch_meta, action, my_auth, my_env, start)
     return action
 
 
@@ -1400,7 +1404,7 @@ def bamqcCGAP_status(connection, **kwargs):
     # check if the qc_metric is in the file
     for a_file in bam_list:
         results = ff_utils.get_metadata(a_file, key=my_auth)
-        qc_metric = cgap_utils.is_there_my_qc_metric(results, 'QualityMetricWgsBamqc', my_auth)
+        qc_metric = wfr_utils.is_there_my_qc_metric(results, 'QualityMetricWgsBamqc', my_auth)
         if not qc_metric:
             res.append(results)
 
@@ -1408,7 +1412,7 @@ def bamqcCGAP_status(connection, **kwargs):
         check.summary = 'All Good!'
         return check
 
-    check = cgap_utils.check_runs_without_output(res, check, 'workflow_qcboard-bam', my_auth, start)
+    check = check_runs_without_output(res, check, 'workflow_qcboard-bam', my_auth, start)
     return check
 
 
@@ -1431,10 +1435,10 @@ def bamqcCGAP_start(connection, **kwargs):
             action.description = 'Did not complete action due to time limitations'
             break
         a_file = ff_utils.get_metadata(a_target, key=my_auth)
-        attributions = cgap_utils.get_attribution(a_file)
+        attributions = wfr_utils.get_attribution(a_file)
         inp_f = {'input_files': a_file['@id']}
-        wfr_setup = wfrset_cgap_utils.step_settings('workflow_qcboard-bam', 'no_organism', attributions)
-        url = cgap_utils.run_missing_wfr(wfr_setup, inp_f, a_file['accession'], connection.ff_keys, connection.ff_env)
+        wfr_setup = step_settings('workflow_qcboard-bam', 'no_organism', attributions)
+        url = wfr_utils.run_missing_wfr(wfr_setup, inp_f, a_file['accession'], connection.ff_keys, connection.ff_env)
         # aws run url
         if url.startswith('http'):
             action_logs['runs_started'].append(url)
@@ -1517,7 +1521,7 @@ def cram_status(connection, **kwargs):
                            'reference_fasta': '/files-reference/GAPFIXRDPDK5/',
                            'reference_md5_list': '/files-reference/GAPFIGWSGHNU/'}
             tag = 'cram2fastq_' + a_sample['accession'] + '_' + a_cram['@id']
-            keep, step1_status, step1_output = cgap_utils.stepper(library, keep,
+            keep, step1_status, step1_output = wfr_utils.stepper(library, keep,
                                                                   tag, a_cram['@id'],
                                                                   input_files,  'workflow_cram2fastq',
                                                                   ['fastq1', 'fastq2'])
@@ -1598,7 +1602,7 @@ def cram_start(connection, **kwargs):
         missing_runs = cram_check_result.get('needs_runs')
     if kwargs.get('patch_completed'):
         patch_meta = cram_check_result.get('completed_runs')
-    action = cgap_utils.start_tasks(missing_runs, patch_meta, action, my_auth, my_env, start)
+    action = wfr_utils.start_tasks(missing_runs, patch_meta, action, my_auth, my_env, start)
     return action
 
 
@@ -1621,7 +1625,7 @@ def long_running_wfrs_status(connection, **kwargs):
     check.status = 'PASS'
     check.allow_action = False
     # get workflow run limits
-    workflow_details = cgap_utils.workflow_details
+    workflow_details = wfr_utils.workflow_details
     # find all runs thats status is not complete or error
     q = '/search/?type=WorkflowRun&run_status!=complete&run_status!=error'
     running_wfrs = ff_utils.search_metadata(q, my_auth)
@@ -1629,7 +1633,7 @@ def long_running_wfrs_status(connection, **kwargs):
     # if a comma separated list of uuids is given, limit the result to them
     uuids = str(kwargs.get('limit_to_uuids'))
     if uuids:
-        uuids = cgap_utils.string_to_list(uuids)
+        uuids = wfr_utils.string_to_list(uuids)
         running_wfrs = [i for i in running_wfrs if i['uuid'] in uuids]
 
     if not running_wfrs:
@@ -1657,7 +1661,7 @@ def long_running_wfrs_status(connection, **kwargs):
         if run_time > run_limit:
             long_running += 1
             # find all items to be deleted
-            delete_list_uuid = cgap_utils.fetch_wfr_associated(a_wfr)
+            delete_list_uuid = wfr_utils.fetch_wfr_associated(a_wfr)
             check.full_output.append({'wfr_uuid': a_wfr['uuid'],
                                       'wfr_type': run_type,
                                       'wfr_run_time': str(int(run_time)) + 'h',
@@ -1723,12 +1727,12 @@ def problematic_wfrs_status(connection, **kwargs):
     # if a comma separated list of uuids is given, limit the result to them
     uuids = str(kwargs.get('limit_to_uuids'))
     if uuids:
-        uuids = cgap_utils.string_to_list(uuids)
+        uuids = wfr_utils.string_to_list(uuids)
         errored_wfrs = [i for i in errored_wfrs if i['uuid'] in uuids]
 
     delete_categories = str(kwargs.get('delete_categories'))
     if delete_categories:
-        delete_categories = cgap_utils.string_to_list(delete_categories)
+        delete_categories = wfr_utils.string_to_list(delete_categories)
 
     if not errored_wfrs:
         check.summary = 'All Good!'
@@ -1767,7 +1771,7 @@ def problematic_wfrs_status(connection, **kwargs):
         # all should be assigned to a category
         assert category
         # find all items to be deleted
-        delete_list_uuid = cgap_utils.fetch_wfr_associated(a_wfr)
+        delete_list_uuid = wfr_utils.fetch_wfr_associated(a_wfr)
 
         info_pack = {'wfr_uuid': a_wfr['uuid'],
                      'wfr_type': run_type,
@@ -1907,7 +1911,7 @@ def replace_me_status(connection, **kwargs):
                               'additional_file_parameters': {'input_file': {"unzip": "gz"}}
                               }
             s2_tag = print_id + '_new_step'
-            keep, step2_status, step2_output = cgap_utils.stepper(library, keep,
+            keep, step2_status, step2_output = wfr_utils.stepper(library, keep,
                                                                   s2_tag, 'input file',
                                                                   s2_input_files,  'name of the app name', 'output argument')
 
@@ -1990,5 +1994,5 @@ def replace_me_start(connection, **kwargs):
         missing_runs = replace_me_check_result.get('needs_runs')
     if kwargs.get('patch_completed'):
         patch_meta = replace_me_check_result.get('completed_runs')
-    action = cgap_utils.start_tasks(missing_runs, patch_meta, action, my_auth, my_env, start)
+    action = wfr_utils.start_tasks(missing_runs, patch_meta, action, my_auth, my_env, start)
     return action

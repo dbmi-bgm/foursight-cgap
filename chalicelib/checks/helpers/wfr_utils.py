@@ -1,13 +1,17 @@
-from dcicutils import ff_utils, s3Utils
+import json
 from datetime import datetime
 from operator import itemgetter
-from . import wfrset_cgap_utils
-import json
-lambda_limit = wfrset_cgap_utils.lambda_limit
-# use wf_dict in workflow version check to make sure latest version and workflow uuid matches
-wf_dict = wfrset_cgap_utils.wf_dict
-# check at the end
-# check extract_file_info has 4 arguments
+from dcicutils import ff_utils, s3Utils
+from foursight_core.checks.helpers.wfr_utils import (
+    lambda_limit,
+    check_runs_without_output
+)
+from .wfrset_utils import (
+    # use wf_dict in workflow version check to make sure latest version and workflow uuid matches
+    wf_dict,
+    step_settings 
+)
+
 
 # wfr_name, accepted versions, expected run time
 workflow_details = {
@@ -267,7 +271,7 @@ def check_latest_workflow_version(workflows):
     """Some sanity checks for workflow versions
     expectations:
      - All workflows that we are currently active should be listed both on
-       cgap_utils.py (workflow_details) and wfrset_cgap_utils.py (wf_dict)
+       wfr_utils.py (workflow_details) and wfrset_utils.py (wf_dict)
      - The lastest workflow version on foursight (workflow_details) should be carried by the
        latest released workflow item on the data portal.
        If a new version is released on the portal, we need it to be on foursight too, if not stop the check.
@@ -276,10 +280,10 @@ def check_latest_workflow_version(workflows):
     errors = []
     for a_wf in workflows:
         wf_name = a_wf['app_name']
-        # make sure the workflow is in our control list on cgap_utils.py
+        # make sure the workflow is in our control list on wfr_utils.py
         if wf_name not in workflow_details:
             continue
-        # make sure the workflow is in our settings list on wfrset_cgap_utils.py
+        # make sure the workflow is in our settings list on wfrset_utils.py
         if wf_name not in [i['app_name'] for i in wf_dict]:
             continue
         wf_info = workflow_details[wf_name]
@@ -302,7 +306,7 @@ def check_latest_workflow_version(workflows):
             err = '{} version {} is not decleared on foursight)'.format(wf_name, last_wf_version_on_portal)
             errors.append(err)
             continue
-        # check if the lastest version workflow uuids is correct on wfr_dict (wfrset_cgap_utils.py)
+        # check if the lastest version workflow uuids is correct on wfr_dict (wfrset_utils.py)
         latest_workflow_uuid = [i['uuid'] for i in same_wf_name_workflows if i['app_version'] == last_version][0]
         wf_dict_item = [i['workflow_uuid'] for i in wf_dict if i['app_name'] == wf_name][0]
         if latest_workflow_uuid != wf_dict_item:
@@ -792,10 +796,10 @@ def start_missing_run(run_info, auth, env):
     if not attr_file:
         possible_keys = [i for i in inputs.keys() if i != 'additional_file_parameters']
         error_message = ('one of these argument names {} which carry the input file -not the references-'
-                         ' should be added to att_keys dictionary on foursight cgap_utils.py function start_missing_run').format(possible_keys)
+                         ' should be added to att_keys dictionary on foursight wfr_utils.py function start_missing_run').format(possible_keys)
         raise ValueError(error_message)
     attributions = get_attribution(ff_utils.get_metadata(attr_file, auth))
-    settings = wfrset_cgap_utils.step_settings(run_settings[0], run_settings[1], attributions, run_settings[2])
+    settings = step_settings(run_settings[0], run_settings[1], attributions, run_settings[2])
     url = run_missing_wfr(settings, inputs, name_tag, auth, env)
     return url
 
@@ -836,62 +840,6 @@ def run_missing_wfr(input_json, input_files_and_params, run_name, auth, env):
         return url
     except Exception as e:
         return str(e)
-
-
-def check_runs_without_output(res, check, run_name, my_auth, start):
-    """Common processing for checks that are running on files and not producing output files
-    like qcs ones producing extra files"""
-    # no successful run
-    missing_run = []
-    # successful run but no expected metadata change (qc or extra file)
-    missing_meta_changes = []
-    # still running
-    running = []
-    # multiple failed runs
-    problems = []
-
-    for a_file in res:
-        # lambda has a time limit (300sec), kill before it is reached so we get some results
-        now = datetime.utcnow()
-        if (now-start).seconds > lambda_limit:
-            check.brief_output.append('did not complete checking all')
-            break
-        file_id = a_file['accession']
-        report = get_wfr_out(a_file, run_name,  key=my_auth, md_qc=True)
-        if report['status'] == 'running':
-            running.append(file_id)
-        elif report['status'].startswith("no complete run, too many"):
-            problems.append(file_id)
-        elif report['status'] != 'complete':
-            missing_run.append(file_id)
-        # There is a successful run, but no extra_file
-        elif report['status'] == 'complete':
-            missing_meta_changes.append(file_id)
-    if running:
-        check.summary = 'Some files are running'
-        check.brief_output.append(str(len(running)) + ' files are still running.')
-        check.full_output['running'] = running
-    if problems:
-        check.summary = 'Some files have problems'
-        check.brief_output.append(str(len(problems)) + ' files have multiple failed runs')
-        check.full_output['problems'] = problems
-        check.status = 'WARN'
-    if missing_run:
-        check.allow_action = True
-        check.summary = 'Some files are missing runs'
-        check.brief_output.append(str(len(missing_run)) + ' files lack a successful run')
-        check.full_output['files_without_run'] = missing_run
-        check.status = 'WARN'
-    if missing_meta_changes:
-        check.allow_action = True
-        check.summary = 'Some files are missing runs'
-        check.brief_output.append(str(len(missing_meta_changes)) + ' files have successful run but no qc/extra file')
-        check.full_output['files_without_changes'] = missing_meta_changes
-        check.status = 'WARN'
-    check.summary = check.summary.strip()
-    if not check.brief_output:
-        check.brief_output = ['All Good!']
-    return check
 
 
 def find_fastq_info(my_sample, fastq_files, organism='human'):

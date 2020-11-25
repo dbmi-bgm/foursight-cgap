@@ -1,13 +1,11 @@
-from __future__ import print_function, unicode_literals
-from ..utils import (
-    check_function,
-    action_function,
-)
 from ..run_result import CheckResult, ActionResult
 from dcicutils import ff_utils
 import re
 import requests
-from .helpers import wrangler_utils
+from foursight_core.checks.helpers import wrangler_utils
+from ..decorators import Decorators
+check_function = Decorators().check_function
+action_function = Decorators().action_function
 
 
 STATUS_LEVEL = {
