@@ -2,16 +2,15 @@ import json
 from datetime import datetime
 from ..run_result import CheckResult, ActionResult
 from dcicutils import ff_utils, s3Utils
-from foursight_core.checks.helpers import (
-    wfr_utils as core_wfr_utils,
+from foursight_core.checks.helpers.wfr_utils import (
+    check_runs_without_output,
+    lambda_limit
 )
-from .helpers import wfr_utils, wfrset_utils
+from .helpers import wfr_utils
+from .helpers.wfrset_utils import step_settings
 from ..decorators import Decorators
 check_function = Decorators().check_function
 action_function = Decorators().action_function
-
-
-lambda_limit = wfr_utils.lambda_limit
 
 
 # list of acceptible version
@@ -165,7 +164,7 @@ def md5runCGAP_start(connection, **kwargs):
         attributions = wfr_utils.get_attribution(a_file)
         inp_f = {'input_file': a_file['@id'],
                  'additional_file_parameters': {'input_file': {'mount': True}}}
-        wfr_setup = wfrset_utils.step_settings('md5', 'no_organism', attributions)
+        wfr_setup = step_settings('md5', 'no_organism', attributions)
 
         url = wfr_utils.run_missing_wfr(wfr_setup, inp_f, a_file['accession'], connection.ff_keys, connection.ff_env)
         # aws run url
@@ -227,7 +226,7 @@ def fastqcCGAP_status(connection, **kwargs):
     if not res:
         check.summary = 'All Good!'
         return check
-    check = core_wfr_utils.check_runs_without_output(res, check, 'fastqc', my_auth, start)
+    check = check_runs_without_output(res, check, 'fastqc', my_auth, start)
     return check
 
 
@@ -253,7 +252,7 @@ def fastqcCGAP_start(connection, **kwargs):
         attributions = wfr_utils.get_attribution(a_file)
         inp_f = {'input_fastq': a_file['@id'],
                  'additional_file_parameters': {'input_fastq': {'mount': True}}}
-        wfr_setup = wfrset_utils.step_settings('fastqc', 'no_organism', attributions)
+        wfr_setup = step_settings('fastqc', 'no_organism', attributions)
         url = wfr_utils.run_missing_wfr(wfr_setup, inp_f, a_file['accession'], connection.ff_keys, connection.ff_env)
         # aws run url
         if url.startswith('http'):
@@ -1413,7 +1412,7 @@ def bamqcCGAP_status(connection, **kwargs):
         check.summary = 'All Good!'
         return check
 
-    check = core_wfr_utils.check_runs_without_output(res, check, 'workflow_qcboard-bam', my_auth, start)
+    check = check_runs_without_output(res, check, 'workflow_qcboard-bam', my_auth, start)
     return check
 
 
@@ -1438,7 +1437,7 @@ def bamqcCGAP_start(connection, **kwargs):
         a_file = ff_utils.get_metadata(a_target, key=my_auth)
         attributions = wfr_utils.get_attribution(a_file)
         inp_f = {'input_files': a_file['@id']}
-        wfr_setup = wfrset_utils.step_settings('workflow_qcboard-bam', 'no_organism', attributions)
+        wfr_setup = step_settings('workflow_qcboard-bam', 'no_organism', attributions)
         url = wfr_utils.run_missing_wfr(wfr_setup, inp_f, a_file['accession'], connection.ff_keys, connection.ff_env)
         # aws run url
         if url.startswith('http'):

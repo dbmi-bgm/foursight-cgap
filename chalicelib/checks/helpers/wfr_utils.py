@@ -2,15 +2,16 @@ import json
 from datetime import datetime
 from operator import itemgetter
 from dcicutils import ff_utils, s3Utils
-from foursight_core.checks.helpers.wfrset_utils import lambda_limit
 from foursight_core.checks.helpers.wfr_utils import (
+    lambda_limit,
     check_runs_without_output
 )
-from . import wfrset_utils
-# use wf_dict in workflow version check to make sure latest version and workflow uuid matches
-wf_dict = wfrset_utils.wf_dict
-# check at the end
-# check extract_file_info has 4 arguments
+from .wfrset_utils import (
+    # use wf_dict in workflow version check to make sure latest version and workflow uuid matches
+    wf_dict,
+    step_settings 
+)
+
 
 # wfr_name, accepted versions, expected run time
 workflow_details = {
@@ -798,7 +799,7 @@ def start_missing_run(run_info, auth, env):
                          ' should be added to att_keys dictionary on foursight wfr_utils.py function start_missing_run').format(possible_keys)
         raise ValueError(error_message)
     attributions = get_attribution(ff_utils.get_metadata(attr_file, auth))
-    settings = wfrset_utils.step_settings(run_settings[0], run_settings[1], attributions, run_settings[2])
+    settings = step_settings(run_settings[0], run_settings[1], attributions, run_settings[2])
     url = run_missing_wfr(settings, inputs, name_tag, auth, env)
     return url
 
