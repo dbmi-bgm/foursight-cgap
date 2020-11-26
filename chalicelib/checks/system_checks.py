@@ -9,7 +9,6 @@ from foursight_core.checks.helpers.sys_utils import (
     parse_datetime_to_utc,
     cat_indices
 )
-from ..run_result import CheckResult
 from dcicutils import (
     ff_utils,
     es_utils,
@@ -17,8 +16,11 @@ from dcicutils import (
     env_utils
 )
 from ..decorators import Decorators
-check_function = Decorators().check_function
-action_function = Decorators().action_function
+deco = Decorators()
+CheckResult = deco.CheckResult
+ActionResult = deco.ActionResult
+check_function = deco.check_function
+action_function = deco.action_function
 
 
 # XXX: put into utils?

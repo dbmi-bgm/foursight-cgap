@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-from ..run_result import CheckResult, ActionResult
 from dcicutils import ff_utils, s3Utils
 from foursight_core.checks.helpers.wfr_utils import (
     check_runs_without_output,
@@ -9,8 +8,11 @@ from foursight_core.checks.helpers.wfr_utils import (
 from .helpers import wfr_utils
 from .helpers.wfrset_utils import step_settings
 from ..decorators import Decorators
-check_function = Decorators().check_function
-action_function = Decorators().action_function
+deco = Decorators()
+CheckResult = deco.CheckResult
+ActionResult = deco.ActionResult
+check_function = deco.check_function
+action_function = deco.action_function
 
 
 # list of acceptible version

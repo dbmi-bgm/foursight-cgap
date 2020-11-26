@@ -1,9 +1,11 @@
 import time
 import datetime
-from ..run_result import CheckResult, ActionResult
 from ..decorators import Decorators
-check_function = Decorators().check_function
-action_function = Decorators().action_function
+deco = Decorators()
+CheckResult = deco.CheckResult
+ActionResult = deco.ActionResult
+check_function = deco.check_function
+action_function = deco.action_function
 
 
 @check_function()

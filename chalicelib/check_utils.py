@@ -1,19 +1,13 @@
 from os.path import dirname
 from foursight_core.check_utils import CheckHandler as CheckHandler_from_core
-from .environment import Environment as CurrentEnvironmentClass
-from .run_result import (
-    CheckResult as CurrentCheckResultClass,
-    ActionResult as CurrentActionResultClass
-)
+from .vars import FOURSIGHT_PREFIX
 
 
 class CheckHandler(CheckHandler_from_core):
 
-    # these must be overwritten for inherited classes
+    # overwriting parent class
+    prefix = FOURSIGHT_PREFIX
     setup_dir = dirname(__file__)
-    CheckResult = CurrentCheckResultClass
-    ActionResult = CurrentActionResultClass
-    Environment = CurrentEnvironmentClass
     check_package_name = 'chalicelib'
 
     @classmethod

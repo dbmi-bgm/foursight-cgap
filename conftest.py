@@ -13,15 +13,15 @@ from foursight_core import (
     es_connection,
     exceptions,
     check_schema,
+    stage,
+    environment,
+    sqs_utils,
+    run_result,
 )
 from chalicelib import (
-    sqs_utils,
     app_utils,
     check_utils,
     decorators,
-    run_result,
-    stage,
-    environment,
 )
 from chalicelib.vars import *
 from dcicutils import s3_utils, ff_utils
@@ -35,7 +35,7 @@ action_function = decorators.Decorators().action_function
 def setup():
     app.set_stage('test')  # set the stage info for tests
     test_client = boto3.client('sqs')  # purge test queue
-    queue_url = sqs_utils.SQS.get_sqs_queue().url
+    queue_url = sqs_utils.SQS(FOURSIGHT_PREFIX).get_sqs_queue().url
     try:
         test_client.purge_queue(
             QueueUrl=queue_url

@@ -3,7 +3,8 @@ from conftest import *
 
 class TestESConnection():
     environ = DEV_ENV
-    conn = app_utils.AppUtils.init_connection(environ)
+    app_utils_obj = app_utils.AppUtils()
+    conn = app_utils_obj.init_connection(environ)
     index = 'unit_test_index'
     try:
         es = es_connection.ESConnection(index, host=HOST)
