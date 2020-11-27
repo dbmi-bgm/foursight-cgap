@@ -2,14 +2,7 @@ from dcicutils import ff_utils
 import re
 import requests
 from foursight_core.checks.helpers import wrangler_utils
-from ..decorators import Decorators
-deco = Decorators()
-CheckResult = deco.CheckResult
-ActionResult = deco.ActionResult
-check_function = deco.check_function
-action_function = deco.action_function
-
-
+from .helpers.confchecks import *  # import initialized decorators and its methods
 
 
 STATUS_LEVEL = {

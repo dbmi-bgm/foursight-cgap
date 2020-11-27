@@ -7,12 +7,7 @@ from foursight_core.checks.helpers.wfr_utils import (
 )
 from .helpers import wfr_utils
 from .helpers.wfrset_utils import step_settings
-from ..decorators import Decorators
-deco = Decorators()
-CheckResult = deco.CheckResult
-ActionResult = deco.ActionResult
-check_function = deco.check_function
-action_function = deco.action_function
+from .helpers.confchecks import *  # import initialized decorators and its methods
 
 
 # list of acceptible version

@@ -14,12 +14,7 @@ from dcicutils.beanstalk_utils import (
     compute_cgap_prd_env, compute_ff_prd_env, beanstalk_info, is_indexing_finished
 )
 from ..vars import FOURSIGHT_PREFIX, DEV_ENV
-from ..decorators import Decorators
-deco = Decorators()
-CheckResult = deco.CheckResult
-ActionResult = deco.ActionResult
-check_function = deco.check_function
-action_function = deco.action_function
+from .helpers.confchecks import *  # import initialized decorators and its methods
 
 
 def try_to_describe_indexer_env(env):
