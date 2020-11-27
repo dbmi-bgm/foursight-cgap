@@ -17,19 +17,20 @@ from foursight_core import (
     environment,
     sqs_utils,
     run_result,
+    check_utils,
 )
 from chalicelib import (
     app_utils,
-    check_utils,
     decorators,
 )
-from chalicelib.vars import *
+from .vars import *
 from dcicutils import s3_utils, ff_utils
 from contextlib import contextmanager
 import pytest
 
 check_function = decorators.Decorators().check_function
 action_function = decorators.Decorators().action_function
+DEV_ENV = 'cgapdev'
 
 @pytest.fixture(scope='session', autouse=True)
 def setup():
