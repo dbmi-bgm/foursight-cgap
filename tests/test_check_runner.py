@@ -191,7 +191,7 @@ class TestCheckRunner():
     def test_queue_check_group(self):
         # find the checks we will be using
         use_schedule = 'ten_min_checks'
-        check_handler = check_utils.CheckHandler()
+        check_handler = check_utils.CheckHandler(FOURSIGHT_PREFIX)
         check_schedule = check_handler.get_check_schedule(use_schedule)
         use_checks = [cs[0].split('/')[1] for env in check_schedule for cs in check_schedule[env]]
         # get a reference point for check results

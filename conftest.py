@@ -23,14 +23,14 @@ from chalicelib import (
     app_utils,
     decorators,
 )
-from .vars import *
+from chalicelib.vars import *
+from chalicelib import __file__ as chalicelib_path
 from dcicutils import s3_utils, ff_utils
 from contextlib import contextmanager
 import pytest
 
 check_function = decorators.Decorators().check_function
 action_function = decorators.Decorators().action_function
-DEV_ENV = 'cgapdev'
 
 @pytest.fixture(scope='session', autouse=True)
 def setup():
