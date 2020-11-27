@@ -13,6 +13,7 @@ class TestCheckUtils():
             get_check = check_str.split('/')[1]
             chalice_resp = self.app_utils_obj.run_get_check(self.environ, get_check)
             body = chalice_resp.body
+            print("chalice_resp.body= " + str(body))
             if body.get('status') == 'success':
                 assert (chalice_resp.status_code == 200)
                 if body.get('data') is None:  # check not run yet

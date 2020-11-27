@@ -39,7 +39,7 @@ class TestAppUtils():
     def test_bad_view_result(self):
         """ Tests giving a bad response to process_view_result """
         res = 'a string, not a dict response'
-        error = app_utils.AppUtils.process_view_result(self.conn, res, False)
+        error = self.app_utils_obj.process_view_result(self.conn, res, False)
         assert error['status'] == 'ERROR'
 
     def test_init_environments(self):
@@ -94,11 +94,11 @@ class TestAppUtils():
             "name": "Dummy",
             "iat": 1516239022
         }  # mock a 'correct' jwt decode
-        with mock.patch('chalicelib.self.app_utils_obj.get_jwt', return_value='token'):
+        with mock.patch('chalicelib.app_utils.AppUtils.get_jwt', return_value='token'):
             with mock.patch('jwt.decode', return_value=payload1):
                 auth = self.app_utils_obj.check_authorization({}, env=self.environ)
             assert auth
-        with mock.patch('chalicelib.self.app_utils_obj.get_jwt', return_value='token'):
+        with mock.patch('chalicelib.app_utils.AppUtils.get_jwt', return_value='token'):
             with mock.patch('jwt.decode', return_value=payload1):
                 # test authenticating on more than one env
                 auth = self.app_utils_obj.check_authorization({}, env=self.environ)
@@ -114,7 +114,7 @@ class TestAppUtils():
         }
         auth = self.app_utils_obj.check_authorization(ctx, env='all')
         assert auth
-        with mock.patch('chalicelib.self.app_utils_obj.get_jwt', return_value='token'):
+        with mock.patch('chalicelib.app_utils.AppUtils.get_jwt', return_value='token'):
             with mock.patch('jwt.decode', return_value=payload1):
                 auth = self.app_utils_obj.check_authorization({}, env='data,staging') # test more than one
             assert auth

@@ -249,7 +249,7 @@ pytz = "^2020.1"
 type = "git"
 url = "https://github.com/4dn-dcic/foursight-core.git"
 reference = "core2"
-resolved_reference = "6e3b9c73c97c01380b88886879300d9961035d50"
+resolved_reference = "b556221d56e7702da8ef85d4f4fe0ced5f919199"
 
 [[package]]
 name = "future"

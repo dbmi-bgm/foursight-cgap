@@ -276,7 +276,7 @@ class TestCheckRunner():
         assert (bad_sqs_attrs.get('ApproximateNumberOfMessages') == bad_sqs_attrs.get('ApproximateNumberOfMessagesNotVisible') == 'ERROR')
 
     def test_record_and_collect_run_info(self):
-        check = run_result.CheckResult(self.connection, 'not_a_real_check')
+        check = decorators.Decorators().CheckResult(self.connection, 'not_a_real_check')
         check.kwargs['_run_info'] = {'run_id': 'test_run_uuid'}
         resp = check.record_run_info()
         assert (resp is not None)
