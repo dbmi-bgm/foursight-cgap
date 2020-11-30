@@ -29,10 +29,10 @@ API Documentation
 Foursight-CGAP uses autodoc to generate documentation for both the core chalicelib and checks. You can find the autodocs in the ``Chalicelib API Documentation`` and ``Check Documentation`` files.
 
 
-Foursight
----------
+Foursight-core
+--------------
 
-For the rest of the documentation, see `Foursight-CGAP documantation <https://foursight.readthedocs.io/en/latest/>`_.
+For the rest of the documentation, see `Foursight-core documantation <https://foursight-core.readthedocs.io/en/latest/>`_.
 
 
 *Contents*
