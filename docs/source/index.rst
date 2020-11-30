@@ -41,5 +41,4 @@ For the rest of the documentation, see `Foursight-core documantation <https://fo
    :maxdepth: 4
 
    environments
-   modules
    check_modules
