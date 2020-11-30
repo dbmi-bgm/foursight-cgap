@@ -7,7 +7,12 @@ from foursight_core.checks.helpers.wfr_utils import (
 )
 from .helpers import wfr_utils
 from .helpers.wfrset_utils import step_settings
-from .helpers.confchecks import *  # import initialized decorators and its methods
+
+# Use confchecks to import decorators object and its methods for each check module
+# rather than importing check_function, action_function, CheckResult, ActionResult
+# individually - they're now part of class Decorators in foursight-core::decorators
+# that requires initialization with foursight prefix.
+from .helpers.confchecks import *
 
 
 # list of acceptible version
