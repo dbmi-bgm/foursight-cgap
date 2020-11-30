@@ -13,11 +13,13 @@ from dcicutils.env_utils import (
 from dcicutils.beanstalk_utils import (
     compute_cgap_prd_env, compute_ff_prd_env, beanstalk_info, is_indexing_finished
 )
-from ..run_result import CheckResult, ActionResult
 from ..vars import FOURSIGHT_PREFIX, DEV_ENV
-from ..decorators import Decorators
-check_function = Decorators().check_function
-action_function = Decorators().action_function
+
+# Use confchecks to import decorators object and its methods for each check module
+# rather than importing check_function, action_function, CheckResult, ActionResult
+# individually - they're now part of class Decorators in foursight-core::decorators
+# that requires initialization with foursight prefix.
+from .helpers.confchecks import *
 
 
 def try_to_describe_indexer_env(env):

@@ -1,11 +1,13 @@
-from ..run_result import CheckResult, ActionResult
 from dcicutils import ff_utils
 import re
 import requests
 from foursight_core.checks.helpers import wrangler_utils
-from ..decorators import Decorators
-check_function = Decorators().check_function
-action_function = Decorators().action_function
+
+# Use confchecks to import decorators object and its methods for each check module
+# rather than importing check_function, action_function, CheckResult, ActionResult
+# individually - they're now part of class Decorators in foursight-core::decorators
+# that requires initialization with foursight prefix.
+from .helpers.confchecks import *
 
 
 STATUS_LEVEL = {

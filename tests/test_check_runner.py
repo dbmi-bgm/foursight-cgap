@@ -33,9 +33,10 @@ class TestCheckRunner():
     connection = app_utils_obj.init_connection(environ)
     connection.connections['es'] = None # disable es
     # set up a queue for test checks
-    queue_name = stage.Stage.get_queue_name()
-    runner_name = stage.Stage.get_runner_name()
-    queue = sqs_utils.SQS.get_sqs_queue()
+    queue_name = stage.Stage(FOURSIGHT_PREFIX).get_queue_name()
+    runner_name = stage.Stage(FOURSIGHT_PREFIX).get_runner_name()
+    sqs = sqs_utils.SQS(FOURSIGHT_PREFIX)
+    queue = sqs.get_sqs_queue()
 
     def clear_queue_and_runners(self):
         """
@@ -45,7 +46,7 @@ class TestCheckRunner():
         tries = 0
         found_clear = True
         while tries < 10:
-            sqs_attrs = sqs_utils.SQS.get_sqs_attributes(self.queue.url)
+            sqs_attrs = self.sqs.get_sqs_attributes(self.queue.url)
             vis_messages = int(sqs_attrs.get('ApproximateNumberOfMessages'))
             invis_messages = int(sqs_attrs.get('ApproximateNumberOfMessagesNotVisible'))
             if vis_messages == 0 and invis_messages == 0:
@@ -190,7 +191,7 @@ class TestCheckRunner():
     def test_queue_check_group(self):
         # find the checks we will be using
         use_schedule = 'ten_min_checks'
-        check_handler = check_utils.CheckHandler()
+        check_handler = check_utils.CheckHandler(FOURSIGHT_PREFIX)
         check_schedule = check_handler.get_check_schedule(use_schedule)
         use_checks = [cs[0].split('/')[1] for env in check_schedule for cs in check_schedule[env]]
         # get a reference point for check results
@@ -202,7 +203,7 @@ class TestCheckRunner():
         # wait for queue to empty
         while finished_count < 2:
             time.sleep(1)
-            sqs_attrs = sqs_utils.SQS.get_sqs_attributes(run_input.get('sqs_url'))
+            sqs_attrs = self.sqs.get_sqs_attributes(run_input.get('sqs_url'))
             vis_messages = int(sqs_attrs.get('ApproximateNumberOfMessages'))
             invis_messages = int(sqs_attrs.get('ApproximateNumberOfMessagesNotVisible'))
             if vis_messages == 0 and invis_messages == 0:
@@ -271,11 +272,11 @@ class TestCheckRunner():
 
     def test_get_sqs_attributes(self):
         # bad sqs url
-        bad_sqs_attrs = sqs_utils.SQS.get_sqs_attributes('not_a_queue')
+        bad_sqs_attrs = self.sqs.get_sqs_attributes('not_a_queue')
         assert (bad_sqs_attrs.get('ApproximateNumberOfMessages') == bad_sqs_attrs.get('ApproximateNumberOfMessagesNotVisible') == 'ERROR')
 
     def test_record_and_collect_run_info(self):
-        check = run_result.CheckResult(self.connection, 'not_a_real_check')
+        check = decorators.Decorators(FOURSIGHT_PREFIX).CheckResult(self.connection, 'not_a_real_check')
         check.kwargs['_run_info'] = {'run_id': 'test_run_uuid'}
         resp = check.record_run_info()
         assert (resp is not None)

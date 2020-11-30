@@ -13,29 +13,28 @@ from foursight_core import (
     es_connection,
     exceptions,
     check_schema,
-)
-from chalicelib import (
-    sqs_utils,
-    app_utils,
-    check_utils,
-    decorators,
-    run_result,
     stage,
     environment,
+    sqs_utils,
+    run_result,
+    check_utils,
+    decorators,
+)
+from chalicelib import (
+    app_utils,
 )
 from chalicelib.vars import *
+from chalicelib import __file__ as chalicelib_path
+from chalicelib.checks.helpers.confchecks import * 
 from dcicutils import s3_utils, ff_utils
 from contextlib import contextmanager
 import pytest
-
-check_function = decorators.Decorators().check_function
-action_function = decorators.Decorators().action_function
 
 @pytest.fixture(scope='session', autouse=True)
 def setup():
     app.set_stage('test')  # set the stage info for tests
     test_client = boto3.client('sqs')  # purge test queue
-    queue_url = sqs_utils.SQS.get_sqs_queue().url
+    queue_url = sqs_utils.SQS(FOURSIGHT_PREFIX).get_sqs_queue().url
     try:
         test_client.purge_queue(
             QueueUrl=queue_url

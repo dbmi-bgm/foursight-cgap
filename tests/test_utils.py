@@ -3,11 +3,12 @@ from conftest import *
 
 class TestUtils():
     environ = DEV_ENV # hopefully this is up
-    conn = app_utils.AppUtils.init_connection(environ)
+    app_utils_obj = app_utils.AppUtils()
+    conn = app_utils_obj.init_connection(environ)
 
     @check_function(abc=123, do_not_store=True, uuid=datetime.datetime.utcnow().isoformat())
     def test_function_dummy(self, *args, **kwargs):
-        connection = app_utils.AppUtils.init_connection(self.environ)
+        connection = self.app_utils_obj.init_connection(self.environ)
         check = run_result.CheckResult(connection, 'not_a_check')
         check.summary = 'A string summary'
         check.description = 'A string description'
@@ -17,7 +18,7 @@ class TestUtils():
         return check
 
     def test_check_timeout(self):
-        assert (isinstance(decorators.Decorators().CHECK_TIMEOUT, int))
+        assert (isinstance(decorators.Decorators(FOURSIGHT_PREFIX).CHECK_TIMEOUT, int))
 
     @pytest.mark.skip  # Works but does not behave correctly with pytest
     def test_check_times_out(self):
@@ -60,9 +61,9 @@ class TestUtils():
         """
         Sanity test for s3 utils for all envs
         """
-        environments = [env for env in app_utils.AppUtils.init_environments() if 'cgap' not in env]
+        environments = [env for env in self.app_utils_obj.init_environments() if 'cgap' not in env]
         for env in environments:
-            conn = app_utils.AppUtils.init_connection(env)
+            conn = self.app_utils_obj.init_connection(env)
             s3_obj = s3_utils.s3Utils(env=conn.ff_env)
             assert (s3_obj.sys_bucket is not None)
             assert (s3_obj.outfile_bucket is not None)

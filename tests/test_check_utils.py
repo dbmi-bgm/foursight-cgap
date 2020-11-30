@@ -5,14 +5,16 @@ class TestCheckUtils():
     environ = DEV_ENV  # hopefully this is up
     app_utils_obj = app_utils.AppUtils()
     connection = app_utils_obj.init_connection(environ)
+    check_handler = app_utils_obj.check_handler
 
     def test_get_check_strings(self):
         # do this for every check
-        all_check_strs = check_utils.CheckHandler.get_check_strings()
+        all_check_strs = self.check_handler.get_check_strings()
         for check_str in all_check_strs:
             get_check = check_str.split('/')[1]
             chalice_resp = self.app_utils_obj.run_get_check(self.environ, get_check)
             body = chalice_resp.body
+            print("chalice_resp.body= " + str(body))
             if body.get('status') == 'success':
                 assert (chalice_resp.status_code == 200)
                 if body.get('data') is None:  # check not run yet
@@ -23,103 +25,99 @@ class TestCheckUtils():
                 error_msg = "Not a valid check or action."
                 assert (body.get('description') == error_msg)
         # test a specific check
-        one_check_str = check_utils.CheckHandler.get_check_strings('indexing_progress')
+        one_check_str = self.check_handler.get_check_strings('indexing_progress')
         assert (one_check_str == 'system_checks/indexing_progress')
         assert (one_check_str in all_check_strs)
         # test a specific check that doesn't exist
-        bad_check_str = check_utils.CheckHandler.get_check_strings('not_a_real_check')
+        bad_check_str = self.check_handler.get_check_strings('not_a_real_check')
         assert (bad_check_str is None)
 
     def test_validate_check_setup(self):
-        check_handler = check_utils.CheckHandler()
-        assert (check_handler.validate_check_setup(check_handler.CHECK_SETUP) == check_handler.CHECK_SETUP)
+        assert (self.check_handler.validate_check_setup(self.check_handler.CHECK_SETUP) == self.check_handler.CHECK_SETUP)
         # make sure modules were added
-        for check in check_handler.CHECK_SETUP.values():
+        for check in self.check_handler.CHECK_SETUP.values():
             assert ('module' in check)
         # do a while bunch of validation failure cases
         bad_setup = {'not_a_check': {}}
         with pytest.raises(exceptions.BadCheckSetup) as exc:
-            check_handler.validate_check_setup(bad_setup)
+            self.check_handler.validate_check_setup(bad_setup)
         assert ('does not have a proper check function defined' in str(exc.value))
         bad_setup = {'indexing_progress': []}
         with pytest.raises(exceptions.BadCheckSetup) as exc:
-            check_handler.validate_check_setup(bad_setup)
+            self.check_handler.validate_check_setup(bad_setup)
         assert ('must be a dictionary' in str(exc.value))
         bad_setup = {'indexing_progress': {'title': {}, 'group': {}, 'blah': {}}}
         with pytest.raises(exceptions.BadCheckSetup) as exc:
-            check_handler.validate_check_setup(bad_setup)
+            self.check_handler.validate_check_setup(bad_setup)
         assert ('must have the required keys' in str(exc.value))
         bad_setup = {'indexing_progress': {'title': {}, 'group': {}, 'schedule': []}}
         with pytest.raises(exceptions.BadCheckSetup) as exc:
-            check_handler.validate_check_setup(bad_setup)
+            self.check_handler.validate_check_setup(bad_setup)
         assert ('must have a string value for field' in str(exc.value))
         bad_setup = {'indexing_progress': {'title': '', 'group': '', 'schedule': []}}
         with pytest.raises(exceptions.BadCheckSetup) as exc:
-            check_handler.validate_check_setup(bad_setup)
+            self.check_handler.validate_check_setup(bad_setup)
         assert ('must have a dictionary value for field' in str(exc.value))
         bad_setup = {'indexing_progress': {'title': '', 'group': '', 'schedule': {}}}
         with pytest.raises(exceptions.BadCheckSetup) as exc:
-            check_handler.validate_check_setup(bad_setup)
+            self.check_handler.validate_check_setup(bad_setup)
         assert ('must have a list of "display" environments' in str(exc.value))
         bad_setup = {'indexing_progress': {'title': '', 'group': '', 'schedule': {'fake_sched': []}}}
         with pytest.raises(exceptions.BadCheckSetup) as exc:
-            check_handler.validate_check_setup(bad_setup)
+            self.check_handler.validate_check_setup(bad_setup)
         assert ('must have a dictionary value' in str(exc.value))
         bad_setup = {'indexing_progress': {'title': '', 'group': '', 'schedule': {'fake_sched': {'not_an_env': []}}}}
         with pytest.raises(exceptions.BadCheckSetup) as exc:
-            check_handler.validate_check_setup(bad_setup)
+            self.check_handler.validate_check_setup(bad_setup)
         assert ('is not an existing environment' in str(exc.value))
         bad_setup = {'indexing_progress': {'title': '', 'group': '', 'schedule': {'fake_sched': {'all': []}}}}
         with pytest.raises(exceptions.BadCheckSetup) as exc:
-            check_handler.validate_check_setup(bad_setup)
+            self.check_handler.validate_check_setup(bad_setup)
         assert ('must have a dictionary value' in str(exc.value))
         bad_setup = {'indexing_progress': {'title': '', 'group': '', 'schedule': {'fake_sched': {'all': {'kwargs': []}}}}}
         with pytest.raises(exceptions.BadCheckSetup) as exc:
-            check_handler.validate_check_setup(bad_setup)
+            self.check_handler.validate_check_setup(bad_setup)
         assert ('must have a dictionary value' in str(exc.value))
         bad_setup = {'indexing_progress': {'title': '', 'group': '', 'schedule': {'fake_sched': {'all': {'dependencies': {}}}}}}
         with pytest.raises(exceptions.BadCheckSetup) as exc:
-            check_handler.validate_check_setup(bad_setup)
+            self.check_handler.validate_check_setup(bad_setup)
         assert ('must have a list value' in str(exc.value))
         bad_setup = {'indexing_progress': {'title': '', 'group': '', 'schedule': {'fake_sched': {'all': {'dependencies': ['not_a_real_check']}}}}}
         with pytest.raises(exceptions.BadCheckSetup) as exc:
-            check_handler.validate_check_setup(bad_setup)
+            self.check_handler.validate_check_setup(bad_setup)
         assert ('is not a valid check name that shares the same schedule' in str(exc.value))
         # this one will work -- display provided
         okay_setup = {'indexing_progress': {'title': '', 'group': '', 'schedule': {}, 'display': ['data']}}
-        okay_validated = check_handler.validate_check_setup(okay_setup)
+        okay_validated = self.check_handler.validate_check_setup(okay_setup)
         assert (okay_validated['indexing_progress'].get('module') == 'system_checks')
         # this one adds kwargs and id to setup
         okay_setup = {'indexing_progress': {'title': '', 'group': '', 'schedule': {'fake_sched': {'all': {}}}}}
-        okay_validated = check_handler.validate_check_setup(okay_setup)
+        okay_validated = self.check_handler.validate_check_setup(okay_setup)
         assert ({'kwargs', 'dependencies'} <= set(okay_validated['indexing_progress']['schedule']['fake_sched']['all'].keys()))
 
     def test_get_action_strings(self):
-        all_action_strings = check_utils.CheckHandler.get_action_strings()
+        all_action_strings = self.check_handler.get_action_strings()
         for act_str in all_action_strings:
             assert (len(act_str.split('/')) == 2)
         # test a specific action
-        one_act_str = check_utils.CheckHandler.get_action_strings('patch_file_size')
+        one_act_str = self.check_handler.get_action_strings('patch_file_size')
         assert (one_act_str == 'wrangler_checks/patch_file_size')
         assert (one_act_str in all_action_strings)
         # test an action that doesn't exist
-        bad_act_str = check_utils.CheckHandler.get_check_strings('not_a_real_action')
+        bad_act_str = self.check_handler.get_check_strings('not_a_real_action')
         assert (bad_act_str is None)
 
     def test_get_schedule_names(self):
-        check_handler = check_utils.CheckHandler()
-        schedules = check_handler.get_schedule_names()
+        schedules = self.check_handler.get_schedule_names()
         assert (isinstance(schedules, list))
         assert (len(schedules) > 0)
 
     def test_get_check_title_from_setup(self):
-        check_handler = check_utils.CheckHandler()
-        title = check_handler.get_check_title_from_setup('indexing_progress')
-        assert (title == check_handler.CHECK_SETUP['indexing_progress']['title'])
+        title = self.check_handler.get_check_title_from_setup('indexing_progress')
+        assert (title == self.check_handler.CHECK_SETUP['indexing_progress']['title'])
 
     def test_get_check_schedule(self):
-        check_handler = check_utils.CheckHandler()
-        schedule = check_handler.get_check_schedule('morning_checks')
+        schedule = self.check_handler.get_check_schedule('morning_checks')
         assert (len(schedule) > 0)
         for env in schedule:
             assert (isinstance(schedule[env], list))
@@ -127,18 +125,17 @@ class TestCheckUtils():
                 assert len(check_info) == 3
 
         # test with conditions
-        schedule_cond1 = check_handler.get_check_schedule('morning_checks', conditions=['put_env'])
+        schedule_cond1 = self.check_handler.get_check_schedule('morning_checks', conditions=['put_env'])
         assert (0 < len(schedule_cond1) < len(schedule))
         # test with conditions that don't exist (ALL must match)
-        schedule_cond2 = check_handler.get_check_schedule('morning_checks',
+        schedule_cond2 = self.check_handler.get_check_schedule('morning_checks',
                                                           conditions=['put_env', 'fake_condition'])
         assert (len(schedule_cond2) == 0)
 
     def test_get_checks_within_schedule(self):
-        check_handler = check_utils.CheckHandler()
-        checks_in_sched = check_handler.get_checks_within_schedule('morning_checks')
+        checks_in_sched = self.check_handler.get_checks_within_schedule('morning_checks')
         assert (len(checks_in_sched) > 0)
-        checks_in_sched = check_handler.get_checks_within_schedule('not_a_real_schedule')
+        checks_in_sched = self.check_handler.get_checks_within_schedule('not_a_real_schedule')
         assert (len(checks_in_sched) == 0)
 
     @pytest.mark.parametrize('use_es', [True, False])
@@ -148,8 +145,7 @@ class TestCheckUtils():
         # will get primary results by default
         if not use_es:
             self.connection.connections['es'] = None
-        check_handler = check_utils.CheckHandler()
-        all_res_primary = check_handler.get_check_results(self.connection)
+        all_res_primary = self.check_handler.get_check_results(self.connection)
         for check_res in all_res_primary:
             assert (isinstance(check_res, dict))
             assert ('name' in check_res)
@@ -159,7 +155,7 @@ class TestCheckUtils():
                 continue
             uuid_compares[check_res['name']] = check_res['uuid']
         # compare to latest results (which should be the same or newer)
-        all_res_latest = check_handler.get_check_results(self.connection, use_latest=True)
+        all_res_latest = self.check_handler.get_check_results(self.connection, use_latest=True)
         for check_res in all_res_latest:
             assert (isinstance(check_res, dict))
             assert ('name' in check_res)
@@ -168,17 +164,16 @@ class TestCheckUtils():
             if check_res['name'] in uuid_compares:
                 assert (check_res['uuid'] >= uuid_compares[check_res['name']])
         # get a specific check
-        one_res = check_handler.get_check_results(self.connection, checks=['indexing_progress'])
+        one_res = self.check_handler.get_check_results(self.connection, checks=['indexing_progress'])
         assert (len(one_res) == 1)
         assert (one_res[0]['name'] == 'indexing_progress')
         # bad check name, will now return a placeholder so len should be 1
-        test_res = check_handler.get_check_results(self.connection, checks=['not_a_real_check'])
+        test_res = self.check_handler.get_check_results(self.connection, checks=['not_a_real_check'])
         assert (len(test_res) == 1)
         assert test_res[0]['summary'] == 'Check has not yet run'
 
     def test_get_grouped_check_results(self):
-        check_handler = check_utils.CheckHandler()
-        grouped_results = check_handler.get_grouped_check_results(self.connection)
+        grouped_results = self.check_handler.get_grouped_check_results(self.connection)
         for group in grouped_results:
             assert ('_name' in group)
             assert (isinstance(group['_statuses'], dict))
@@ -190,8 +185,7 @@ class TestCheckUtils():
         check = run_result.CheckResult(self.connection, 'test_random_nums')
         # with a check (primary is True)
         test_info = ['test_checks/test_random_nums', {'primary': True, 'uuid': test_uuid}, [], 'xxx']
-        check_handler = check_utils.CheckHandler()
-        check_res = check_handler.run_check_or_action(self.connection, test_info[0], test_info[1])
+        check_res = self.check_handler.run_check_or_action(self.connection, test_info[0], test_info[1])
         assert (isinstance(check_res, dict))
         assert ('name' in check_res)
         assert ('status' in check_res)
@@ -206,7 +200,7 @@ class TestCheckUtils():
         latest_res = check.get_latest_result()
         assert (latest_res.get('uuid') == primary_uuid)
         # with a check and no primary=True flag
-        check_res = check_handler.run_check_or_action(self.connection, test_info[0], {})
+        check_res = self.check_handler.run_check_or_action(self.connection, test_info[0], {})
         latest_uuid = check_res.get('uuid')
         assert ('runtime_seconds' in check_res.get('kwargs'))
         check_res.get('kwargs').pop('runtime_seconds')
@@ -222,7 +216,7 @@ class TestCheckUtils():
         act_kwargs = {'primary': True, 'uuid': test_uuid, 'check_name': 'test_random_nums',
                       'called_by': test_uuid}
         test_info_2 = ['test_checks/add_random_test_nums', act_kwargs, [] ,'xxx']
-        action_res = check_handler.run_check_or_action(self.connection, test_info_2[0], test_info_2[1])
+        action_res = self.check_handler.run_check_or_action(self.connection, test_info_2[0], test_info_2[1])
         assert (isinstance(action_res, dict))
         assert ('name' in action_res)
         assert ('status' in action_res)
@@ -250,31 +244,27 @@ class TestCheckUtils():
             ['wrangler_checks/iteasdts_by_type', {}, [], 'xx1'],
             ['test_checks/test_function_unused', {}, [], 'xx1']
         ]
-        check_handler = check_utils.CheckHandler()
         for bad_check_info in bad_check_group:
-            check_res = check_handler.run_check_or_action(self.connection, bad_check_info[0], bad_check_info[1])
+            check_res = self.check_handler.run_check_or_action(self.connection, bad_check_info[0], bad_check_info[1])
             assert not (isinstance(check_res, dict))
             assert ('ERROR' in check_res)
 
     def test_run_check_exception(self):
-        check_handler = check_utils.CheckHandler()
-        check_res = check_handler.run_check_or_action(self.connection, 'test_checks/test_check_error', {})
+        check_res = self.check_handler.run_check_or_action(self.connection, 'test_checks/test_check_error', {})
         assert (check_res['status'] == 'ERROR')
         # this output is a list
         assert ('by zero' in ''.join(check_res['full_output']))
         assert (check_res['description'] == 'Check failed to run. See full output.')
 
     def test_run_action_no_check_name_called_by(self):
-        check_handler = check_utils.CheckHandler()
-        action_res = check_handler.run_check_or_action(self.connection, 'test_checks/test_action_error', {})
+        action_res = self.check_handler.run_check_or_action(self.connection, 'test_checks/test_action_error', {})
         assert (action_res['status'] == 'FAIL')
         # this output is a list
         assert ('Action requires check_name and called_by in its kwargs' in ''.join(action_res['output']))
         assert (action_res['description'] == 'Action failed to run. See output.')
 
     def test_run_action_exception(self):
-        check_handler = check_utils.CheckHandler()
-        action_res = check_handler.run_check_or_action(self.connection, 'test_checks/test_action_error', {'check_name': '', 'called_by': None})
+        action_res = self.check_handler.run_check_or_action(self.connection, 'test_checks/test_action_error', {'check_name': '', 'called_by': None})
         assert (action_res['status'] == 'FAIL')
         # this output is a list
         assert ('by zero' in ''.join(action_res['output']))
