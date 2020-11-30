@@ -27,7 +27,7 @@ class TestFSConnection():
         assert (check_res.get('name') == 'item_counts_by_type')
 
     def test_check_result_basics(self):
-        test_check = decorators.Decorators().CheckResult(self.connection, 'test_check')
+        test_check = decorators.Decorators(FOURSIGHT_PREFIX).CheckResult(self.connection, 'test_check')
         test_check.summary = 'Unittest check'
         test_check.ff_link = 'not_a_real_http_link'
         assert (test_check.connections['s3'].status_code == 404)

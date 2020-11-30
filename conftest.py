@@ -18,19 +18,17 @@ from foursight_core import (
     sqs_utils,
     run_result,
     check_utils,
+    decorators,
 )
 from chalicelib import (
     app_utils,
-    decorators,
 )
 from chalicelib.vars import *
 from chalicelib import __file__ as chalicelib_path
+from chalicelib.checks.helpers.confchecks import * 
 from dcicutils import s3_utils, ff_utils
 from contextlib import contextmanager
 import pytest
-
-check_function = decorators.Decorators().check_function
-action_function = decorators.Decorators().action_function
 
 @pytest.fixture(scope='session', autouse=True)
 def setup():

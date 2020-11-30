@@ -18,7 +18,7 @@ class TestUtils():
         return check
 
     def test_check_timeout(self):
-        assert (isinstance(decorators.Decorators().CHECK_TIMEOUT, int))
+        assert (isinstance(decorators.Decorators(FOURSIGHT_PREFIX).CHECK_TIMEOUT, int))
 
     @pytest.mark.skip  # Works but does not behave correctly with pytest
     def test_check_times_out(self):

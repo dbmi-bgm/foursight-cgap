@@ -223,7 +223,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "0.1.0b6"
+version = "0.1.0b9"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -424,7 +424,7 @@ python-versions = "*"
 
 [[package]]
 name = "packaging"
-version = "20.4"
+version = "20.7"
 description = "Core utilities for Python packages"
 category = "dev"
 optional = false
@@ -432,7 +432,6 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [package.dependencies]
 pyparsing = ">=2.0.2"
-six = "*"
 
 [[package]]
 name = "pluggy"
@@ -762,7 +761,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.7"
-content-hash = "342a2d6347f99d22c01a0f5f6977e72cd000802ec84616b94999cc67fb0a8645"
+content-hash = "0ed37ac82659ac24e1cf8a02059f15f5ba9f768ff81f83f877386451fc4786a4"
 
 [metadata.files]
 atomicwrites = [
@@ -875,8 +874,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight_core-0.1.0b6-py3-none-any.whl", hash = "sha256:ab4960925da1e5fee8117e3ec381e95d4174d488d429d28b469fb22eb79d58fb"},
-    {file = "foursight_core-0.1.0b6.tar.gz", hash = "sha256:a02db2c2de81eab794382476c0cec1218223dc34a1685f48949b69a8bb5d3f59"},
+    {file = "foursight_core-0.1.0b9-py3-none-any.whl", hash = "sha256:8b5d10b01e7b99668ab66854ff3f2fd6eb5cac98cc8ae37e46deb3f997dc85b6"},
+    {file = "foursight_core-0.1.0b9.tar.gz", hash = "sha256:291d5aaf778bef0322610c688965b5178a44d3c3bf9ac99d92aca8baed546ac5"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
@@ -973,8 +972,8 @@ mypy-extensions = [
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
 ]
 packaging = [
-    {file = "packaging-20.4-py2.py3-none-any.whl", hash = "sha256:998416ba6962ae7fbd6596850b80e17859a5753ba17c32284f67bfff33784181"},
-    {file = "packaging-20.4.tar.gz", hash = "sha256:4357f74f47b9c12db93624a82154e9b120fa8293699949152b22065d556079f8"},
+    {file = "packaging-20.7-py2.py3-none-any.whl", hash = "sha256:eb41423378682dadb7166144a4926e443093863024de508ca5c9737d6bc08376"},
+    {file = "packaging-20.7.tar.gz", hash = "sha256:05af3bb85d320377db281cf254ab050e1a7ebcbf5410685a9a407e18a1f81236"},
 ]
 pluggy = [
     {file = "pluggy-0.13.1-py2.py3-none-any.whl", hash = "sha256:966c145cd83c96502c3c3868f50408687b38434af77734af1e9ca461a4081d2d"},
