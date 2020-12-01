@@ -26,4 +26,4 @@ Foursight-CGAP is under active development and features will likely change.
 Documentation
 --------------
 
-For more details, see `Foursight-cgap documantation <https://foursight-cgap.readthedocs.io/en/latest/>`_.
+For more details, see `Foursight-cgap documentation <https://foursight-cgap.readthedocs.io/en/latest/>`_.
