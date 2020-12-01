@@ -32,7 +32,7 @@ Foursight-CGAP uses autodoc to generate documentation for both the core chalicel
 Foursight-core
 --------------
 
-For the rest of the documentation, see `Foursight-core documantation <https://foursight-core.readthedocs.io/en/latest/>`_.
+For the rest of the documentation, see `Foursight-core documentation <https://foursight-core.readthedocs.io/en/latest/>`_.
 
 
 *Contents*
