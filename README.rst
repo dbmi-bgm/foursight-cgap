@@ -1,5 +1,5 @@
-Foursight
-=========
+Foursight-CGAP
+==============
 
 Check out our full documentation `here <https://foursight.readthedocs.io/en/latest/>`_.
 
