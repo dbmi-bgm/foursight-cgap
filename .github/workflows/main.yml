@@ -37,6 +37,8 @@ jobs:
           aws-region: us-east-1
       
       - name: QA
+        env:
+          S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
         run: |
           poetry install
           poetry run pytest -vv tests
