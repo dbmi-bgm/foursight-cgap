@@ -86,6 +86,7 @@ class TestCheckResult():
             error_check.get_closest_result(diff_hours=0, diff_mins=0)
         assert ('Could not find closest non-ERROR result' in str(exc.value))
 
+    @pytest.mark.flaky
     @pytest.mark.parametrize('use_es', [True, False])
     def test_get_result_history(self, use_es):
         """
