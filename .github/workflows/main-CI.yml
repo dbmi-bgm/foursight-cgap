@@ -42,6 +42,6 @@ jobs:
           DEV_SECRET: ${{ secrets.DEV_SECRET }}
         run: |
           poetry install
-          poetry run pytest -vv tests -m not integratedx
+          poetry run pytest -vv tests -m "not integratedx"
           
           

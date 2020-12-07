@@ -1,4 +1,4 @@
-# Docs Deployment for Foursight-Fourfront
+# Docs Deployment for Foursight-CGAP
 
 name: deploy-docs
 
@@ -18,6 +18,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - name: Docs
+      - name: Docs  # XXX: DOCS_TOKEN needs to be added to secrets
+        env:
+          DOCS_TOKEN: ${{ secrets.DOCS_TOKEN }}
         run: curl -X POST -d "branches=master" -d "token=$DOCS_TOKEN" https://readthedocs.org/api/v2/webhook/foursight-cgap/138355/ 
 
