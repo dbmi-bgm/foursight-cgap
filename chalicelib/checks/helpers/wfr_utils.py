@@ -4,12 +4,13 @@ from operator import itemgetter
 from dcicutils import ff_utils, s3Utils
 from foursight_core.checks.helpers.wfr_utils import (
     lambda_limit,
-    check_runs_without_output
+    check_runs_without_output,
+    get_wfr_out
 )
 from .wfrset_utils import (
     # use wf_dict in workflow version check to make sure latest version and workflow uuid matches
     wf_dict,
-    step_settings 
+    step_settings
 )
 
 
@@ -562,9 +563,9 @@ def stepper(library, keep,
         filtered_wfrs = filter_wfrs_with_input_and_tag(all_wfrs, new_step_name, input_file_dict, tag=tag)
 
         if no_output:
-            step_result = get_wfr_out(input_resp, new_step_name, all_wfrs=filtered_wfrs, md_qc=True)
+            step_result = get_wfr_out(input_resp, new_step_name, workflow_details, all_wfrs=filtered_wfrs, md_qc=True)
         else:
-            step_result = get_wfr_out(input_resp, new_step_name, all_wfrs=filtered_wfrs)
+            step_result = get_wfr_out(input_resp, new_step_name, workflow_details, all_wfrs=filtered_wfrs)
         step_status = step_result['status']
         # if successful
         input_file_accession = input_resp['accession']
@@ -599,7 +600,7 @@ def stepper(library, keep,
     keep['missing_run'] = missing_run
     return keep, step_status, step_output
 
-
+# This is going to be replaced by foursight-core
 def get_wfr_out(emb_file, wfr_name, key=None, all_wfrs='not given', versions=None, md_qc=False, run=None):
     """For a given file, fetches the status of last wfr (of wfr_name type)
     If there is a successful run, it will return the output files as a dictionary of

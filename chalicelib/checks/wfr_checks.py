@@ -3,7 +3,8 @@ from datetime import datetime
 from dcicutils import ff_utils, s3Utils
 from foursight_core.checks.helpers.wfr_utils import (
     check_runs_without_output,
-    lambda_limit
+    lambda_limit,
+    get_wfr_out
 )
 from .helpers import wfr_utils
 from .helpers.wfrset_utils import step_settings
@@ -14,7 +15,8 @@ from .helpers.wfrset_utils import step_settings
 # that requires initialization with foursight prefix.
 from .helpers.confchecks import *
 
-
+# Workflow details dict containing wfr_name, accepted versions, expected run time
+workflow_details = wfr_utils.workflow_details
 # list of acceptible version
 cgap_partI_version = ['WGS_partI_V11', 'WGS_partI_V12', 'WGS_partI_V13', 'WGS_partI_V15', 'WGS_partI_V16', 'WGS_partI_V17']
 cgap_partII_version = ['WGS_partII_V11', 'WGS_partII_V13', 'WGS_partII_V15', 'WGS_partII_V16', 'WGS_partII_V17']
@@ -95,7 +97,7 @@ def md5runCGAP_status(connection, **kwargs):
         if not head_info:
             no_s3_file.append(file_id)
             continue
-        md5_report = wfr_utils.get_wfr_out(a_file, "md5", key=my_auth, md_qc=True)
+        md5_report = get_wfr_out(a_file, "md5", workflow_details, key=my_auth, md_qc=True)
         if md5_report['status'] == 'running':
             running.append(file_id)
         elif md5_report['status'].startswith("no complete run, too many"):
@@ -228,7 +230,7 @@ def fastqcCGAP_status(connection, **kwargs):
     if not res:
         check.summary = 'All Good!'
         return check
-    check = check_runs_without_output(res, check, 'fastqc', my_auth, start)
+    check = check_runs_without_output(res, check, 'fastqc', workflow_details, my_auth, start)
     return check
 
 
@@ -1414,7 +1416,7 @@ def bamqcCGAP_status(connection, **kwargs):
         check.summary = 'All Good!'
         return check
 
-    check = check_runs_without_output(res, check, 'workflow_qcboard-bam', my_auth, start)
+    check = check_runs_without_output(res, check, 'workflow_qcboard-bam', workflow_details, my_auth, start)
     return check
 
 
@@ -1626,8 +1628,7 @@ def long_running_wfrs_status(connection, **kwargs):
     check.full_output = []
     check.status = 'PASS'
     check.allow_action = False
-    # get workflow run limits
-    workflow_details = wfr_utils.workflow_details
+
     # find all runs thats status is not complete or error
     q = '/search/?type=WorkflowRun&run_status!=complete&run_status!=error'
     running_wfrs = ff_utils.search_metadata(q, my_auth)
