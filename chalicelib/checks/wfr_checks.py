@@ -1,13 +1,9 @@
 import json
 from datetime import datetime
 from dcicutils import ff_utils, s3Utils
-from foursight_core.checks.helpers.wfr_utils import (
-    check_runs_without_output,
-    lambda_limit
-)
 from .helpers import wfr_utils
 from .helpers.wfrset_utils import step_settings
-
+from .helpers.wfrset_utils import lambda_limit
 # Use confchecks to import decorators object and its methods for each check module
 # rather than importing check_function, action_function, CheckResult, ActionResult
 # individually - they're now part of class Decorators in foursight-core::decorators
@@ -228,7 +224,7 @@ def fastqcCGAP_status(connection, **kwargs):
     if not res:
         check.summary = 'All Good!'
         return check
-    check = check_runs_without_output(res, check, 'fastqc', my_auth, start)
+    check = wfr_utils.check_runs_without_output(res, check, 'fastqc', my_auth, start)
     return check
 
 
@@ -1414,7 +1410,7 @@ def bamqcCGAP_status(connection, **kwargs):
         check.summary = 'All Good!'
         return check
 
-    check = check_runs_without_output(res, check, 'workflow_qcboard-bam', my_auth, start)
+    check = wfr_utils.check_runs_without_output(res, check, 'workflow_qcboard-bam', my_auth, start)
     return check
 
 
