@@ -1106,7 +1106,10 @@ def cgapS3_status(connection, **kwargs):
             input_vcf = vep_annotated_vcf
             s2_input_files = {"input_vcf": input_vcf,
                               # "bigfile": "20004873-b672-4d84-a7c1-7fd5c0407519",
-                              'additional_file_parameters': {'input_vcf': {"unzip": "gz"}}
+                              "genes": "/files-processed/GAPFI5MKCART/",
+                              'additional_file_parameters': {'input_vcf': {"mount": True},
+                                                             'genes': {"mount": True}
+                                                            }
                               }
             s2_tag = print_id + '_filtering'
             keep, step2_status, step2_output = wfr_utils.stepper(library, keep,
@@ -1121,7 +1124,7 @@ def cgapS3_status(connection, **kwargs):
                 s3_input_files = {'input_vcf': step2_output,
                                   'unrelated': '/files-processed/GAPFI344NFZE/',
                                   'trio': step1_output,
-                                  'additional_file_parameters': {'input_vcf': {"unzip": "gz"},
+                                  'additional_file_parameters': {'input_vcf': {"mount": True},
                                                                  'unrelated': {"mount": True},
                                                                  'trio': {"mount": True},
                                                                  }
@@ -1140,7 +1143,7 @@ def cgapS3_status(connection, **kwargs):
         else:
             # Run ComHet
             s4_input_files = {"input_vcf": step3_output,
-                              'additional_file_parameters': {'input_vcf': {"unzip": "gz"}}
+                              'additional_file_parameters': {'input_vcf': {"mount": True}}
                               }
             proband_first_sample_list = list(reversed(sample_ids))  # proband first sample ids
             update_pars = {"parameters": {"trio": proband_first_sample_list}}
