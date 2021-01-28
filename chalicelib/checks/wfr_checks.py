@@ -12,9 +12,10 @@ from .helpers.confchecks import *
 
 
 # list of acceptible version
-cgap_partI_version = ['WGS_partI_V11', 'WGS_partI_V12', 'WGS_partI_V13', 'WGS_partI_V15', 'WGS_partI_V16', 'WGS_partI_V17']
-cgap_partII_version = ['WGS_partII_V11', 'WGS_partII_V13', 'WGS_partII_V15', 'WGS_partII_V16', 'WGS_partII_V17']
-cgap_partIII_version = ['WGS_partIII_V15', 'WGS_partIII_V16', 'WGS_partIII_V17']
+cgap_partI_version = ['WGS_partI_V11', 'WGS_partI_V12', 'WGS_partI_V13', 'WGS_partI_V15', 'WGS_partI_V16', 'WGS_partI_V17',
+                      'WGS_partI_V18', 'WGS_partI_V19', 'WGS_partI_V20']]
+cgap_partII_version = ['WGS_partII_V20']
+cgap_partIII_version = ['WGS_partIII_V20']
 
 
 @check_function(file_type='File', start_date=None)
@@ -780,7 +781,7 @@ def cgapS2_status(connection, **kwargs):
             step4_status = ""
         else:
             # run step4 VEP
-            s3_input_files = {'input_vcf': step3_output,
+            s4_input_files = {'input_vcf': step3_output,
                             'reference': "/files-reference/GAPFIXRDPDK5/",
                             'regions': "/files-reference/GAPFIBGEOI72/",
                             'vep': "/files-reference/GAPFIPK4VGWV/",
@@ -800,11 +801,11 @@ def cgapS2_status(connection, **kwargs):
                                                            'gnomad':
                                                              }
                               }
-            s3_tag = print_id + '_VEP_' + step2_output.split('/')[2]
+            s4_tag = print_id + '_VEP_' + step3_output.split('/')[2]
             # there are 2 files we need, one to use in the next step
-            keep, step3_status, step3_outputs = wfr_utils.stepper(library, keep,
-                                                                   s3_tag, step2_output,
-                                                                   s3_input_files,  step3_name, 'annotated_vcf')
+            keep, step4_status, step4_outputs = wfr_utils.stepper(library, keep,
+                                                                   s4_tag, step3_output,
+                                                                   s4_input_files,  step4_name, 'annotated_vcf')
 
         if step4_status != 'complete':
             step5_status = ""
@@ -820,7 +821,7 @@ def cgapS2_status(connection, **kwargs):
                                           "trio_errors": True,
                                           "het_hom": True,
                                           "ti_tv": True}}
-            s5_tag = print_id + '_micro_vcfqc_' + step4_output.split('/')[2]
+            s5_tag = print_id + '_vep_vcfqc_' + step4_output.split('/')[2]
             keep, step5_status, step5_output = wfr_utils.stepper(library, keep,
                                                                   s5_tag, step4_output,
                                                                   s5_input_files,  step5_name, '',
@@ -841,7 +842,7 @@ def cgapS2_status(connection, **kwargs):
             # existing_pf = [i['@id'] for i in an_msa['processed_files']]
             completed = [
                 an_msa['@id'],
-                {'processed_files': [step3_output_full, step4_output],
+                {'processed_files': [step4_output],
                  'completed_processes': previous_tags + [pipeline_tag, ]}]
             print('COMPLETED', step4_output)
         else:
@@ -957,8 +958,7 @@ def cgapS3_status(connection, **kwargs):
     step2_name = 'workflow_granite-filtering-check'
     step3_name = 'workflow_granite-novoCaller-rck-check'
     step4_name = 'workflow_granite-comHet-check'
-    step5_name = 'workflow_mutanno-annot-check'
-    step5a_name = 'workflow_granite-qcVCF'
+    step5_name = 'workflow_granite-qcVCF'
     step6_name = 'bamsnap'
     # collect all wf for wf version check
     all_system_wfs = ff_utils.search_metadata('/search/?type=Workflow&status=released', my_auth)
@@ -1057,7 +1057,7 @@ def cgapS3_status(connection, **kwargs):
         # return bams and titles for all samples in sample_proessing starting with proband-mother-father-sibling
         input_bams, input_titles = wfr_utils.get_bamsnap_parameters(samples_pedigree, all_samples)
 
-        # we need the vep and micro vcf in the processed_files field of sample_processing
+        # we need the vep vcf in the processed_files field of sample_processing
         if len(an_msa.get('processed_files', [])) != 2:
             final_status = print_id + '2 items in processed_files of msa was expected'
             print(final_status)
@@ -1066,8 +1066,7 @@ def cgapS3_status(connection, **kwargs):
             continue
 
         # extract input files from msa_processed files
-        mti_vep_full = an_msa['processed_files'][0]['@id']
-        micro_annotated_vcf = an_msa['processed_files'][1]['@id']
+        vep_annotated_vcf = an_msa['processed_files'][0]['@id']
 
         # if trio, run rck_tar
         if run_mode == 'trio':
@@ -1087,7 +1086,7 @@ def cgapS3_status(connection, **kwargs):
             step2_status = ""
         else:
             # Run filtering
-            input_vcf = micro_annotated_vcf
+            input_vcf = vep_annotated_vcf
             s2_input_files = {"input_vcf": input_vcf,
                               # "bigfile": "20004873-b672-4d84-a7c1-7fd5c0407519",
                               'additional_file_parameters': {'input_vcf': {"unzip": "gz"}}
@@ -1128,6 +1127,13 @@ def cgapS3_status(connection, **kwargs):
                               }
             proband_first_sample_list = list(reversed(sample_ids))  # proband first sample ids
             update_pars = {"parameters": {"trio": proband_first_sample_list}}
+
+            # if ingestion needs to be skipped, we need to pass metadata to the vcf file
+            if skip_ingestion:
+                update_file_metadata = {'custom_pf_fields': {'comHet_vcf': {'file_ingestion_status': 'Ingestion disabled'}}}
+            else:
+                update_file_metadata = {}
+
             s4_tag = print_id + '_comhet'
             keep, step4_status, step4_output = wfr_utils.stepper(library, keep,
                                                                   s4_tag, step3_output,
@@ -1137,35 +1143,10 @@ def cgapS3_status(connection, **kwargs):
         if step4_status != 'complete':
             step5_status = ""
         else:
-            # Run Full Annotation
-            s5_input_files = {'input_vcf': step4_output,
-                              'mti': '/files-reference/GAPFIL98NJ2K/',
-                              'mti_vep': mti_vep_full,
-                              'chainfile': '/files-reference/GAPFIYPTSAU8/',
-                              'regions': '/files-reference/GAPFIBGEOI72/',
-                              'additional_file_parameters': {'mti': {"mount": True},
-                                                             'mti_vep': {"mount": True}
-                                                             },
+            # Run step 5 vcfqc
+            s5_input_files = {"input_vcf": step4_output,
+                              'additional_file_parameters': {'input_vcf': {"unzip": "gz"}}
                               }
-            # if ingestion needs to be skipped, we need to pass metadata to the vcf file
-            if skip_ingestion:
-                update_file_metadata = {'custom_pf_fields': {'annotated_vcf': {'file_ingestion_status': 'Ingestion disabled'}}}
-            else:
-                update_file_metadata = {}
-
-            s5_tag = print_id + '_full_ann'
-            keep, step5_status, step5_output = wfr_utils.stepper(library, keep,
-                                                                  s5_tag, step4_output,
-                                                                  s5_input_files,  step5_name, 'annotated_vcf',
-                                                                  additional_input=update_file_metadata)
-
-        if step5_status != 'complete':
-            step5a_status = ""
-        else:
-            # Run step 5a vcfqc
-            s5a_input_files = {"input_vcf": step5_output,
-                               'additional_file_parameters': {'input_vcf': {"unzip": "gz"}}
-                               }
             str_qc_pedigree = str(json.dumps(qc_pedigree))
             proband_first_sample_list = list(reversed(sample_ids))  # proband first sample ids
             update_pars = {"parameters": {"samples": proband_first_sample_list,
@@ -1178,14 +1159,14 @@ def cgapS3_status(connection, **kwargs):
                                                                         "(Clinvar Pathogenic/Likely Pathogenic, Conflicting Interpretation or Risk Factor)")
                                                 }
                            }
-            s5a_tag = print_id + '_full_vcfqc'
-            keep, step5a_status, step5a_output = wfr_utils.stepper(library, keep,
-                                                                    s5a_tag, step5_output,
-                                                                    s5a_input_files,  step5a_name, '',
-                                                                    additional_input=update_pars, no_output=True)
+            s5_tag = print_id + '_full_vcfqc'
+            keep, step5_status, step5_output = wfr_utils.stepper(library, keep,
+                                                                 s5_tag, step4_output,
+                                                                 s5_input_files,  step5_name, '',
+                                                                 additional_input=update_pars, no_output=True)
         # in principle we can run bamsnap and vcf qc at the same time
         # currently we are waiting for qc to be successful to continue
-        if step5a_status != 'complete':
+        if step5_status != 'complete':
             step6_status = ""
         # if skipping ingestion, skip bamsnap too
         elif skip_ingestion:
@@ -1193,7 +1174,7 @@ def cgapS3_status(connection, **kwargs):
         else:
             # BAMSNAP
             s6_input_files = {'input_bams': input_bams,
-                              'input_vcf': step5_output,
+                              'input_vcf': step4_output,
                               'ref': '/files-reference/GAPFIXRDPDK5/',
                               'additional_file_parameters': {'input_vcf': {"mount": True},
                                                              'input_bams': {"mount": True},
@@ -1203,7 +1184,7 @@ def cgapS3_status(connection, **kwargs):
             s6_tag = print_id + '_bamsnap'
             update_pars = {"parameters": {"titles": input_titles}}
             keep, step6_status, step6_output = wfr_utils.stepper(library, keep,
-                                                                  s6_tag, step5_output,
+                                                                  s6_tag, step4_output,
                                                                   s6_input_files,  step6_name, '',
                                                                   additional_input=update_pars, no_output=True)
 
