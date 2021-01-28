@@ -66,16 +66,10 @@ wf_dict = [
     #  /  \  / __)
     # (  O )( (__
     #  \__\) \___)
-    {
-       "app_name": "workflow_qcboard-bam",
-       "parameters": {},
-       "workflow_uuid": "ad8716a3-b6e8-4021-bbc6-b0cefc9c4dd8",
-       "config": {
-         "instance_type": "t3.medium",
-         "ebs_size": "1.3x",
-         "EBS_optimized": True
-       }
-    },
+    #
+    #
+    #
+    #
     #  ____   __   ____  ____    __
     # (  _ \ / _\ (  _ \(_  _)  (  )
     #  ) __//    \ )   /  )(     )(
@@ -87,7 +81,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "c5n.18xlarge",
-            "ebs_size": "5x",
+            "ebs_size": "6.3x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
             },
@@ -104,7 +98,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "c5.2xlarge",
-            "ebs_size": "2.2x",
+            "ebs_size": "3x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
             },
@@ -198,7 +192,7 @@ wf_dict = [
     # part 1 - step 8   (only run for samples that will go to part3)
     {  # mpileupCounts
         'app_name': 'workflow_granite-mpileupCounts',
-        'workflow_uuid': 'c6dac0af-631d-402f-a1c1-282e091f1b3e',
+        'workflow_uuid': 'ee996546-e768-4116-804f-79fd3900a9fe',
         'parameters': {"nthreads": 15},
         "config": {
             "instance_type": "c5.4xlarge",
@@ -250,6 +244,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "c5n.4xlarge",
+            "ebs_size": "10x",
             "EBS_optimized": True
         },
         'custom_pf_fields': {
@@ -276,10 +271,10 @@ wf_dict = [
     {  # SAMPLEGENO
         'app_name': 'workflow_samplegeno',
         'workflow_uuid': 'cgap:workflow_samplegeno_v20',
-        'parameters': {"nthreads": 15},
+        'parameters': {},
         "config": {
-            "instance_type": "c5.9xlarge",
-            "ebs_size": "10x",
+            "instance_type": "t3.small",
+            "ebs_size": "6x",
             "EBS_optimized": True
         },
         'custom_pf_fields': {
@@ -292,10 +287,10 @@ wf_dict = [
     {  # VEP
         'app_name': 'workflow_vep-annot-check',
         'workflow_uuid': 'cgap:workflow_vep-annot-check_v20',
-        'parameters': {"nthreads": 15},
+        'parameters': {"nthreads": 72},
         "config": {
-            "instance_type": "c5.9xlarge",
-            "ebs_size": "10x",
+            "instance_type": "c5n.18xlarge",
+            "ebs_size": "0.5x",
             "EBS_optimized": True
         },
         'custom_pf_fields': {
@@ -328,7 +323,7 @@ wf_dict = [
     {  # Step2 - filtering
         'app_name': 'workflow_granite-filtering-check',
         'workflow_uuid': 'cgap:workflow_granite-filtering-check_v20',
-        'parameters': {"aftag": "gnomADgenome", "afthr": 0.01},
+        'parameters': {"aftag": "gnomADg_AF", "afthr": 0.01},
         "config": {
             "instance_type": "t3.medium",
             "ebs_size": "6x",
@@ -360,7 +355,9 @@ wf_dict = [
     {  # Step4 - compHet
         'app_name': 'workflow_granite-comHet-check',
         'workflow_uuid': 'cgap:workflow_granite-comHet-check_v20',
-        'parameters': {},
+        'parameters': {
+                # "trio": ["PROBAND_ID", "[PARENT_ID]", "[PARENT_ID]"]
+            },
         "config": {
             "instance_type": "t3.small",
             "ebs_size": "2.5x",
@@ -376,7 +373,10 @@ wf_dict = [
     {  # Step 6 = bamsnap
         'app_name': 'bamsnap',
         'workflow_uuid': 'cgap:bamsnap_v20',
-        'parameters': {"nproc": 16},
+        'parameters': {
+                    "nproc": 16
+                    # "titles": ["NA12877 (Father)", "NA12878 (Mother)", "NA12879 (Daughter)"]
+                },
         "config": {
             "instance_type": "c5.4xlarge",
             "ebs_size": 10,
@@ -386,7 +386,10 @@ wf_dict = [
     {  # VCFQC used in Part III & Part II
         'app_name': 'workflow_granite-qcVCF',
         'workflow_uuid': '33a85705-b757-49e0-aaef-d786695d6d03',
-        'parameters': {"trio_errors": True,
+        'parameters': {
+                       # "pedigree": "",
+                       # "samples": [""],
+                       "trio_errors": True,
                        "het_hom": True,
                        "ti_tv": True},
         "config": {
