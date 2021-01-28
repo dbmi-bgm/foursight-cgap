@@ -273,8 +273,8 @@ wf_dict = [
                 'description': 'processed output from cgap downstream pipeline'}
                 }
     },
-    {  # VEP
-        'app_name': 'workflow_vep-parallel',
+    {  # SAMPLEGENO
+        'app_name': 'workflow_samplegeno',
         'workflow_uuid': 'adc588cf-1c6c-4281-9193-9645726eb792',
         'parameters': {"nthreads": 15},
         "config": {
@@ -283,30 +283,26 @@ wf_dict = [
             "EBS_optimized": True
         },
         'custom_pf_fields': {
-            'microannot_mti': {
+            'samplegeno_vcf': {
                 'file_type': 'intermediate file',
-                'description': 'Intermediate file'
-                },
-            'annot_mti': {
-                'file_type': 'intermediate file',
-                'description': 'Intermediate file'
+                'description': 'Intermediate VCF file'
                 }
         }
     },
-    {  # micro-annotation
-        'app_name': 'workflow_mutanno-micro-annot-check',
-        'workflow_uuid': 'ca3469c6-ac71-4a7d-97ea-477037b05f2f',
-        'parameters': {"nthreads": 70},
+    {  # VEP
+        'app_name': 'workflow_vep-annot-check',
+        'workflow_uuid': 'adc588cf-1c6c-4281-9193-9645726eb792',
+        'parameters': {"nthreads": 15},
         "config": {
-            "instance_type": "c5n.18xlarge",
-            "ebs_size": "3x",
+            "instance_type": "c5.9xlarge",
+            "ebs_size": "10x",
             "EBS_optimized": True
         },
         'custom_pf_fields': {
             'annotated_vcf': {
-                'file_type': 'micro-annotated VCF',
-                'description': 'micro-annotated VCF file'
-            }
+                'file_type': 'vep-annotated VCF',
+                'description': 'vep-annotated VCF file'
+                }
         }
     },
     #  ____   __   ____  ____    __  __  __
@@ -372,22 +368,6 @@ wf_dict = [
         },
         'custom_pf_fields': {
             'comHet_vcf': {
-                'file_type': 'intermediate file',
-                'description': 'Intermediate VCF file'
-            }
-        }
-    },
-    {  # Step5 - full annotation
-        'app_name': 'workflow_mutanno-annot-check',
-        'workflow_uuid': '04da27aa-204c-4db2-9d66-a1624a463c13',
-        'parameters': {"nthreads": 1},
-        "config": {
-            "instance_type": "c5.large",
-            "ebs_size": "1.2x",
-            "EBS_optimized": True
-        },
-        'custom_pf_fields': {
-            'annotated_vcf': {
                 'file_type': 'full annotated VCF',
                 'description': 'full annotated VCF file'
             }
