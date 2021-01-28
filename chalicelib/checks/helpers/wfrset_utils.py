@@ -275,7 +275,7 @@ wf_dict = [
     },
     {  # SAMPLEGENO
         'app_name': 'workflow_samplegeno',
-        'workflow_uuid': 'adc588cf-1c6c-4281-9193-9645726eb792',
+        'workflow_uuid': 'cgap:workflow_samplegeno_v20',
         'parameters': {"nthreads": 15},
         "config": {
             "instance_type": "c5.9xlarge",
@@ -291,7 +291,7 @@ wf_dict = [
     },
     {  # VEP
         'app_name': 'workflow_vep-annot-check',
-        'workflow_uuid': 'adc588cf-1c6c-4281-9193-9645726eb792',
+        'workflow_uuid': 'cgap:workflow_vep-annot-check_v20',
         'parameters': {"nthreads": 15},
         "config": {
             "instance_type": "c5.9xlarge",
@@ -311,7 +311,7 @@ wf_dict = [
     # (__)  \_/\_/(__\_) (__)   (__)(__)(__)
     {  # step1a rckTar
         'app_name': 'workflow_granite-rckTar',
-        'workflow_uuid': '64ff003a-b25d-4856-a9fc-ad8702b8c6d4',
+        'workflow_uuid': 'cgap:workflow_granite-rckTar_v20',
         'parameters': {},
         "config": {
             "instance_type": "c5.xlarge",
@@ -327,7 +327,7 @@ wf_dict = [
     },
     {  # Step2 - filtering
         'app_name': 'workflow_granite-filtering-check',
-        'workflow_uuid': 'e43171b4-4ee5-4074-8734-727399e3179d',
+        'workflow_uuid': 'cgap:workflow_granite-filtering-check_v20',
         'parameters': {"aftag": "gnomADgenome", "afthr": 0.01},
         "config": {
             "instance_type": "t3.medium",
@@ -343,7 +343,7 @@ wf_dict = [
     },
     {  # Step3 - novocaller
         'app_name': 'workflow_granite-novoCaller-rck-check',
-        'workflow_uuid': '55c9ebf7-ef39-4eb0-9685-c090f2e788ae',
+        'workflow_uuid': 'cgap:workflow_granite-novoCaller-rck-check_v20',
         'parameters': {},
         "config": {
             "instance_type": "c5.xlarge",
@@ -359,7 +359,7 @@ wf_dict = [
     },
     {  # Step4 - compHet
         'app_name': 'workflow_granite-comHet-check',
-        'workflow_uuid': 'f43c5ac3-d755-4acc-a6ed-7f65b8b4961b',
+        'workflow_uuid': 'cgap:workflow_granite-comHet-check_v20',
         'parameters': {},
         "config": {
             "instance_type": "t3.small",
@@ -375,7 +375,7 @@ wf_dict = [
     },
     {  # Step 6 = bamsnap
         'app_name': 'bamsnap',
-        'workflow_uuid': 'a4016214-e4ce-4a34-93a1-c0751bbd1d37',
+        'workflow_uuid': 'cgap:bamsnap_v20',
         'parameters': {"nproc": 16},
         "config": {
             "instance_type": "c5.4xlarge",
