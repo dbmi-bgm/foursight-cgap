@@ -52,11 +52,6 @@ workflow_details = {
         "run_time": 12,
         "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
-    # defunct step 8
-    "workflow_index-sorted-bam": {
-        "run_time": 12,
-        "accepted_versions": ["v9"]
-    },
     # new step 8
     'workflow_gatk-HaplotypeCaller': {
         "run_time": 12,
@@ -83,23 +78,13 @@ workflow_details = {
         "run_time": 12,
         "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
-    # part III step 3 - defunct
-    'workflow_gatk-VQSR-check': {
-        "run_time": 12,
-        "accepted_versions": ["v10", "v11", "v12", "v13"]
-    },
-    # defunct
-    "workflow_qcboard-bam": {
-        "run_time": 12,
-        "accepted_versions": ["v3"]
-    },
     "workflow_cram2fastq": {
         "run_time": 12,
-        "accepted_versions": ["v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_cram2bam-check": {
         "run_time": 12,
-        "accepted_versions": ["v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_vep-parallel": {
         "run_time": 12,
@@ -112,11 +97,6 @@ workflow_details = {
     "workflow_vep-annot-check": {
         "run_time": 12,
         "accepted_versions": ["v20"]
-    },
-    # defunct
-    "workflow_mutanno-micro-annot-check": {
-        "run_time": 12,
-        "accepted_versions": ["v17"]
     },
     # Part III
     "workflow_granite-rckTar": {
@@ -134,11 +114,6 @@ workflow_details = {
     "workflow_granite-comHet-check": {
         "run_time": 12,
         "accepted_versions": ["v20"]
-    },
-    # defunct
-    "workflow_mutanno-annot-check": {
-        "run_time": 12,
-        "accepted_versions": ["v17"]
     },
     "bamsnap": {
         "run_time": 12,
