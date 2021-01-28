@@ -798,7 +798,7 @@ def cgapS2_status(connection, **kwargs):
                                                            'dbnsfp': {"mount": True},
                                                            'spliceai_snv': {"mount": True},
                                                            'spliceai_indel': {"mount": True},
-                                                           'gnomad':
+                                                           'gnomad': {"mount": True}
                                                              }
                               }
             s4_tag = print_id + '_VEP_' + step3_output.split('/')[2]
