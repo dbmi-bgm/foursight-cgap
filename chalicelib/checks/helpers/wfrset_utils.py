@@ -268,6 +268,16 @@ wf_dict = [
                 'description': 'processed output from cgap downstream pipeline'}
                 }
     },
+    {  # peddy_qc
+        'app_name': 'workflow_peddy',
+        'workflow_uuid': 'e17b9fe7-19e7-40d7-9c46-07bc7920ffc8',
+        'parameters': {},
+        "config": {
+            "instance_type": "t3.small",
+            "ebs_size": "1.2x",
+            "EBS_optimized": True
+        }
+    },
     {  # SAMPLEGENO
         'app_name': 'workflow_samplegeno',
         'workflow_uuid': 'cgap:workflow_samplegeno_v20',
