@@ -768,45 +768,49 @@ def cgapS2_status(connection, **kwargs):
         else:
             # run step3 samplegeno
             s3_input_files = {'input_vcf': step2_output,
-                              'mti': "/files-reference/GAPFIFJM2A8Z/",
-                              'reference': "/files-reference/GAPFIXRDPDK5/",
-                              'regions': "/files-reference/GAPFIBGEOI72/",
-                              'vep_tar': "/files-reference/GAPFIFZB4NUO/",
-                              'additional_file_parameters': {'mti': {"mount": True},
-                                                             'reference': {"mount": True},
-                                                             'vep_tar': {"mount": True}
+                              'additional_file_parameters': {'input_vcf': {"mount": True}
                                                              }
                               }
-            s3_tag = print_id + '_VEP_' + step2_output.split('/')[2]
+            s3_tag = print_id + '_samplegeno_' + step2_output.split('/')[2]
             # there are 2 files we need, one to use in the next step
             keep, step3_status, step3_outputs = wfr_utils.stepper(library, keep,
                                                                    s3_tag, step2_output,
-                                                                   s3_input_files,  step3_name, ['microannot_mti', 'annot_mti'])
+                                                                   s3_input_files,  step3_name, 'samplegeno_vcf')
         if step3_status != 'complete':
             step4_status = ""
         else:
             # run step4 VEP
             s3_input_files = {'input_vcf': step3_output,
-                              'mti': "/files-reference/GAPFIFJM2A8Z/",
-                              'reference': "/files-reference/GAPFIXRDPDK5/",
-                              'regions': "/files-reference/GAPFIBGEOI72/",
-                              'vep_tar': "/files-reference/GAPFIFZB4NUO/",
-                              'additional_file_parameters': {'mti': {"mount": True},
-                                                             'reference': {"mount": True},
-                                                             'vep_tar': {"mount": True}
+                            'reference': "/files-reference/GAPFIXRDPDK5/",
+                            'regions': "/files-reference/GAPFIBGEOI72/",
+                            'vep': "/files-reference/GAPFIPK4VGWV/",
+                            'clinvar': "/files-reference/GAPFI121RWQE/",
+                            'dbnsfp': "/files-reference/GAPFIKJ66FKY/",
+                            'maxent': "/files-reference/GAPFI6BNNTKA/",
+                            'spliceai_snv': "/files-reference/GAPFISUOC64Q/",
+                            'spliceai_indel': "/files-reference/GAPFIZOPCWIU/",
+                            'gnomad': "/files-reference/GAPFIJOMA2Q8/",
+                            'additional_file_parameters': {'input_vcf': {"mount": True},
+                                                           'reference': {"mount": True},
+                                                           'regions': {"mount": True},
+                                                           'clinvar': {"mount": True},
+                                                           'dbnsfp': {"mount": True},
+                                                           'spliceai_snv': {"mount": True},
+                                                           'spliceai_indel': {"mount": True},
+                                                           'gnomad':
                                                              }
                               }
             s3_tag = print_id + '_VEP_' + step2_output.split('/')[2]
             # there are 2 files we need, one to use in the next step
             keep, step3_status, step3_outputs = wfr_utils.stepper(library, keep,
                                                                    s3_tag, step2_output,
-                                                                   s3_input_files,  step3_name, ['microannot_mti', 'annot_mti'])
+                                                                   s3_input_files,  step3_name, 'annotated_vcf')
 
         if step4_status != 'complete':
             step5_status = ""
         else:
             # step 5 vcfqc
-            s5_input_files = {"input_vcf": step4_output,
+            s5_input_files = {'input_vcf': step4_output,
                               'additional_file_parameters': {'input_vcf': {"unzip": "gz"}}
                               }
             str_qc_pedigree = str(json.dumps(qc_pedigree))
