@@ -642,8 +642,8 @@ def cgapS2_status(connection, **kwargs):
     # list step names
     step1_name = 'workflow_gatk-CombineGVCFs'
     step2_name = 'workflow_gatk-GenotypeGVCFs-check'
-    step3_name = 'workflow_vep-parallel'
-    step4_name = 'workflow_mutanno-micro-annot-check'
+    step3_name = 'workflow_samplegeno'
+    step4_name = 'workflow_vep-annot-check'
     step5_name = 'workflow_granite-qcVCF'
 
     # collect all wf for wf version check
@@ -766,7 +766,7 @@ def cgapS2_status(connection, **kwargs):
         if step2_status != 'complete':
             step3_status = ""
         else:
-            # run step3 VEP
+            # run step3 samplegeno
             s3_input_files = {'input_vcf': step2_output,
                               'mti': "/files-reference/GAPFIFJM2A8Z/",
                               'reference': "/files-reference/GAPFIXRDPDK5/",
@@ -782,31 +782,25 @@ def cgapS2_status(connection, **kwargs):
             keep, step3_status, step3_outputs = wfr_utils.stepper(library, keep,
                                                                    s3_tag, step2_output,
                                                                    s3_input_files,  step3_name, ['microannot_mti', 'annot_mti'])
-
         if step3_status != 'complete':
             step4_status = ""
         else:
-            # run step4 micro annotation
-            # VEP has 2 outputs, unpack them
-            step3_output_micro = step3_outputs[0]
-            step3_output_full = step3_outputs[1]
-            s4_input_files = {'input_vcf': step2_output,
-                              'mti_vep': step3_output_micro,
+            # run step4 VEP
+            s3_input_files = {'input_vcf': step3_output,
                               'mti': "/files-reference/GAPFIFJM2A8Z/",
+                              'reference': "/files-reference/GAPFIXRDPDK5/",
                               'regions': "/files-reference/GAPFIBGEOI72/",
+                              'vep_tar': "/files-reference/GAPFIFZB4NUO/",
                               'additional_file_parameters': {'mti': {"mount": True},
-                                                             'mti_vep': {"mount": True}}
+                                                             'reference': {"mount": True},
+                                                             'vep_tar': {"mount": True}
+                                                             }
                               }
-            s4_tag = print_id + '_micro_ann_' + step3_output_micro.split('/')[2]
-            # this step is tagged (with uuid of sample_processing, which means
-            # that when finding the workflowruns, it will not only look with
-            # workflow app name and input files, but also the tag on workflow run items
-            # since we differentiate sample processings at this step, downsteam will be separated
-            # no need for tagging them too
-            keep, step4_status, step4_output = wfr_utils.stepper(library, keep,
-                                                                  s4_tag, step3_output_micro,
-                                                                  s4_input_files,  step4_name, 'annotated_vcf',
-                                                                  tag=an_msa['uuid'])
+            s3_tag = print_id + '_VEP_' + step2_output.split('/')[2]
+            # there are 2 files we need, one to use in the next step
+            keep, step3_status, step3_outputs = wfr_utils.stepper(library, keep,
+                                                                   s3_tag, step2_output,
+                                                                   s3_input_files,  step3_name, ['microannot_mti', 'annot_mti'])
 
         if step4_status != 'complete':
             step5_status = ""
