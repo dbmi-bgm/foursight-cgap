@@ -643,6 +643,7 @@ def cgapS2_status(connection, **kwargs):
     # list step names
     step1_name = 'workflow_gatk-CombineGVCFs'
     step2_name = 'workflow_gatk-GenotypeGVCFs-check'
+    step2b_name = 'workflow_peddy'
     step3_name = 'workflow_samplegeno'
     step4_name = 'workflow_vep-annot-check'
     step5_name = 'workflow_granite-qcVCF'
