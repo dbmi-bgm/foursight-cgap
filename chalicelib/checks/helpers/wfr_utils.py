@@ -26,50 +26,46 @@ workflow_details = {
     },
     "workflow_bwa-mem_no_unzip-check": {
         "run_time": 12,
-        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_add-readgroups-check": {
         "run_time": 12,
-        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_merge-bam-check": {
         "run_time": 12,
-        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_picard-MarkDuplicates-check": {
         "run_time": 12,
-        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_sort-bam-check": {
         "run_time": 12,
-        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_gatk-BaseRecalibrator": {
         "run_time": 12,
-        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_gatk-ApplyBQSR-check": {
         "run_time": 12,
-        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     # defunct step 8
     "workflow_index-sorted-bam": {
         "run_time": 12,
         "accepted_versions": ["v9"]
     },
-    "workflow_granite-mpileupCounts": {
-        "run_time": 12,
-        "accepted_versions": ["v14", "v15", "v16", "v17"]
-    },
     # new step 8
     'workflow_gatk-HaplotypeCaller': {
         "run_time": 12,
-        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     # step 9
     'workflow_granite-mpileupCounts': {
         "run_time": 12,
-        "accepted_versions": ["v14", "v15", "v16", "v17"]
+        "accepted_versions": ["v14", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     # step 10
     'cgap-bamqc': {
@@ -80,18 +76,19 @@ workflow_details = {
     # part II step 1
     'workflow_gatk-CombineGVCFs': {
         "run_time": 12,
-        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     # part II step 2
     'workflow_gatk-GenotypeGVCFs-check': {
         "run_time": 12,
-        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
-    # part III step 3
+    # part III step 3 - defunct
     'workflow_gatk-VQSR-check': {
         "run_time": 12,
         "accepted_versions": ["v10", "v11", "v12", "v13"]
     },
+    # defunct
     "workflow_qcboard-bam": {
         "run_time": 12,
         "accepted_versions": ["v3"]
@@ -108,6 +105,15 @@ workflow_details = {
         "run_time": 12,
         "accepted_versions": ["v17"]
     },
+    "workflow_samplegeno": {
+        "run_time": 12,
+        "accepted_versions": ["v20"]
+    },
+    "workflow_vep-annot-check": {
+        "run_time": 12,
+        "accepted_versions": ["v20"]
+    },
+    # defunct
     "workflow_mutanno-micro-annot-check": {
         "run_time": 12,
         "accepted_versions": ["v17"]
@@ -115,27 +121,28 @@ workflow_details = {
     # Part III
     "workflow_granite-rckTar": {
         "run_time": 12,
-        "accepted_versions": ["v16", "v17"]
+        "accepted_versions": ["v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_granite-filtering-check": {
         "run_time": 12,
-        "accepted_versions": ["v16", "v17"]
+        "accepted_versions": ["v20"]
     },
     "workflow_granite-novoCaller-rck-check": {
         "run_time": 12,
-        "accepted_versions": ["v16", "v17"]
+        "accepted_versions": ["v20"]
     },
     "workflow_granite-comHet-check": {
         "run_time": 12,
-        "accepted_versions": ["v16", "v17"]
+        "accepted_versions": ["v20"]
     },
+    # defunct
     "workflow_mutanno-annot-check": {
         "run_time": 12,
         "accepted_versions": ["v17"]
     },
     "bamsnap": {
         "run_time": 12,
-        "accepted_versions": ["v17"]
+        "accepted_versions": ["v20"]
     },
     "workflow_granite-qcVCF": {
         "run_time": 12,
