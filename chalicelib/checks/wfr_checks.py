@@ -765,6 +765,22 @@ def cgapS2_status(connection, **kwargs):
                                                                   s2_input_files,  step2_name, 'vcf')
 
         if step2_status != 'complete':
+            step2b_status = ""
+        else:
+            # step 2b peddy qc
+            s2b_input_files = {"input_vcf": step2_output}
+            # str_qc_pedigree = str(json.dumps(qc_pedigree))
+            proband_first_sample_list = list(reversed(sample_ids))  # proband first sample ids
+            update_pars = {"parameters": {"family": "",
+                                          "pedigree": ""}
+                           }
+            s2b_tag = an_msa['@id'] + '_Part2step2b'
+            keep, step2b_status, step2b_output = wfr_utils.stepper(library, keep,
+                                                                   'step2b', s2b_tag, step2_output,
+                                                                   s2b_input_files,  step2b_name, '',
+                                                                   additional_input=update_pars, no_output=True)
+
+        if step2b_status != 'complete':
             step3_status = ""
         else:
             # run step3 samplegeno
