@@ -121,11 +121,11 @@ workflow_details = {
     },
     "workflow_granite-qcVCF": {
         "run_time": 12,
-        "accepted_versions": ["v2", "v3"]
+        "accepted_versions": ["v4"]
     },
     "workflow_peddy": {
         "run_time": 12,
-        "accepted_versions": ["v3"]
+        "accepted_versions": ["v4"]
     }
 }
 
