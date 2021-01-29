@@ -274,7 +274,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "t3.small",
-            "ebs_size": "1.2x",
+            "ebs_size": "50x",
             "EBS_optimized": True
         }
     },
