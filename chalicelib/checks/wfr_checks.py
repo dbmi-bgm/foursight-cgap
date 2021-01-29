@@ -841,7 +841,7 @@ def cgapS2_status(connection, **kwargs):
                            }
             s5b_tag = an_msa['@id'] + '_Part2step5b'
             keep, step5b_status, step5b_output = wfr_utils.stepper(library, keep,
-                                                                   'step5b', s25_tag, step4_output,
+                                                                   'step5b', s5b_tag, step4_output,
                                                                    s5b_input_files,  step5b_name, '',
                                                                    additional_input=update_pars, no_output=True)
         final_status = print_id
