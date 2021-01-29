@@ -766,7 +766,7 @@ def cgapS2_status(connection, **kwargs):
                                                                   s2_input_files,  step2_name, 'vcf')
 
 
-        if step2b_status != 'complete':
+        if step2_status != 'complete':
             step3_status = ""
         else:
             # run step3 samplegeno
