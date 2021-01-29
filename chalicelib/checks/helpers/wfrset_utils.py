@@ -297,7 +297,7 @@ wf_dict = [
     {  # VEP
         'app_name': 'workflow_vep-annot-check',
         'workflow_uuid': 'cgap:workflow_vep-annot-check_v20',
-        'parameters': {"nthreads": 72},
+        'parameters': {"nthreads": 64},
         "config": {
             "instance_type": "c5n.18xlarge",
             "ebs_size": "0.5x",
