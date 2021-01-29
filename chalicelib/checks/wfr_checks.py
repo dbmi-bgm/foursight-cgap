@@ -838,8 +838,7 @@ def cgapS2_status(connection, **kwargs):
                                 }
             # str_qc_pedigree = str(json.dumps(qc_pedigree))
             proband_first_sample_list = list(reversed(sample_ids))  # proband first sample ids
-            update_pars = {"parameters": {"family": "",
-                                          "pedigree": ""}
+            update_pars = {"parameters": {"pedigree": str_qc_pedigree}
                            }
             s5b_tag = an_msa['@id'] + '_Part2step5b'
             keep, step5b_status, step5b_output = wfr_utils.stepper(library, keep,
