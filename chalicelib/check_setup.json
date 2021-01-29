@@ -234,6 +234,10 @@
         "group": "Pipeline checks",
         "schedule": {
             "hourly_checks": {
+                "cgap": {
+                    "kwargs": {"primary": true},
+                    "dependencies": []
+                },
                 "cgapwolf": {
                     "kwargs": {"primary": true, "queue_action": "prod"},
                     "dependencies": []
