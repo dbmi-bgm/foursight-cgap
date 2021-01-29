@@ -856,7 +856,7 @@ def cgapS2_status(connection, **kwargs):
         running = keep['running']
         problematic_run = keep['problematic_run']
 
-        if step5_status == 'complete' and step5b_statue == 'complete':
+        if step5_status == 'complete' and step5b_status == 'complete':
             final_status += ' completed'
             # existing_pf = [i['@id'] for i in an_msa['processed_files']]
             completed = [
