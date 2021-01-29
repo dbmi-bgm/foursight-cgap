@@ -643,10 +643,10 @@ def cgapS2_status(connection, **kwargs):
     # list step names
     step1_name = 'workflow_gatk-CombineGVCFs'
     step2_name = 'workflow_gatk-GenotypeGVCFs-check'
-    step2b_name = 'workflow_peddy'
     step3_name = 'workflow_samplegeno'
     step4_name = 'workflow_vep-annot-check'
     step5_name = 'workflow_granite-qcVCF'
+    step5b_name = 'workflow_peddy'
 
     # collect all wf for wf version check
     all_system_wfs = ff_utils.search_metadata('/search/?type=Workflow&status=released', my_auth)
@@ -765,21 +765,6 @@ def cgapS2_status(connection, **kwargs):
                                                                   s2_tag, step1_output,
                                                                   s2_input_files,  step2_name, 'vcf')
 
-        if step2_status != 'complete':
-            step2b_status = ""
-        else:
-            # step 2b peddy qc
-            s2b_input_files = {"input_vcf": step2_output}
-            # str_qc_pedigree = str(json.dumps(qc_pedigree))
-            proband_first_sample_list = list(reversed(sample_ids))  # proband first sample ids
-            update_pars = {"parameters": {"family": "",
-                                          "pedigree": ""}
-                           }
-            s2b_tag = an_msa['@id'] + '_Part2step2b'
-            keep, step2b_status, step2b_output = wfr_utils.stepper(library, keep,
-                                                                   'step2b', s2b_tag, step2_output,
-                                                                   s2b_input_files,  step2b_name, '',
-                                                                   additional_input=update_pars, no_output=True)
 
         if step2b_status != 'complete':
             step3_status = ""
@@ -844,6 +829,21 @@ def cgapS2_status(connection, **kwargs):
                                                                   s5_input_files,  step5_name, '',
                                                                   additional_input=update_pars, no_output=True)
 
+        if step4_status != 'complete':
+            step5b_status = ""
+        else:
+            # step 5b peddy qc
+            s5b_input_files = {"input_vcf": step4_output}
+            # str_qc_pedigree = str(json.dumps(qc_pedigree))
+            proband_first_sample_list = list(reversed(sample_ids))  # proband first sample ids
+            update_pars = {"parameters": {"family": "",
+                                          "pedigree": ""}
+                           }
+            s5b_tag = an_msa['@id'] + '_Part2step5b'
+            keep, step5b_status, step5b_output = wfr_utils.stepper(library, keep,
+                                                                   'step5b', s25_tag, step4_output,
+                                                                   s5b_input_files,  step5b_name, '',
+                                                                   additional_input=update_pars, no_output=True)
         final_status = print_id
         completed = []
         pipeline_tag = cgap_partII_version[-1]
