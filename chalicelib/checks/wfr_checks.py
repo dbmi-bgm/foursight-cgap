@@ -814,7 +814,7 @@ def cgapS2_status(connection, **kwargs):
         else:
             # step 5 vcfqc
             s5_input_files = {'input_vcf': step4_output,
-                              'additional_file_parameters': {'input_vcf': {"unzip": "gz"}}
+                              'additional_file_parameters': {'input_vcf': {"mount": True}}
                               }
             str_qc_pedigree = str(json.dumps(qc_pedigree))
             proband_first_sample_list = list(reversed(sample_ids))  # proband first sample ids
@@ -833,7 +833,9 @@ def cgapS2_status(connection, **kwargs):
             step5b_status = ""
         else:
             # step 5b peddy qc
-            s5b_input_files = {"input_vcf": step4_output}
+            s5b_input_files = {"input_vcf": step4_output,
+                                'additional_file_parameters': {'input_vcf': {"mount": True}}
+                                }
             # str_qc_pedigree = str(json.dumps(qc_pedigree))
             proband_first_sample_list = list(reversed(sample_ids))  # proband first sample ids
             update_pars = {"parameters": {"family": "",
