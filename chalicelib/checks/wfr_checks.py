@@ -776,9 +776,9 @@ def cgapS2_status(connection, **kwargs):
                               }
             s3_tag = print_id + '_samplegeno_' + step2_output.split('/')[2]
             # there are 2 files we need, one to use in the next step
-            keep, step3_status, step3_outputs = wfr_utils.stepper(library, keep,
-                                                                   s3_tag, step2_output,
-                                                                   s3_input_files,  step3_name, 'samplegeno_vcf')
+            keep, step3_status, step3_output = wfr_utils.stepper(library, keep,
+                                                                 s3_tag, step2_output,
+                                                                 s3_input_files,  step3_name, 'samplegeno_vcf')
         if step3_status != 'complete':
             step4_status = ""
         else:
@@ -805,9 +805,9 @@ def cgapS2_status(connection, **kwargs):
                               }
             s4_tag = print_id + '_VEP_' + step3_output.split('/')[2]
             # there are 2 files we need, one to use in the next step
-            keep, step4_status, step4_outputs = wfr_utils.stepper(library, keep,
-                                                                   s4_tag, step3_output,
-                                                                   s4_input_files,  step4_name, 'annotated_vcf')
+            keep, step4_status, step4_output = wfr_utils.stepper(library, keep,
+                                                                 s4_tag, step3_output,
+                                                                 s4_input_files,  step4_name, 'annotated_vcf')
 
         if step4_status != 'complete':
             step5_status = ""
