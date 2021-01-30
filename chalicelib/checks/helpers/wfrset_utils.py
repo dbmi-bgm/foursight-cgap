@@ -336,7 +336,7 @@ wf_dict = [
         'parameters': {"aftag": "gnomADg_AF", "afthr": 0.01},
         "config": {
             "instance_type": "t3.medium",
-            "ebs_size": "6x",
+            "ebs_size": "9x",
             "EBS_optimized": True
         },
         'custom_pf_fields': {
