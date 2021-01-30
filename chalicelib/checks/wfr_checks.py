@@ -1077,8 +1077,8 @@ def cgapS3_status(connection, **kwargs):
         input_bams, input_titles = wfr_utils.get_bamsnap_parameters(samples_pedigree, all_samples)
 
         # we need the vep vcf in the processed_files field of sample_processing
-        if len(an_msa.get('processed_files', [])) != 2:
-            final_status = print_id + '2 items in processed_files of msa was expected'
+        if len(an_msa.get('processed_files', [])) != 1:
+            final_status = print_id + ' 1 item in processed_files of msa was expected'
             print(final_status)
             check.brief_output.append(final_status)
             check.full_output['skipped'].append({an_msa['@id']: final_status})
