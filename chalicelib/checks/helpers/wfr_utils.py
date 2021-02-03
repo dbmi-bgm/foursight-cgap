@@ -416,19 +416,27 @@ def filter_wfrs_with_input_and_tag(all_wfr_items, app_name, input_file_dict, tag
 
     # filter for app_name
     wfrs_with_app_name = [i for i in all_wfr_items if i['display_title'].startswith(app_name)]
+
+    for wf_ in wfrs_with_app_name:
+        print('\t\twfr filter, ' + wf_['title'])
+
     # filter for tag
     if tag:
+        print('\t\t-> TAG')
         wfrs_with_tag = [i for i in wfrs_with_app_name if tag in i.get('tags', [])]
     else:
+        print('\t\t-> NO TAG')
         wfrs_with_tag = wfrs_with_app_name
     # filter for input files
     # collect input files
     input_files = collect_input_files_from_input_dictionary(input_file_dict)
+    print('\t\t-> input_files, ' + str(input_files))
     # check for workflows with same inputs
     filtered_wfrs = []
     for a_wfr in wfrs_with_tag:
         # get all input files from the workflow item
         wfr_inputs = collect_inputs_from_workflow_run(a_wfr)
+        print('\t\t\t-> wfr_input, ' + str(wfr_inputs))
         # expectation is exact match of input files, if so pass the filter
         if match_all_input:
             if sorted(wfr_inputs) == sorted(input_files):
@@ -437,6 +445,11 @@ def filter_wfrs_with_input_and_tag(all_wfr_items, app_name, input_file_dict, tag
         else:
             if all(file in wfr_inputs for file in input_files):
                 filtered_wfrs.append(a_wfr)
+        # for wf_ in filtered_wfrs:
+        #     print('\t\tfiltered_wfrs, ' + wf_['title'])
+
+    for wf_ in filtered_wfrs:
+        print('\t\tfiltered_wfrs, ' + wf_['title'])
     return filtered_wfrs
 
 
@@ -488,6 +501,7 @@ def stepper(library, keep,
         - keep : same as input, with addition from this check
         - step_status : a short summary of this functions result (complete, running, no complete run)
     """
+    print('\t\t\tinit keep missing, ' + str(keep['missing_run']))
     if not additional_input:
         additional_input = {}
     step_output = ''
@@ -540,12 +554,20 @@ def stepper(library, keep,
         #                      (ie 2 quads made up of the same samples with different probands.)
         filtered_wfrs = filter_wfrs_with_input_and_tag(all_wfrs, new_step_name, input_file_dict, tag=tag)
 
+        # for wf_ in all_wfrs:
+        #     if 'granite' in wf_['title']:
+        #         print('\t\twfr title, ' + wf_['title'])
+        #         print('\t\t\tdisplay title, ' + wf_['display_title'])
+        for wf_ in filtered_wfrs:
+            print('\t\twfr, ' + wf_['title'])
+
         if no_output:
             step_result = get_wfr_out(input_resp, new_step_name, all_wfrs=filtered_wfrs, md_qc=True)
         else:
             step_result = get_wfr_out(input_resp, new_step_name, all_wfrs=filtered_wfrs)
         step_status = step_result['status']
         # if successful
+        print('\t\t\t-> get_wfr_out, ' + step_status)
         input_file_accession = input_resp['accession']
         if step_status == 'complete':
             if new_step_output_arg:
@@ -576,6 +598,7 @@ def stepper(library, keep,
     keep['running'] = running
     keep['problematic_run'] = problematic_run
     keep['missing_run'] = missing_run
+    print('\t\t\tstepper keep missing, ' + str(keep['missing_run']))
     return keep, step_status, step_output
 
 

@@ -987,7 +987,7 @@ def cgapS3_status(connection, **kwargs):
         check.brief_output.extend(wf_errs)
         return check
     # iterate over msa
-    print(len(res))
+    print('Files num: {0}'.format(len(res)))
     cnt = 0
     for an_msa in res:
         # msa id to be used on foursight brief output
@@ -1003,7 +1003,7 @@ def cgapS3_status(connection, **kwargs):
                                                            add_pc_wfr=True,
                                                            ignore_field=['previous_version'])
         now = datetime.utcnow()
-        print('\n', print_id, (now-start).seconds, len(all_uuids))
+        #print('\n', print_id, (now-start).seconds, len(all_uuids))
         if (now-start).seconds > lambda_limit:
             check.summary = 'Timout - only {} sample_processings were processed'.format(str(cnt))
             break
@@ -1084,11 +1084,14 @@ def cgapS3_status(connection, **kwargs):
             check.full_output['skipped'].append({an_msa['@id']: final_status})
             continue
 
+        print('\nStart - {1}'.format(cnt, print_id))
         # extract input files from msa_processed files
         vep_annotated_vcf = an_msa['processed_files'][0]['@id']
+        print('\t-> vep_annotated_vcf ' + vep_annotated_vcf)
 
         # if trio, run rck_tar
         if run_mode == 'trio':
+            print('\t\t-> is trio, run rck_tar')
             new_names = [i + '.rck.gz' for i in sample_ids]  # proband last
             s1_input_files = {'input_rcks': input_rcks,  # proband last
                               'additional_file_parameters': {'input_rcks': {"rename": new_names}}
@@ -1098,17 +1101,19 @@ def cgapS3_status(connection, **kwargs):
                                                                   s1_tag, input_rcks,
                                                                   s1_input_files,  step1_name, 'rck_tar')
         else:
+            print('\t\t-> no trio, skip rck_tar')
             step1_status = 'complete'
             step1_output = ''
 
         if step1_status != 'complete':
             step2_status = ""
         else:
+            print('\t\t-> Run filtering')
             # Run filtering
             input_vcf = vep_annotated_vcf
             s2_input_files = {"input_vcf": input_vcf,
                               # "bigfile": "20004873-b672-4d84-a7c1-7fd5c0407519",
-                              "genes": "/files-processed/GAPFI5MKCART/",
+                              "genes": "/files-reference/GAPFI5MKCART/",
                               'additional_file_parameters': {'input_vcf': {"mount": True},
                                                              'genes': {"mount": True}
                                                             }
@@ -1121,6 +1126,7 @@ def cgapS3_status(connection, **kwargs):
         if step2_status != 'complete':
             step3_status = ""
         else:
+            print('\t\t-> Run novoCaller')
             # Run novoCaller
             if run_mode == 'trio':
                 s3_input_files = {'input_vcf': step2_output,
@@ -1143,6 +1149,7 @@ def cgapS3_status(connection, **kwargs):
         if step3_status != 'complete':
             step4_status = ""
         else:
+            print('\t\t-> Run ComHet')
             # Run ComHet
             s4_input_files = {"input_vcf": step3_output,
                               'additional_file_parameters': {'input_vcf': {"mount": True}}
@@ -1210,6 +1217,10 @@ def cgapS3_status(connection, **kwargs):
                                                                   s6_input_files,  step6_name, '',
                                                                   additional_input=update_pars, no_output=True)
 
+        # try:
+        #     print('\t\t-> final output, ' + step5_output)
+        # except:
+        #     print('\t\t-> final output, ' + 'NO OUTPUT')
         final_status = print_id
         completed = []
         pipeline_tag = cgap_partIII_version[-1]
@@ -1226,9 +1237,9 @@ def cgapS3_status(connection, **kwargs):
             # existing_pf = [i['@id'] for i in an_msa['processed_files']]
             completed = [
                 an_msa['@id'],
-                {'processed_files': previous_files + [step5_output, ],
+                {'processed_files': previous_files + [step4_output, ],
                  'completed_processes': previous_tags + [pipeline_tag, ]}]
-            print('COMPLETED', step5_output)
+            print('COMPLETED', step4_output)
         else:
             if missing_run:
                 final_status += ' |Missing: ' + " ".join([i[0] for i in missing_run])
