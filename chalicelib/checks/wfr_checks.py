@@ -400,7 +400,10 @@ def cgap_status(connection, **kwargs):
 
         for pair in sample_raw_files:
             # RUN STEP 1
-            s1_input_files = {'fastq_R1': pair[0], 'fastq_R2': pair[1], 'reference': refs['bwa_ref']}
+            s1_input_files = {'fastq_R1': pair[0], 'fastq_R2': pair[1], 'reference': refs['bwa_ref'],
+                              'additional_file_parameters': {'fastq_R1': {"mount": True},
+                                                             'fastq_R2': {"mount": True},
+                                                             'reference': {"mount": True}}}
             s1_tag = 'step1_' + a_sample['accession'] + '_' + pair[0].split('/')[2] + '_' + pair[1].split('/')[2]
             keep, step1_status, step1_output = wfr_utils.stepper(library, keep, s1_tag, pair,
                                                                   s1_input_files,  step1_name, 'raw_bam')
@@ -409,7 +412,8 @@ def cgap_status(connection, **kwargs):
                 step2_status = ''
                 stop_level_2 = True
             else:
-                s2_input_files = {'input_bam': step1_output}
+                s2_input_files = {'input_bam': step1_output,
+                                  'additional_file_parameters': {'input_bam': {"mount": True}}}
                 s2_tag = 'step2_' + a_sample['accession'] + '_' + step1_output.split('/')[2]
                 add_par = {"parameters": {"sample_name": bam_sample_id}}
                 keep, step2_status, step2_output = wfr_utils.stepper(library, keep, s2_tag, step1_output,
@@ -428,7 +432,8 @@ def cgap_status(connection, **kwargs):
                 step3_status = 'complete'
                 step3_output = s3_input_bams[0]
             else:
-                s3_input_files = {'input_bams': s3_input_bams}
+                s3_input_files = {'input_bams': s3_input_bams,
+                                  'additional_file_parameters': {'input_bams': {"mount": True}}}
                 s3_tag = 'step3_' + a_sample['accession']
                 keep, step3_status, step3_output = wfr_utils.stepper(library, keep, s3_tag, s3_input_bams,
                                                                       s3_input_files,  step3_name, 'merged_bam')
@@ -436,7 +441,8 @@ def cgap_status(connection, **kwargs):
         if step3_status != 'complete':
             step4_status = ""
         else:
-            s4_input_files = {'input_bam': step3_output}
+            s4_input_files = {'input_bam': step3_output,
+                              'additional_file_parameters': {'input_bam': {"mount": True}}}
             s4_tag = 'step4_' + a_sample['accession']
             keep, step4_status, step4_output = wfr_utils.stepper(library, keep, s4_tag, step3_output,
                                                                   s4_input_files,  step4_name, 'dupmarked_bam')
@@ -444,7 +450,8 @@ def cgap_status(connection, **kwargs):
         if step4_status != 'complete':
             step5_status = ""
         else:
-            s5_input_files = {'input_bam': step4_output}
+            s5_input_files = {'input_bam': step4_output,
+                              'additional_file_parameters': {'input_bam': {"mount": True}}}
             s5_tag = 'step5_' + a_sample['accession']
             keep, step5_status, step5_output = wfr_utils.stepper(library, keep, s5_tag, step4_output,
                                                                   s5_input_files,  step5_name, 'sorted_bam')
@@ -455,7 +462,11 @@ def cgap_status(connection, **kwargs):
             s6_input_files = {'input_bam': step5_output,
                               'known-sites-snp': '/files-reference/GAPFI4LJRN98/',
                               'known-sites-indels': '/files-reference/GAPFIAX2PPYB/',
-                              'reference': '/files-reference/GAPFIXRDPDK5/'}
+                              'reference': '/files-reference/GAPFIXRDPDK5/',
+                              'additional_file_parameters': {'input_bam': {"mount": True},
+                                                             'known-sites-snp': {"mount": True},
+                                                             'known-sites-indels': {"mount": True},
+                                                             'reference': {"mount": True}}}
             s6_tag = 'step6_' + a_sample['accession']
             keep, step6_status, step6_output = wfr_utils.stepper(library, keep, s6_tag, step5_output,
                                                                   s6_input_files,  step6_name, 'recalibration_report')
@@ -465,7 +476,10 @@ def cgap_status(connection, **kwargs):
         else:
             s7_input_files = {'input_bam': step5_output,
                               'reference': '/files-reference/GAPFIXRDPDK5/',
-                              'recalibration_report': step6_output}
+                              'recalibration_report': step6_output,
+                              'additional_file_parameters': {'input_bam': {"mount": True},
+                                                             'reference': {"mount": True},
+                                                             'recalibration_report': {"mount": True}}}
             s7_tag = 'step7_' + a_sample['accession']
             keep, step7_status, step7_output = wfr_utils.stepper(library, keep, s7_tag, step6_output,
                                                                   s7_input_files,  step7_name, 'recalibrated_bam')
