@@ -441,8 +441,7 @@ def cgap_status(connection, **kwargs):
         if step3_status != 'complete':
             step4_status = ""
         else:
-            s4_input_files = {'input_bam': step3_output,
-                              'additional_file_parameters': {'input_bam': {"mount": True}}}
+            s4_input_files = {'input_bam': step3_output}
             s4_tag = 'step4_' + a_sample['accession']
             keep, step4_status, step4_output = wfr_utils.stepper(library, keep, s4_tag, step3_output,
                                                                   s4_input_files,  step4_name, 'dupmarked_bam')
@@ -476,10 +475,7 @@ def cgap_status(connection, **kwargs):
         else:
             s7_input_files = {'input_bam': step5_output,
                               'reference': '/files-reference/GAPFIXRDPDK5/',
-                              'recalibration_report': step6_output,
-                              'additional_file_parameters': {'input_bam': {"mount": True},
-                                                             'reference': {"mount": True},
-                                                             'recalibration_report': {"mount": True}}}
+                              'recalibration_report': step6_output}
             s7_tag = 'step7_' + a_sample['accession']
             keep, step7_status, step7_output = wfr_utils.stepper(library, keep, s7_tag, step6_output,
                                                                   s7_input_files,  step7_name, 'recalibrated_bam')

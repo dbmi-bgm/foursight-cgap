@@ -131,7 +131,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "c5n.18xlarge",
-            "ebs_size": "3x",
+            "ebs_size": "4x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
         },
@@ -179,7 +179,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "t3.micro",
-            "ebs_size": "2.5x",
+            "ebs_size": "3.5x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
         },
