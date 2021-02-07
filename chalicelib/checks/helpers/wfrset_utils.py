@@ -179,7 +179,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "t3.micro",
-            "ebs_size": "3.5x",
+            "ebs_size": "4.5x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
         },
@@ -196,7 +196,7 @@ wf_dict = [
         'parameters': {"nthreads": 15},
         "config": {
             "instance_type": "c5.4xlarge",
-            "ebs_size": 200,
+            "ebs_size": "3.5x",
             "EBS_optimized": True
         },
         'custom_pf_fields': {
