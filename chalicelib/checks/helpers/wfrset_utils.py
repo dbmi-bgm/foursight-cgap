@@ -196,7 +196,7 @@ wf_dict = [
         'parameters': {"nthreads": 15},
         "config": {
             "instance_type": "c5.4xlarge",
-            "ebs_size": "3.5x",
+            "ebs_size": 200,
             "EBS_optimized": True
         },
         'custom_pf_fields': {
@@ -320,7 +320,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "c5.xlarge",
-            "ebs_size": "2.5x",
+            "ebs_size": "3.5x",
             "EBS_optimized": True
         },
         'custom_pf_fields': {
