@@ -235,7 +235,7 @@
         "schedule": {
             "hourly_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {"primary": true, "queue_action": "prod"},
                     "dependencies": []
                 },
                 "cgapwolf": {
