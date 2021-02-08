@@ -1115,25 +1115,22 @@ def cgapS3_status(connection, **kwargs):
             step1_status = 'complete'
             step1_output = ''
 
-        if step1_status != 'complete':
-            step2_status = ""
-        else:
-            print('\t\t-> Run filtering')
-            # Run filtering
-            input_vcf = vep_annotated_vcf
-            s2_input_files = {"input_vcf": input_vcf,
-                              # "bigfile": "20004873-b672-4d84-a7c1-7fd5c0407519",
-                              "genes": "/files-reference/GAPFI5MKCART/",
-                              'additional_file_parameters': {'input_vcf': {"mount": True},
-                                                             'genes': {"mount": True}
-                                                            }
-                              }
-            s2_tag = print_id + '_filtering'
-            keep, step2_status, step2_output = wfr_utils.stepper(library, keep,
-                                                                  s2_tag, input_vcf,
-                                                                  s2_input_files,  step2_name, 'merged_vcf')
+        print('\t\t-> Run filtering')
+        # Run filtering in parallel with rck_tar
+        input_vcf = vep_annotated_vcf
+        s2_input_files = {"input_vcf": input_vcf,
+                          # "bigfile": "20004873-b672-4d84-a7c1-7fd5c0407519",
+                          "genes": "/files-reference/GAPFI5MKCART/",
+                          'additional_file_parameters': {'input_vcf': {"mount": True},
+                                                         'genes': {"mount": True}
+                                                        }
+                          }
+        s2_tag = print_id + '_filtering'
+        keep, step2_status, step2_output = wfr_utils.stepper(library, keep,
+                                                              s2_tag, input_vcf,
+                                                              s2_input_files,  step2_name, 'merged_vcf')
 
-        if step2_status != 'complete':
+        if step1_status != 'complete' or step2_status != 'complete':
             step3_status = ""
         else:
             print('\t\t-> Run novoCaller')
