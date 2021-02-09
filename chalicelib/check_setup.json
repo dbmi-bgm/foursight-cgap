@@ -233,7 +233,7 @@
         "title": "d) CGAP pipeline Part III",
         "group": "Pipeline checks",
         "schedule": {
-            "ten_min_checks": {
+            "hourly_checks": {
                 "cgap": {
                     "kwargs": {"primary": true, "queue_action": "prod"},
                     "dependencies": []
