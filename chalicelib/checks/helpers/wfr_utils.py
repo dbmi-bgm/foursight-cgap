@@ -142,6 +142,27 @@ def remove_parents_without_sample(samples_pedigree):
         a_member['parents'] = new_parents
     return samples_pedigree
 
+def full_pedigree(samples_pedigree_json):
+    """extract pedigree for qc for every family member
+    - input samples accession list
+    - qc pedigree
+    """
+    # remove parent ids that are not in the sample_pedigree as individual
+    samples_pedigree = remove_parents_without_sample(samples_pedigree_json)
+    input_samples = []
+    qc_pedigree = []
+    error = ""
+    # get samples
+    for sample in samples_pedigree:
+        member_qc_pedigree = {
+            'gender': sample.get('sex', ''),
+            'individual': sample.get('individual', ''),
+            'parents': sample.get('parents', []),
+            'sample_name': sample.get('sample_name', '')
+            }
+        qc_pedigree.append(member_qc_pedigree)
+        input_samples.append(sample['sample_accession'])
+    return input_samples, qc_pedigree, error
 
 def analyze_pedigree(samples_pedigree_json, all_samples):
     """extract pedigree for qc for trio (father/mother/proband) or proband
@@ -191,8 +212,8 @@ def analyze_pedigree(samples_pedigree_json, all_samples):
             }
         qc_pedigree.append(member_qc_pedigree)
         run_mode = 'proband_only'
-    # remove parents from mother and father (temporary fix until vcfqc V4 is in production)
-    qc_pedigree = remove_parents_without_sample(qc_pedigree)
+    # # remove parents from mother and father (temporary fix until vcfqc V4 is in production)
+    # qc_pedigree = remove_parents_without_sample(qc_pedigree)
     return input_samples, qc_pedigree, run_mode, error
 
 
