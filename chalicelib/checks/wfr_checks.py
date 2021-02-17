@@ -854,7 +854,7 @@ def cgapS2_status(connection, **kwargs):
                                                                   s5_input_files,  step5_name, '',
                                                                   additional_input=update_pars, no_output=True)
 
-        if step4_status != 'complete':
+        if step5_status != 'complete':
             step5b_status = ""
         else:
             print('\t\t-> Run peddy')
@@ -866,6 +866,7 @@ def cgapS2_status(connection, **kwargs):
             update_pars = {"parameters": {"pedigree": str_qc_pedigree,
                                           "family": "FAMILY"}
                            }
+            ## This looks weird, to check ##
             s5b_tag = an_msa['@id'] + '_Part2step5b'
             keep, step5b_status, step5b_output = wfr_utils.stepper(library, keep,
                                                                    s5b_tag, step4_output,
