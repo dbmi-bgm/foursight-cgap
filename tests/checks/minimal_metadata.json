@@ -9,7 +9,7 @@
       "paired_end": "1",
       "project": "/projects/cgap-core/",
       "institution": "/institutions/hms-dbmi/",
-      "status": "uploaded"
+      "status": "uploading"
     },
     {
       "aliases": [
@@ -26,7 +26,7 @@
       ],
       "project": "/projects/cgap-core/",
       "institution": "/institutions/hms-dbmi/",
-      "status": "uploaded"
+      "status": "uploading"
     },
     {
       "aliases": [
@@ -37,7 +37,7 @@
       "paired_end": "1",
       "project": "/projects/cgap-core/",
       "institution": "/institutions/hms-dbmi/",
-      "status": "uploaded"
+      "status": "uploading"
     },
     {
       "aliases": [
@@ -54,7 +54,7 @@
       ],
       "project": "/projects/cgap-core/",
       "institution": "/institutions/hms-dbmi/",
-      "status": "uploaded"
+      "status": "uploading"
     },
     {
       "aliases": [
@@ -65,7 +65,7 @@
       "paired_end": "1",
       "project": "/projects/cgap-core/",
       "institution": "/institutions/hms-dbmi/",
-      "status": "uploaded"
+      "status": "uploading"
     },
     {
       "aliases": [
@@ -82,7 +82,7 @@
       ],
       "project": "/projects/cgap-core/",
       "institution": "/institutions/hms-dbmi/",
-      "status": "uploaded"
+      "status": "uploading"
     }
   ],
   "sample": [
