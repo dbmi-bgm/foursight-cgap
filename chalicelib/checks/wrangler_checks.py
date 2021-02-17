@@ -1036,14 +1036,6 @@ def core_project_status(connection, **kwargs):
     item_type = kwargs.get('item_type')
     full_output = {}
     for item in item_type:
-        # For the first check, create CheckResult and grab its uuid. For
-        # subsequent checks, use the same uuid to store all data on one
-        # check output.  
-        if item == item_type[0]:
-            init_uuid = kwargs.get('uuid')
-        else:
-            check = CheckResult(connection, 'core_project_status', 
-                                init_uuid=init_uuid)
         search_query = ('search/?project.display_title=CGAP+Core'
                         '&type=' + item +
                         '&status!=shared'
