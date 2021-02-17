@@ -401,5 +401,18 @@
                 }
             }
         }
+    },
+    "core_info_shared":{
+        "title": "Ensure CGAP Core variant samples shared",
+        "group": "Metadata checks",
+        "schedule": {
+            "morning_checks": {
+                "all": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
+        }
     }
 }

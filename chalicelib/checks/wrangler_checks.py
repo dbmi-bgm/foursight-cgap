@@ -1021,3 +1021,81 @@ def add_grouped_with_file_relation(connection, **kwargs):
         action.status = 'DONE'
     action.output = action_logs
     return action
+
+@check_function(item_type = ['VariantSample'])
+def core_project_status(connection, **kwargs):
+    """
+    Ensure CGAP Core projects have their objects shared.
+
+    Default behavior is to check only VariantSample objects, but defining 
+    'item_type' in check_setup.json will override the default and check status
+    for all objects defined there. 
+    """
+
+    full_output = {}
+    for item in item_type:
+        # For the first check, create CheckResult and grab its uuid. For
+        # subsequent checks, use the same uuid to store all data on one
+        # check output.  
+        if item == item_type[0]:
+            check = CheckResult(connection, 'core_project_status')
+            init_uuid = kwargs.get('uuid')
+        else:
+            check = CheckResult(connection, 'core_project_status', 
+                                init_uuid=init_uuid)
+        search_query = ('search/?project.display_title=CGAP+Core'
+                        '&type=' + item +
+                        '&status!=shared'
+                        '&frame=object&field=uuid')
+        not_shared = ff_utils.search_metadata(search_query,
+                                              key=connection.ff_keys)
+        if not_shared:
+            not_shared_uuids = []
+            for item_uuid in not_shared:
+                not_shared_uuids.append(item['uuid'])
+            full_output[item] = not_shared_uuids
+
+    if full_output:
+        check.status = 'WARN'
+        check.summary = 'Some CGAP Core items are not shared'
+        check.description = ('{} CGAP Core items do not have shared'
+                             'status'.format(sum([len(x) for x in 
+                                                  full_output.values()])))
+        brief_output = {key: len(value) for key, value in full_output.items()}
+        check.brief_output = brief_output
+        check.full_output = full_output
+        check.allow_action = True
+        check.action = 'share_core_project'
+    else:
+        check.status = 'PASS'
+        check.summary = check.description = 'All CGAP Core items are shared'
+    return check
+
+@action_function()
+def share_core_project(connection, **kwargs):
+    """
+    Change CGAP Core project item status to shared. 
+
+    Patches the status of the output of core_project_status above. 
+    """
+
+    action = ActionResult(connection, 'share_core_project')
+    check_response = action.get_associated_check_result(kwargs)
+    check_full_output = check_response['full_output']
+    uuids_to_patch = [x for x in check_full_output.values()]
+    action_logs = {'patch_success': [], 'patch_failure': []}
+    for uuid in uuids_to_patch:
+        patch_body = {'status': 'shared'}
+        try:
+            ff_utils.patch_metadata(patch_body, uuid, key=connection.ff_keys)
+        except Exception as patch_error:
+            action_logs['patch_failure'].append({uuid: str(patch_error)})
+        else:
+            action_logs['patch_success'].append(uuid)
+    if action_log['patch_failure']:
+        action.status = 'FAIL'
+    else:
+        action.status = 'DONE'
+    action.output = action_logs
+    return action
+
