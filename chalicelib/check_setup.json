@@ -402,14 +402,18 @@
             }
         }
     },
-    "core_info_shared":{
-        "title": "Ensure CGAP Core variant samples shared",
+    "core_project_status":{
+        "title": "Ensure CGAP Core project items are shared",
         "group": "Metadata checks",
         "schedule": {
             "morning_checks": {
                 "all": {
                     "kwargs": {
-                        "primary": true
+                        "primary": true,
+                        "item_type": ["VariantSample", "Case", "Family",
+                            "Individual", "WorkflowRun", "FileFastq",
+                            "FileProcessed", "Sample", "SampleProcessing",
+                            "Report", "QualityMetric", "FilterSet"]
                     }
                 }
             }

@@ -1022,7 +1022,7 @@ def add_grouped_with_file_relation(connection, **kwargs):
     action.output = action_logs
     return action
 
-@check_function(item_type = ['VariantSample'])
+@check_function(item_type=['VariantSample'])
 def core_project_status(connection, **kwargs):
     """
     Ensure CGAP Core projects have their objects shared.
@@ -1032,13 +1032,14 @@ def core_project_status(connection, **kwargs):
     for all objects defined there. 
     """
 
+    check = CheckResult(connection, 'core_project_status')
+    item_type = kwargs.get('item_type')
     full_output = {}
     for item in item_type:
         # For the first check, create CheckResult and grab its uuid. For
         # subsequent checks, use the same uuid to store all data on one
         # check output.  
         if item == item_type[0]:
-            check = CheckResult(connection, 'core_project_status')
             init_uuid = kwargs.get('uuid')
         else:
             check = CheckResult(connection, 'core_project_status', 
@@ -1051,8 +1052,8 @@ def core_project_status(connection, **kwargs):
                                               key=connection.ff_keys)
         if not_shared:
             not_shared_uuids = []
-            for item_uuid in not_shared:
-                not_shared_uuids.append(item['uuid'])
+            for item_object in not_shared:
+                not_shared_uuids.append(item_object['uuid'])
             full_output[item] = not_shared_uuids
 
     if full_output:
@@ -1068,7 +1069,8 @@ def core_project_status(connection, **kwargs):
         check.action = 'share_core_project'
     else:
         check.status = 'PASS'
-        check.summary = check.description = 'All CGAP Core items are shared'
+        check.summary = check.description = ('All CGAP Core items are shared:'
+                                             '{}'.format(item_type))
     return check
 
 @action_function()
@@ -1082,7 +1084,9 @@ def share_core_project(connection, **kwargs):
     action = ActionResult(connection, 'share_core_project')
     check_response = action.get_associated_check_result(kwargs)
     check_full_output = check_response['full_output']
-    uuids_to_patch = [x for x in check_full_output.values()]
+    # Concatenate list of lists from full_output to single list of uuids
+    uuids_to_patch = [item for sublist in check_full_output.values() 
+                      for item in sublist]
     action_logs = {'patch_success': [], 'patch_failure': []}
     for uuid in uuids_to_patch:
         patch_body = {'status': 'shared'}
@@ -1092,7 +1096,7 @@ def share_core_project(connection, **kwargs):
             action_logs['patch_failure'].append({uuid: str(patch_error)})
         else:
             action_logs['patch_success'].append(uuid)
-    if action_log['patch_failure']:
+    if action_logs['patch_failure']:
         action.status = 'FAIL'
     else:
         action.status = 'DONE'
