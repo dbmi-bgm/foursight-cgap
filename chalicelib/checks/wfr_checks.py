@@ -667,7 +667,7 @@ def cgapS2_status(connection, **kwargs):
         return check
 
     # iterate over msa
-    print(len(res))
+    print('Files num: {0}'.format(len(res)))
     cnt = 0
     for an_msa in res:
         # msa id to be used on foursight brief output
@@ -683,7 +683,7 @@ def cgapS2_status(connection, **kwargs):
                                                            add_pc_wfr=True,
                                                            ignore_field=['previous_version'])
         now = datetime.utcnow()
-        print(print_id, (now-start).seconds, len(all_uuids))
+        # print(print_id, (now-start).seconds, len(all_uuids))
         if (now-start).seconds > lambda_limit:
             check.summary = 'Timout - only {} sample_processings were processed'.format(str(cnt))
             break
@@ -705,13 +705,15 @@ def cgapS2_status(connection, **kwargs):
             continue
         # get variables used by vcfqc
         samples_pedigree = an_msa['samples_pedigree']
-        vcfqc_input_samples, qc_pedigree, run_mode, error = wfr_utils.analyze_pedigree(samples_pedigree, all_samples)
+        # vcfqc_input_samples, qc_pedigree, run_mode, error = wfr_utils.analyze_pedigree(samples_pedigree, all_samples)
+        vcfqc_input_samples, qc_pedigree, error = wfr_utils.full_pedigree(samples_pedigree, all_samples)
+        ## get full family
         if error:
             error_msg = print_id + " " + error
             check.brief_output.extend(error_msg)
             check.full_output['problematic_runs'].append({an_msa['@id']: error_msg})
             continue
-        # used by comHet, reversed one will be used by vcfqc
+        # used by vcfqc
         sample_ids = []
         # check all samples and collect input files
         for a_sample in vcfqc_input_samples:
@@ -719,6 +721,16 @@ def cgapS2_status(connection, **kwargs):
             sample_id = sample_resp.get('bam_sample_id')
             if sample_id:
                 sample_ids.append(sample_id)
+
+        ## ORDERING SAMPLES and PEDIGREE ##
+        ##  This is a very hacky temporary fix.
+        ##  To allow the check to detect and remove duplicate qc runs,
+        ##  input samples and pedigree need to match perfectly (same order).
+        ##  Being originally lists, they keep the initial order.
+        ##  Here we re-sort them using sample IDs as key.
+        sample_ids = sorted(sample_ids)
+        qc_pedigree = sorted(qc_pedigree, key = lambda i: i['sample_name'])
+
         # if there are multiple samples merge them
         # if not skip step 1
         input_samples = an_msa['samples']
@@ -742,8 +754,10 @@ def cgapS2_status(connection, **kwargs):
             check.full_output['skipped'].append({an_msa['@id']: 'missing upstream part'})
             continue
 
+        print('\nStart - {1}'.format(cnt, print_id))
         # if multiple sample, merge vcfs, if not skip it (CombineGVCF)
         if len(input_samples) > 1:
+            print('\t\t-> Run CombineGVCF')
             s1_input_files = {'input_gvcfs': input_vcfs,
                               'chromosomes': '/files-reference/GAPFIGJVJDUY/',
                               'reference': '/files-reference/GAPFIXRDPDK5/'}
@@ -765,6 +779,7 @@ def cgapS2_status(connection, **kwargs):
         if step1_status != 'complete':
             step2_status = ""
         else:
+            print('\t\t-> Run GenotypeGVCF')
             # run step2 GenotypeGVCF
             s2_input_files = {'input_gvcf': step1_output,
                               "reference": "/files-reference/GAPFIXRDPDK5/",
@@ -779,19 +794,20 @@ def cgapS2_status(connection, **kwargs):
         if step2_status != 'complete':
             step3_status = ""
         else:
+            print('\t\t-> Run samplegeno')
             # run step3 samplegeno
             s3_input_files = {'input_vcf': step2_output,
                               'additional_file_parameters': {'input_vcf': {"mount": True}
                                                              }
                               }
             s3_tag = print_id + '_samplegeno_' + step2_output.split('/')[2]
-            # there are 2 files we need, one to use in the next step
             keep, step3_status, step3_output = wfr_utils.stepper(library, keep,
                                                                  s3_tag, step2_output,
                                                                  s3_input_files,  step3_name, 'samplegeno_vcf')
         if step3_status != 'complete':
             step4_status = ""
         else:
+            print('\t\t-> Run VEP')
             # run step4 VEP
             s4_input_files = {'input_vcf': step3_output,
                             'reference': "/files-reference/GAPFIXRDPDK5/",
@@ -814,7 +830,6 @@ def cgapS2_status(connection, **kwargs):
                                                              }
                               }
             s4_tag = print_id + '_VEP_' + step3_output.split('/')[2]
-            # there are 2 files we need, one to use in the next step
             keep, step4_status, step4_output = wfr_utils.stepper(library, keep,
                                                                  s4_tag, step3_output,
                                                                  s4_input_files,  step4_name, 'annotated_vcf')
@@ -822,13 +837,13 @@ def cgapS2_status(connection, **kwargs):
         if step4_status != 'complete':
             step5_status = ""
         else:
+            print('\t\t-> Run vcfqc')
             # step 5 vcfqc
             s5_input_files = {'input_vcf': step4_output,
                               'additional_file_parameters': {'input_vcf': {"mount": True}}
                               }
             str_qc_pedigree = str(json.dumps(qc_pedigree))
-            proband_first_sample_list = list(reversed(sample_ids))  # proband first sample ids
-            update_pars = {"parameters": {"samples": proband_first_sample_list,
+            update_pars = {"parameters": {"samples": sample_ids,
                                           "pedigree": str_qc_pedigree,
                                           "trio_errors": True,
                                           "het_hom": True,
@@ -842,12 +857,12 @@ def cgapS2_status(connection, **kwargs):
         if step4_status != 'complete':
             step5b_status = ""
         else:
+            print('\t\t-> Run peddy')
             # step 5b peddy qc
             s5b_input_files = {"input_vcf": step4_output,
                                 'additional_file_parameters': {'input_vcf': {"mount": True}}
                                 }
-            # str_qc_pedigree = str(json.dumps(qc_pedigree))
-            proband_first_sample_list = list(reversed(sample_ids))  # proband first sample ids
+            str_qc_pedigree = str(json.dumps(qc_pedigree))
             update_pars = {"parameters": {"pedigree": str_qc_pedigree,
                                           "family": "FAMILY"}
                            }
@@ -910,6 +925,7 @@ def cgapS2_status(connection, **kwargs):
         # example is a quad analyzed for 2 different probands. In this case you want a single
         # combineGVCF step, but 2 sample_processings will be generated trying to run same job,
         # identify and remove duplicates
+        ## !!!!! DUPLICATE RUNS REMOVE !!!!!
         check.full_output['needs_runs'] = wfr_utils.remove_duplicate_need_runs(check.full_output['needs_runs'])
         check.summary += str(len(check.full_output['needs_runs'])) + ' missing|'
         check.status = 'WARN'
@@ -1179,6 +1195,7 @@ def cgapS3_status(connection, **kwargs):
         if step4_status != 'complete':
             step5_status = ""
         else:
+            print('\t\t-> Run vcfqc')
             # Run step 5 vcfqc
             s5_input_files = {"input_vcf": step4_output,
                               'additional_file_parameters': {'input_vcf': {"mount": True}}
