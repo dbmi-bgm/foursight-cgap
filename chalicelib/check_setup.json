@@ -407,7 +407,7 @@
         "group": "Metadata checks",
         "schedule": {
             "morning_checks": {
-                "all": {
+                "cgap": {
                     "kwargs": {
                         "primary": true,
                         "item_type": ["VariantSample", "Case", "Family",
