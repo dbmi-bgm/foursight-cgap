@@ -706,7 +706,7 @@ def cgapS2_status(connection, **kwargs):
         # get variables used by vcfqc
         samples_pedigree = an_msa['samples_pedigree']
         # vcfqc_input_samples, qc_pedigree, run_mode, error = wfr_utils.analyze_pedigree(samples_pedigree, all_samples)
-        vcfqc_input_samples, qc_pedigree, error = wfr_utils.full_pedigree(samples_pedigree, all_samples)
+        vcfqc_input_samples, qc_pedigree, error = wfr_utils.full_pedigree(samples_pedigree)
         ## get full family
         if error:
             error_msg = print_id + " " + error

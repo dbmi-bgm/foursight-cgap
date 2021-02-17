@@ -142,7 +142,7 @@ def remove_parents_without_sample(samples_pedigree):
         a_member['parents'] = new_parents
     return samples_pedigree
 
-def full_pedigree(samples_pedigree_json, all_samples):
+def full_pedigree(samples_pedigree_json):
     """extract pedigree for qc for every family member
     - input samples accession list
     - qc pedigree
