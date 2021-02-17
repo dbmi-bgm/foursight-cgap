@@ -1052,7 +1052,7 @@ def core_project_status(connection, **kwargs):
         check.status = 'WARN'
         check.summary = 'Some CGAP Core items are not shared'
         check.description = ('{} CGAP Core items do not have shared'
-                             'status'.format(sum([len(x) for x in 
+                             ' status'.format(sum([len(x) for x in 
                                                   full_output.values()])))
         brief_output = {key: len(value) for key, value in full_output.items()}
         check.brief_output = brief_output
@@ -1061,8 +1061,9 @@ def core_project_status(connection, **kwargs):
         check.action = 'share_core_project'
     else:
         check.status = 'PASS'
-        check.summary = check.description = ('All CGAP Core items are shared:'
-                                             '{}'.format(item_type))
+        check.summary = 'All CGAP Core items are shared.'
+        check.description = ('All CGAP Core items are shared:'
+                             ' {}'.format(item_type)) 
     return check
 
 @action_function()
@@ -1076,6 +1077,9 @@ def share_core_project(connection, **kwargs):
     action = ActionResult(connection, 'share_core_project')
     check_response = action.get_associated_check_result(kwargs)
     check_full_output = check_response['full_output']
+    # Remove FileProcessed uuids to prevent automatic patching of these items.
+    if 'FileProcessed' in check_full_output:
+        check_full_output.pop('FileProcessed')
     # Concatenate list of lists from full_output to single list of uuids
     uuids_to_patch = [item for sublist in check_full_output.values() 
                       for item in sublist]
