@@ -5,11 +5,12 @@ import re
 
 
 class TestWfrUtils():
+    """This class tests functions in wfr_utils that require connecting to
+    a test portal. See below TestWfrUtils_NoConnection for the tests that do not require
+    a test portal."""
 
     environ = 'fourfront-cgapwolf'
     my_auth = ff_utils.get_authentication_with_server(ff_env=environ)
-
-    # work in progress
 
     def test_create_metadata_for_case(self):
         res = create_metadata_for_case(self.my_auth)
@@ -63,6 +64,7 @@ class TestWfrUtils():
                 assert meta['status'] == 'deleted'
 
 
+# some util functions
 
 def prep_metadata_for_put(uuid, key):
     res = ff_utils.get_metadata(uuid, key=key,  add_on='?frame=raw')
@@ -82,6 +84,7 @@ def delete_source_experiments(uuid, key):
     put_metadata(res, res['uuid'], key=key, ff_env='fourfront-cgapwolf')
 
 
+# This function is Andy's function which will go to ff_utils soon - replace with ff_utils version.
 def put_metadata(put_item, obj_id='', key=None, ff_env=None, add_on=''):
     '''
     Patch metadata given the patch body and an optional obj_id (if not provided,
@@ -99,3 +102,152 @@ def put_metadata(put_item, obj_id='', key=None, ff_env=None, add_on=''):
     put_item = json.dumps(put_item)
     response = ff_utils.authorized_request(put_url, auth=auth, verb='PUT', data=put_item)
     return ff_utils.get_response_json(response)
+
+
+class TestWfrUtils_NoConnection():
+    """This class tests functions in wfr_utils that does not require connecting to
+    a test portal"""
+
+    def test_order_input_dictionary(self):
+        # the function take a dictionary as input
+        # keep the keys order but sort the keys value if list or tuple
+        # replace value with sorted(value)
+        input_dict = {
+                   "waldo": "baz",
+                   "foobar": ["foo", "bar"],
+                   "quux": ('qux', 'fubar'),
+                   "bazzes": {"garply", "bars", "corge"}
+                   }
+        output_dict = {
+                   "waldo": "baz",
+                   "foobar": ["bar", "foo"],
+                   "quux": ['fubar', 'qux'],
+                   'bazzes': {'bars', 'corge', 'garply'}
+                   }
+        assert output_dict == order_input_dictionary(input_dict)
+
+    def test_remove_duplicate_need_runs(self):
+        # the function take a list of dictionaries that represents runs
+        # compare the run settings and the input files
+        # remove duplicate runs with idential settings and input
+        # input_files dict is sorted by order_input_dictionary^
+        # the function does not sort in any way the run settings
+        input_dict_dupl = [
+            #an_item
+            {
+                #an_sp_id
+                '/sample-processings/foo/': [
+                    #a_run
+                    [
+                        #run name
+                        'foo_run_name',
+                        #run settings
+                        ['app_name',
+                         'organism',
+                         {'parameters':
+                            {
+                            'samples': ['foo-UDN093711', 'foo-UDN289464',
+                                        'foo-UDN554872', 'foo-UDN953750'],
+                            'waldo': 'baz'
+                            }
+                          }
+                        ],
+                        #run input_files
+                        {'input_vcf': ['/files-processed/garply/', '/files-processed/corge/'],
+                         'additional_file_parameters': {'input_vcf': {'mount': True}}},
+                        #all input files
+                        'garply_corge'
+                    ]
+                ]
+            },
+            {
+                '/sample-processings/bar/': [
+                    [
+                        'bar_run_name',
+                        ['app_name',
+                         'organism',
+                         {'parameters':
+                            {
+                            'samples': ['foo-UDN093711', 'foo-UDN289464',
+                                        'foo-UDN554872', 'foo-UDN953750'],
+                            'waldo': 'baz'
+                            }
+                          }
+                        ],
+                        {'input_vcf': ['/files-processed/corge/', '/files-processed/garply/'],
+                         'additional_file_parameters': {'input_vcf': {'mount': True}}},
+                        'corge_garply'
+                    ]
+                ]
+            }
+        ]
+
+        input_dict_no_dupl = [
+            {
+                '/sample-processings/foo/': [
+                    [
+                        'foo_run_name',
+                        ['app_name',
+                         'organism',
+                         {'parameters':
+                            {
+                            # samples order is different between the two runs
+                            'samples': ['foo-UDN289464', 'foo-UDN093711',
+                                        'foo-UDN554872', 'foo-UDN953750'],
+                            'waldo': 'baz'
+                            }
+                          }
+                        ],
+                        {'input_vcf': ['/files-processed/garply/', '/files-processed/corge/'],
+                         'additional_file_parameters': {'input_vcf': {'mount': True}}},
+                        'garply_corge'
+                    ]
+                ]
+            },
+            {
+                '/sample-processings/bar/': [
+                    [
+                        'bar_run_name',
+                        ['app_name',
+                         'organism',
+                         {'parameters':
+                            {
+                            'samples': ['foo-UDN093711', 'foo-UDN289464',
+                                        'foo-UDN554872', 'foo-UDN953750'],
+                            'waldo': 'baz'
+                            }
+                          }
+                        ],
+                        {'input_vcf': ['/files-processed/corge/', '/files-processed/garply/'],
+                         'additional_file_parameters': {'input_vcf': {'mount': True}}},
+                        'corge_garply'
+                    ]
+                ]
+            }
+        ]
+
+        output_dict_dupl = [
+            {
+                '/sample-processings/foo/': [
+                    [
+                        'foo_run_name',
+                        ['app_name',
+                         'organism',
+                         {'parameters':
+                            {
+                            'samples': ['foo-UDN093711', 'foo-UDN289464',
+                                        'foo-UDN554872', 'foo-UDN953750'],
+                            'waldo': 'baz'
+                            }
+                          }
+                        ],
+                        {'input_vcf': ['/files-processed/garply/', '/files-processed/corge/'],
+                         'additional_file_parameters': {'input_vcf': {'mount': True}}},
+                        'garply_corge'
+                    ]
+                ]
+            }
+        ]
+
+        assert output_dict_dupl == remove_duplicate_need_runs(input_dict_dupl)
+        assert input_dict_no_dupl == remove_duplicate_need_runs(input_dict_no_dupl)
