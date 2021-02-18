@@ -26,50 +26,41 @@ workflow_details = {
     },
     "workflow_bwa-mem_no_unzip-check": {
         "run_time": 12,
-        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_add-readgroups-check": {
         "run_time": 12,
-        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_merge-bam-check": {
         "run_time": 12,
-        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_picard-MarkDuplicates-check": {
         "run_time": 12,
-        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_sort-bam-check": {
         "run_time": 12,
-        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_gatk-BaseRecalibrator": {
         "run_time": 12,
-        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_gatk-ApplyBQSR-check": {
         "run_time": 12,
-        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17"]
-    },
-    # defunct step 8
-    "workflow_index-sorted-bam": {
-        "run_time": 12,
-        "accepted_versions": ["v9"]
-    },
-    "workflow_granite-mpileupCounts": {
-        "run_time": 12,
-        "accepted_versions": ["v14", "v15", "v16", "v17"]
+        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     # new step 8
     'workflow_gatk-HaplotypeCaller': {
         "run_time": 12,
-        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     # step 9
     'workflow_granite-mpileupCounts': {
         "run_time": 12,
-        "accepted_versions": ["v14", "v15", "v16", "v17"]
+        "accepted_versions": ["v14", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     # step 10
     'cgap-bamqc': {
@@ -80,70 +71,61 @@ workflow_details = {
     # part II step 1
     'workflow_gatk-CombineGVCFs': {
         "run_time": 12,
-        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     # part II step 2
     'workflow_gatk-GenotypeGVCFs-check': {
         "run_time": 12,
-        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17"]
-    },
-    # part III step 3
-    'workflow_gatk-VQSR-check': {
-        "run_time": 12,
-        "accepted_versions": ["v10", "v11", "v12", "v13"]
-    },
-    "workflow_qcboard-bam": {
-        "run_time": 12,
-        "accepted_versions": ["v3"]
+        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_cram2fastq": {
         "run_time": 12,
-        "accepted_versions": ["v12", "v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_cram2bam-check": {
         "run_time": 12,
-        "accepted_versions": ["v13", "v15", "v16", "v17"]
+        "accepted_versions": ["v13", "v15", "v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_vep-parallel": {
         "run_time": 12,
         "accepted_versions": ["v17"]
     },
-    "workflow_mutanno-micro-annot-check": {
+    "workflow_samplegeno": {
         "run_time": 12,
-        "accepted_versions": ["v17"]
+        "accepted_versions": ["v20"]
+    },
+    "workflow_vep-annot-check": {
+        "run_time": 12,
+        "accepted_versions": ["v20"]
     },
     # Part III
     "workflow_granite-rckTar": {
         "run_time": 12,
-        "accepted_versions": ["v16", "v17"]
+        "accepted_versions": ["v16", "v17", "v18", "v19", "v20"]
     },
     "workflow_granite-filtering-check": {
         "run_time": 12,
-        "accepted_versions": ["v16", "v17"]
+        "accepted_versions": ["v20"]
     },
     "workflow_granite-novoCaller-rck-check": {
         "run_time": 12,
-        "accepted_versions": ["v16", "v17"]
+        "accepted_versions": ["v20"]
     },
     "workflow_granite-comHet-check": {
         "run_time": 12,
-        "accepted_versions": ["v16", "v17"]
-    },
-    "workflow_mutanno-annot-check": {
-        "run_time": 12,
-        "accepted_versions": ["v17"]
+        "accepted_versions": ["v20"]
     },
     "bamsnap": {
         "run_time": 12,
-        "accepted_versions": ["v17"]
+        "accepted_versions": ["v20"]
     },
     "workflow_granite-qcVCF": {
         "run_time": 12,
-        "accepted_versions": ["v2", "v3"]
+        "accepted_versions": ["v4"]
     },
     "workflow_peddy": {
         "run_time": 12,
-        "accepted_versions": ["v3"]
+        "accepted_versions": ["v4"]
     }
 }
 
@@ -160,6 +142,27 @@ def remove_parents_without_sample(samples_pedigree):
         a_member['parents'] = new_parents
     return samples_pedigree
 
+def full_pedigree(samples_pedigree_json):
+    """extract pedigree for qc for every family member
+    - input samples accession list
+    - qc pedigree
+    """
+    # remove parent ids that are not in the sample_pedigree as individual
+    samples_pedigree = remove_parents_without_sample(samples_pedigree_json)
+    input_samples = []
+    qc_pedigree = []
+    error = ""
+    # get samples
+    for sample in samples_pedigree:
+        member_qc_pedigree = {
+            'gender': sample.get('sex', ''),
+            'individual': sample.get('individual', ''),
+            'parents': sample.get('parents', []),
+            'sample_name': sample.get('sample_name', '')
+            }
+        qc_pedigree.append(member_qc_pedigree)
+        input_samples.append(sample['sample_accession'])
+    return input_samples, qc_pedigree, error
 
 def analyze_pedigree(samples_pedigree_json, all_samples):
     """extract pedigree for qc for trio (father/mother/proband) or proband
@@ -209,8 +212,8 @@ def analyze_pedigree(samples_pedigree_json, all_samples):
             }
         qc_pedigree.append(member_qc_pedigree)
         run_mode = 'proband_only'
-    # remove parents from mother and father (temporary fix until vcfqc V4 is in production)
-    qc_pedigree = remove_parents_without_sample(qc_pedigree)
+    # # remove parents from mother and father (temporary fix until vcfqc V4 is in production)
+    # qc_pedigree = remove_parents_without_sample(qc_pedigree)
     return input_samples, qc_pedigree, run_mode, error
 
 
@@ -434,19 +437,27 @@ def filter_wfrs_with_input_and_tag(all_wfr_items, app_name, input_file_dict, tag
 
     # filter for app_name
     wfrs_with_app_name = [i for i in all_wfr_items if i['display_title'].startswith(app_name)]
+
+    for wf_ in wfrs_with_app_name:
+        print('\t\twfr filter, ' + wf_['title'])
+
     # filter for tag
     if tag:
+        print('\t\t-> TAG')
         wfrs_with_tag = [i for i in wfrs_with_app_name if tag in i.get('tags', [])]
     else:
+        print('\t\t-> NO TAG')
         wfrs_with_tag = wfrs_with_app_name
     # filter for input files
     # collect input files
     input_files = collect_input_files_from_input_dictionary(input_file_dict)
+    print('\t\t-> input_files, ' + str(input_files))
     # check for workflows with same inputs
     filtered_wfrs = []
     for a_wfr in wfrs_with_tag:
         # get all input files from the workflow item
         wfr_inputs = collect_inputs_from_workflow_run(a_wfr)
+        print('\t\t\t-> wfr_input, ' + str(wfr_inputs))
         # expectation is exact match of input files, if so pass the filter
         if match_all_input:
             if sorted(wfr_inputs) == sorted(input_files):
@@ -455,6 +466,11 @@ def filter_wfrs_with_input_and_tag(all_wfr_items, app_name, input_file_dict, tag
         else:
             if all(file in wfr_inputs for file in input_files):
                 filtered_wfrs.append(a_wfr)
+        # for wf_ in filtered_wfrs:
+        #     print('\t\tfiltered_wfrs, ' + wf_['title'])
+
+    for wf_ in filtered_wfrs:
+        print('\t\tfiltered_wfrs, ' + wf_['title'])
     return filtered_wfrs
 
 
@@ -506,6 +522,7 @@ def stepper(library, keep,
         - keep : same as input, with addition from this check
         - step_status : a short summary of this functions result (complete, running, no complete run)
     """
+    print('\t\t\tinit keep missing, ' + str(keep['missing_run']))
     if not additional_input:
         additional_input = {}
     step_output = ''
@@ -558,12 +575,20 @@ def stepper(library, keep,
         #                      (ie 2 quads made up of the same samples with different probands.)
         filtered_wfrs = filter_wfrs_with_input_and_tag(all_wfrs, new_step_name, input_file_dict, tag=tag)
 
+        # for wf_ in all_wfrs:
+        #     if 'granite' in wf_['title']:
+        #         print('\t\twfr title, ' + wf_['title'])
+        #         print('\t\t\tdisplay title, ' + wf_['display_title'])
+        for wf_ in filtered_wfrs:
+            print('\t\twfr, ' + wf_['title'])
+
         if no_output:
             step_result = get_wfr_out(input_resp, new_step_name, all_wfrs=filtered_wfrs, md_qc=True)
         else:
             step_result = get_wfr_out(input_resp, new_step_name, all_wfrs=filtered_wfrs)
         step_status = step_result['status']
         # if successful
+        print('\t\t\t-> get_wfr_out, ' + step_status)
         input_file_accession = input_resp['accession']
         if step_status == 'complete':
             if new_step_output_arg:
@@ -594,6 +619,7 @@ def stepper(library, keep,
     keep['running'] = running
     keep['problematic_run'] = problematic_run
     keep['missing_run'] = missing_run
+    print('\t\t\tstepper keep missing, ' + str(keep['missing_run']))
     return keep, step_status, step_output
 
 
