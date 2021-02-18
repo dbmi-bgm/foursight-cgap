@@ -66,16 +66,10 @@ wf_dict = [
     #  /  \  / __)
     # (  O )( (__
     #  \__\) \___)
-    {
-       "app_name": "workflow_qcboard-bam",
-       "parameters": {},
-       "workflow_uuid": "ad8716a3-b6e8-4021-bbc6-b0cefc9c4dd8",
-       "config": {
-         "instance_type": "t3.medium",
-         "ebs_size": "1.3x",
-         "EBS_optimized": True
-       }
-    },
+    #
+    #
+    #
+    #
     #  ____   __   ____  ____    __
     # (  _ \ / _\ (  _ \(_  _)  (  )
     #  ) __//    \ )   /  )(     )(
@@ -87,7 +81,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "c5n.18xlarge",
-            "ebs_size": "5x",
+            "ebs_size": "6.3x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
             },
@@ -104,7 +98,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "c5.2xlarge",
-            "ebs_size": "2.2x",
+            "ebs_size": "3.5x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
             },
@@ -121,7 +115,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "c5.2xlarge",
-            "ebs_size": "2.2x",
+            "ebs_size": "3x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
         },
@@ -137,7 +131,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "c5n.18xlarge",
-            "ebs_size": "3x",
+            "ebs_size": "4x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
         },
@@ -185,7 +179,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "t3.micro",
-            "ebs_size": "2.5x",
+            "ebs_size": "4.5x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
         },
@@ -198,7 +192,7 @@ wf_dict = [
     # part 1 - step 8   (only run for samples that will go to part3)
     {  # mpileupCounts
         'app_name': 'workflow_granite-mpileupCounts',
-        'workflow_uuid': 'c6dac0af-631d-402f-a1c1-282e091f1b3e',
+        'workflow_uuid': 'ee996546-e768-4116-804f-79fd3900a9fe',
         'parameters': {"nthreads": 15},
         "config": {
             "instance_type": "c5.4xlarge",
@@ -219,7 +213,7 @@ wf_dict = [
         'parameters': {"nthreads": 20},
         "config": {
             "instance_type": "c5n.18xlarge",
-            "ebs_size": "5x",
+            "ebs_size": "6x",
             "EBS_optimized": True
         },
         'custom_pf_fields': {
@@ -250,6 +244,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "c5n.4xlarge",
+            "ebs_size": "10x",
             "EBS_optimized": True
         },
         'custom_pf_fields': {
@@ -273,40 +268,46 @@ wf_dict = [
                 'description': 'processed output from cgap downstream pipeline'}
                 }
     },
-    {  # VEP
-        'app_name': 'workflow_vep-parallel',
-        'workflow_uuid': 'adc588cf-1c6c-4281-9193-9645726eb792',
-        'parameters': {"nthreads": 15},
+    {  # peddy_qc
+        'app_name': 'workflow_peddy',
+        'workflow_uuid': '2ba8440c-b157-4394-9e86-c634aa15129d',
+        'parameters': {},
         "config": {
-            "instance_type": "c5.9xlarge",
-            "ebs_size": "10x",
+            "instance_type": "t3.small",
+            "ebs_size": "20x",
+            "EBS_optimized": True
+        }
+    },
+    {  # SAMPLEGENO
+        'app_name': 'workflow_samplegeno',
+        'workflow_uuid': 'cgap:workflow_samplegeno_v20',
+        'parameters': {},
+        "config": {
+            "instance_type": "t3.small",
+            "ebs_size": "6x",
             "EBS_optimized": True
         },
         'custom_pf_fields': {
-            'microannot_mti': {
+            'samplegeno_vcf': {
                 'file_type': 'intermediate file',
-                'description': 'Intermediate file'
-                },
-            'annot_mti': {
-                'file_type': 'intermediate file',
-                'description': 'Intermediate file'
+                'description': 'Intermediate VCF file'
                 }
         }
     },
-    {  # micro-annotation
-        'app_name': 'workflow_mutanno-micro-annot-check',
-        'workflow_uuid': 'ca3469c6-ac71-4a7d-97ea-477037b05f2f',
-        'parameters': {"nthreads": 70},
+    {  # VEP
+        'app_name': 'workflow_vep-annot-check',
+        'workflow_uuid': 'cgap:workflow_vep-annot-check_v20',
+        'parameters': {"nthreads": 64},
         "config": {
             "instance_type": "c5n.18xlarge",
-            "ebs_size": "3x",
+            "ebs_size": "0.5x",
             "EBS_optimized": True
         },
         'custom_pf_fields': {
             'annotated_vcf': {
-                'file_type': 'micro-annotated VCF',
-                'description': 'micro-annotated VCF file'
-            }
+                'file_type': 'vep-annotated VCF',
+                'description': 'vep-annotated VCF file'
+                }
         }
     },
     #  ____   __   ____  ____    __  __  __
@@ -315,11 +316,11 @@ wf_dict = [
     # (__)  \_/\_/(__\_) (__)   (__)(__)(__)
     {  # step1a rckTar
         'app_name': 'workflow_granite-rckTar',
-        'workflow_uuid': '64ff003a-b25d-4856-a9fc-ad8702b8c6d4',
+        'workflow_uuid': 'cgap:workflow_granite-rckTar_v20',
         'parameters': {},
         "config": {
             "instance_type": "c5.xlarge",
-            "ebs_size": "2.5x",
+            "ebs_size": "3.5x",
             "EBS_optimized": True
         },
         'custom_pf_fields': {
@@ -331,11 +332,11 @@ wf_dict = [
     },
     {  # Step2 - filtering
         'app_name': 'workflow_granite-filtering-check',
-        'workflow_uuid': 'e43171b4-4ee5-4074-8734-727399e3179d',
-        'parameters': {"aftag": "gnomADgenome", "afthr": 0.01},
+        'workflow_uuid': 'cgap:workflow_granite-filtering-check_v20',
+        'parameters': {"aftag": "gnomADg_AF", "afthr": 0.01},
         "config": {
             "instance_type": "t3.medium",
-            "ebs_size": "6x",
+            "ebs_size": "9x",
             "EBS_optimized": True
         },
         'custom_pf_fields': {
@@ -347,7 +348,7 @@ wf_dict = [
     },
     {  # Step3 - novocaller
         'app_name': 'workflow_granite-novoCaller-rck-check',
-        'workflow_uuid': '55c9ebf7-ef39-4eb0-9685-c090f2e788ae',
+        'workflow_uuid': 'cgap:workflow_granite-novoCaller-rck-check_v20',
         'parameters': {},
         "config": {
             "instance_type": "c5.xlarge",
@@ -363,8 +364,10 @@ wf_dict = [
     },
     {  # Step4 - compHet
         'app_name': 'workflow_granite-comHet-check',
-        'workflow_uuid': 'f43c5ac3-d755-4acc-a6ed-7f65b8b4961b',
-        'parameters': {},
+        'workflow_uuid': 'cgap:workflow_granite-comHet-check_v20',
+        'parameters': {
+                # "trio": ["PROBAND_ID", "[PARENT_ID]", "[PARENT_ID]"]
+            },
         "config": {
             "instance_type": "t3.small",
             "ebs_size": "2.5x",
@@ -372,22 +375,6 @@ wf_dict = [
         },
         'custom_pf_fields': {
             'comHet_vcf': {
-                'file_type': 'intermediate file',
-                'description': 'Intermediate VCF file'
-            }
-        }
-    },
-    {  # Step5 - full annotation
-        'app_name': 'workflow_mutanno-annot-check',
-        'workflow_uuid': '04da27aa-204c-4db2-9d66-a1624a463c13',
-        'parameters': {"nthreads": 1},
-        "config": {
-            "instance_type": "c5.large",
-            "ebs_size": "1.2x",
-            "EBS_optimized": True
-        },
-        'custom_pf_fields': {
-            'annotated_vcf': {
                 'file_type': 'full annotated VCF',
                 'description': 'full annotated VCF file'
             }
@@ -395,8 +382,11 @@ wf_dict = [
     },
     {  # Step 6 = bamsnap
         'app_name': 'bamsnap',
-        'workflow_uuid': 'a4016214-e4ce-4a34-93a1-c0751bbd1d37',
-        'parameters': {"nproc": 16},
+        'workflow_uuid': 'cgap:bamsnap_v20',
+        'parameters': {
+                    "nproc": 16
+                    # "titles": ["NA12877 (Father)", "NA12878 (Mother)", "NA12879 (Daughter)"]
+                },
         "config": {
             "instance_type": "c5.4xlarge",
             "ebs_size": 10,
@@ -405,8 +395,11 @@ wf_dict = [
     },
     {  # VCFQC used in Part III & Part II
         'app_name': 'workflow_granite-qcVCF',
-        'workflow_uuid': '33a85705-b757-49e0-aaef-d786695d6d03',
-        'parameters': {"trio_errors": True,
+        'workflow_uuid': '29085493-c13d-4ee6-b5b4-8e1cf36b6209',
+        'parameters': {
+                       # "pedigree": "",
+                       # "samples": [""],
+                       "trio_errors": True,
                        "het_hom": True,
                        "ti_tv": True},
         "config": {
