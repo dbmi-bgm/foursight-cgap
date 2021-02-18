@@ -1090,3 +1090,12 @@ def string_to_list(string):
         values = string.replace(a_sep, ",")
     values = [i.strip() for i in values.split(',') if i]
     return values
+
+
+def cleanup(uuid, my_auth, rm_individual=False):
+    res = ff_utils.expand_es_metadata(uuid, key=my_auth, add_pc_wfr=True)
+    itemtypes_to_cleanup = ['case', 'sample_processing', 'report', 'family', 'sample', 'file_processed', 'file_fastq']
+    itemtypeprefix_to_cleanup = ['quality_metric']
+    if rm_individual:
+        itemtypes_to_cleanup.append('individual')
+    return res
