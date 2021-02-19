@@ -333,7 +333,7 @@ wf_dict = [
     {  # Step2 - filtering
         'app_name': 'workflow_granite-filtering-check',
         'workflow_uuid': 'cgap:workflow_granite-filtering-check_v20',
-        'parameters': {"aftag": "gnomADg_AF", "afthr": 0.01},
+        'parameters': {},
         "config": {
             "instance_type": "t3.medium",
             "ebs_size": "9x",

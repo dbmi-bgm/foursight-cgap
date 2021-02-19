@@ -1,4 +1,10 @@
+import os
 import json
+import time
+import copy
+import string
+import random
+import uuid
 from datetime import datetime
 from operator import itemgetter
 from dcicutils import ff_utils, s3Utils
@@ -1090,3 +1096,79 @@ def string_to_list(string):
         values = string.replace(a_sep, ",")
     values = [i.strip() for i in values.split(',') if i]
     return values
+
+
+def cleanup_metadata_for_case(uuid, my_auth, rm_individual=False, cleanup=False):
+    """cleanup=True will actually perform cleanup, if not, just returns items to clean up.
+    Return format is a dictionary with item types as keys and uuid lists as values.
+    rm_individual=True will also cleanup item type 'individual'"""
+
+    # first check the item exists
+    try:
+        meta = ff_utils.get_metadata(uuid, key=my_auth)
+        if meta['status'] == 'deleted':
+            print("The item %s is already deleted" % uuid)
+            return
+    except Exception as e:
+        if 'Not Found' in str(e):
+            print("The item %s is already deleted" % uuid)
+            return
+
+    # find all linked items and filter only wfr-related items
+    res = ff_utils.expand_es_metadata([uuid], key=my_auth, add_pc_wfr=True)
+    itemtypes_to_cleanup = ['case', 'sample_processing', 'report', 'family', 'sample', 'file_processed', 'file_fastq', 'workflow_run_awsem']
+    itemtypes_to_cleanup.append('cohort')  # remove this once we clean up all the cohorts
+    itemtypeprefix_to_cleanup = 'quality_metric'
+    if rm_individual:
+        itemtypes_to_cleanup.append('individual')
+    filtered_res = dict()
+    for itemtype in res[0]:
+        if itemtype in itemtypes_to_cleanup or itemtype.startswith(itemtypeprefix_to_cleanup):
+            filtered_res.update({itemtype: [_['uuid'] for _ in res[0][itemtype]]})
+
+    # print the summary of the items to be cleaned up
+    print("\nNumber of items to be cleaned up")
+    for k, v in iter(filtered_res.items()):
+        print("%s : %s" % (k, str(len(v))))
+
+    # actually clean up if cleanup is True
+    if cleanup:
+        print("\ncleaning up starting..")
+        time.sleep(3)  # wait a bit in case user wants to stop it
+        for itemtype in filtered_res:
+            print("cleaning up item type %s" % itemtype)
+            for uuid in filtered_res[itemtype]:
+                ff_utils.patch_metadata({'status': 'deleted', 'aliases': []}, uuid, key=my_auth)
+    return filtered_res
+
+
+def create_metadata_for_case(my_auth, family_size=3, nrep=1, n_proband=1):
+    case_template_file = os.path.join(os.path.dirname(__file__), 'templates', 'minimal_metadata.json')
+    with open(case_template_file) as f:
+        template = json.load(f)
+
+    # modify template to make a new case
+    template['case'][0]['uuid'] = str(uuid.uuid4())  # add case uuid to make easy to trace later
+    for sm in template['sample']:
+        sm['bam_sample_id'] = randomword(10)  # to avoid key conflict
+
+    template_init = copy.deepcopy(template)
+    for t_item in template_init['individual']:
+        for fld in list(t_item.keys()):
+            if fld not in ['aliases', 'individual_id', 'sex', 'sample', 'project', 'institution']:
+                del t_item[fld]
+
+    for itemtype in ['file_fastq', 'sample', 'individual', 'family', 'sample_processing', 'case']:
+        for t_item in template_init[itemtype]:
+            ff_utils.post_metadata(t_item, itemtype, key=my_auth)
+
+    for t_item in template['individual']:
+        ff_utils.patch_metadata(t_item, t_item['aliases'][0], key=my_auth)
+
+    return(template)
+
+
+# random string generator
+def randomword(length):
+    choices = string.ascii_lowercase + string.ascii_uppercase + string.digits
+    return ''.join(random.choice(choices) for i in range(length))
