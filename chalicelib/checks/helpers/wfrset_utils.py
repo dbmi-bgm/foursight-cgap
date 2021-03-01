@@ -81,7 +81,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "c5n.18xlarge",
-            "ebs_size": "6.3x",
+            "ebs_size": "5.3x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
             },
@@ -98,7 +98,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "c5.2xlarge",
-            "ebs_size": "3.5x",
+            "ebs_size": "2.5x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
             },
@@ -115,7 +115,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "c5.2xlarge",
-            "ebs_size": "3x",
+            "ebs_size": "2x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
         },
@@ -131,7 +131,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "c5n.18xlarge",
-            "ebs_size": "4x",
+            "ebs_size": "3x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
         },
@@ -147,7 +147,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "m5a.2xlarge",
-            "ebs_size": "3.2x",
+            "ebs_size": "2.2x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
         },
@@ -163,7 +163,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "t3.small",
-            "ebs_size": "2x",
+            "ebs_size": "1x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
         },
@@ -179,7 +179,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "t3.micro",
-            "ebs_size": "4.5x",
+            "ebs_size": "3.5x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
         },
@@ -213,7 +213,7 @@ wf_dict = [
         'parameters': {"nthreads": 20},
         "config": {
             "instance_type": "c5n.18xlarge",
-            "ebs_size": "6x",
+            "ebs_size": "5x",
             "EBS_optimized": True
         },
         'custom_pf_fields': {
@@ -320,7 +320,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "c5.xlarge",
-            "ebs_size": "3.5x",
+            "ebs_size": "2.5x",
             "EBS_optimized": True
         },
         'custom_pf_fields': {
@@ -362,7 +362,7 @@ wf_dict = [
             }
         }
     },
-    {  # Step4 - compHet
+    {  # Step4 - comHet
         'app_name': 'workflow_granite-comHet-check',
         'workflow_uuid': 'cgap:workflow_granite-comHet-check_v20',
         'parameters': {
