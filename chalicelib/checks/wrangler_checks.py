@@ -1099,3 +1099,112 @@ def share_core_project(connection, **kwargs):
     action.output = action_logs
     return action
 
+@check_function()
+def update_variant_genelist(connection, **kwargs):
+    """
+    Searches for variant(sample)s with genes in gene lists that are not
+    currently embedded in the item. 
+
+    Because of reverse link from gene to gene list, variant(sample)s are not
+    invalidated upon addition of new gene list. This check and the associated
+    action search through variant(sample)s with genes belonging to all current
+    gene lists and add them to the indexing queue if the gene lists are not
+    embedded.
+    """
+
+    check = CheckResult(connection, 'update_variant_genelist')
+    genelist_search = ff_utils.search_metadata(
+            'search/?type=GeneList&field=uuid&field=genes.uuid', 
+            key=connection.ff_keys
+    )
+    variants_to_index = []
+    variant_samples_to_index = []
+    items_to_index = []
+    for genelist in genelist_search:
+        genelist_genes = []
+        for gene in genelist:
+            genelist_genes.append(gene['uuid'])
+        for gene_uuid in genelist_genes:
+            variant_query = (
+                    'search/?type=Variant'
+                    '&genes.genes_most_severe_gene.uuid=' + gene_uuid + 
+                    '&genes.genes_most_severe_gene.gene_lists.uuid!='
+                    + genelist['uuid'] + '&field=uuid'
+            )
+            variant_search = ff_utils.search_metadata(
+                    variant_query,
+                    key=connection.ff_keys
+            )
+            if variant_search:
+               for variant in variant_search:
+                   variants_to_index.append(variant['uuid'])
+            variant_sample_query = (
+                    'search/?type=VariantSample'
+                    '&variant.genes.genes_most_severe_gene.uuid=' + gene_uuid
+                    + 'variant.genes.genes_most_severe_gene.gene_lists.uuid!='
+                    + genelist['uuid'] + '&field=uuid'
+            )
+            variant_sample_search = ff_utils.search_metadata(
+                    variant_sample_query,
+                    key=connection.ff_keys
+            )
+            if variant_sample_search:
+                for variant_sample in variant_sample_search:
+                    variant_samples_to_index.append(variant_sample['uuid'])
+    items_to_index = list(set(variants_to_index + variant_samples_to_index))
+    if items_to_index:
+        check.status = 'WARN'
+        check.summary = (
+                'Some variants/variant samples need to be re-indexed to '
+                'update gene lists.'
+        )
+        check.description = (
+                '{} variants/variant samples need to be re-indexed to update '
+                'gene lists.'.format(len(items_to_index))
+        )
+        check.full_output = items_to_index
+        check.allow_action = True
+        check.action = 'queue_variants_to_update_genelist'
+    else:
+        check.status = 'PASS'
+        check.summary = (
+                'All variants and variant samples have up-to-date gene lists.'
+        )
+        check.description = check.summary
+    return check
+
+@action_function()
+def queue_variants_to_update_genelist(connection, **kwargs):
+    """
+    Add variants/variant samples to indexing queue to update gene lists. 
+
+    Works with output of update_variant_genelist() above. 
+    """
+
+    action = ActionResult(connection, 'update_variant_genelist')
+    check_response = action.get_associated_check_result(kwargs)
+    check_full_output = check_response['full_output']
+    queue_index_post = {
+            'uuids': check_full_output,
+            'target_queue': 'primary',
+            'strict': True
+    }
+    post_url = 'https://cgap.hms.harvard.edu/queue_indexing'
+    action_logs = {'post success': [], 'post failure': []}
+    try: 
+        post_response = ff_utils.authorized_request(
+                post_url, 
+                auth=connection.ff_keys,
+                verb='POST',
+                data=json.dumps(queue_index_post)
+        )
+    except Exception as post_error:
+        action_logs['post failure'].append(str(post_error))
+    else:
+        action_logs['post success'].append(post_response.json())
+    if action_logs['post failure']:
+        action.status = 'FAIL'
+    else:
+        action.status = 'DONE'
+    action.output = action_logs
+    return action

@@ -418,5 +418,18 @@
                 }
             }
         }
+    },
+    "update_variant_genelist":{
+        "title": "Add gene lists to variants/variant samples",
+        "group": "Metadata checks",
+        "schedule": {
+            "morning_checks": {
+                "cgap": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
+        }
     }
 }
