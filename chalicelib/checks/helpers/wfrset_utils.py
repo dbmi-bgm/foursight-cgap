@@ -389,7 +389,7 @@ wf_dict = [
                 },
         "config": {
             "instance_type": "c5.4xlarge",
-            "ebs_size": 10,
+            "ebs_size": 30,
             "EBS_optimized": True
         }
     },
