@@ -388,9 +388,10 @@ wf_dict = [
                     # "titles": ["NA12877 (Father)", "NA12878 (Mother)", "NA12879 (Daughter)"]
                 },
         "config": {
-            "instance_type": "c5.4xlarge",
+            "instance_type": "r5a.4xlarge",
             "ebs_size": 30,
-            "EBS_optimized": True
+            "EBS_optimized": True,
+            "spot_instance": False
         }
     },
     {  # VCFQC used in Part III & Part II
