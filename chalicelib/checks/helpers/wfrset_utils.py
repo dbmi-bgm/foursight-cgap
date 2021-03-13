@@ -16,14 +16,18 @@ wf_dict = [
     {
         'app_name': 'md5',
         'workflow_uuid': 'c77a117b-9a58-477e-aaa5-291a109a99f6',
-        "config": {"ebs_size": 10}
+        "config": {
+            "ebs_size": 10,
+            "instance_type": 't3.small',
+            'EBS_optimized': True
+        }
     },
     {
         'app_name': 'fastqc',
         'workflow_uuid': '49e96b51-ed6c-4418-a693-d0e9f79adfa5',
         "config": {
             "ebs_size": 10,
-            "instance_type": 't3.micro',
+            "instance_type": 't3.small',
             'EBS_optimized': True
             }
     },
