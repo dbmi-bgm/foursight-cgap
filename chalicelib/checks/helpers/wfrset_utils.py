@@ -182,7 +182,7 @@ wf_dict = [
         'workflow_uuid': '6c9c6f49-f954-4e76-8dfb-d385cddcebd6',
         'parameters': {},
         "config": {
-            "instance_type": "t3.micro",
+            "instance_type": "t3.small",
             "ebs_size": "3.5x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
