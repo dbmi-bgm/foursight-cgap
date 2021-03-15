@@ -423,10 +423,11 @@
         "title": "Add gene lists to variants/variant samples",
         "group": "Metadata checks",
         "schedule": {
-            "morning_checks": {
+            "evening_checks": {
                 "cgap": {
                     "kwargs": {
-                        "primary": true
+                        "primary": true,
+			"queue_action": "prod"
                     }
                 }
             }
