@@ -167,7 +167,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "t3.medium",
-            "ebs_size": "1x",
+            "ebs_size": "1.5x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
         },
