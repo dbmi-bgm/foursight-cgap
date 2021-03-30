@@ -473,9 +473,6 @@ def step_settings(step_name, my_organism, attribution, overwrite=None):
         template['parameters'] = {}
 
     template['common_fields'] = attribution
-    template['custom_qc_fields'] = {}
-    template['custom_pf_fields'] = {}
-    template['wf_mta'] = {}
 
     if overwrite:
         for a_key in overwrite:
