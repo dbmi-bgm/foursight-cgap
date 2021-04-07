@@ -173,10 +173,6 @@
                 "cgap": {
                     "kwargs": {"primary": true, "queue_action": "prod"},
                     "dependencies": []
-                },
-                "cgapwolf": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
-                    "dependencies": []
                 }
             }
         }
@@ -187,10 +183,6 @@
         "schedule": {
             "hourly_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
-                    "dependencies": []
-                },
-                "cgapwolf": {
                     "kwargs": {"primary": true, "queue_action": "prod"},
                     "dependencies": []
                 }
@@ -205,10 +197,6 @@
                 "cgap": {
                     "kwargs": {"primary": true, "queue_action": "prod"},
                     "dependencies": []
-                },
-                "cgapwolf": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
-                    "dependencies": []
                 }
             }
         }
@@ -219,11 +207,7 @@
         "schedule": {
             "hourly_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true},
-                    "dependencies": []
-                },
-                "cgapwolf": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {"primary": true, "queue_action": "prod"},
                     "dependencies": []
                 }
             }
@@ -235,10 +219,6 @@
         "schedule": {
             "hourly_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
-                    "dependencies": []
-                },
-                "cgapwolf": {
                     "kwargs": {"primary": true, "queue_action": "prod"},
                     "dependencies": []
                 }
@@ -253,10 +233,6 @@
                 "cgap": {
                     "kwargs": {"primary": true},
                     "dependencies": []
-                },
-                "cgapwolf": {
-                    "kwargs": {"primary": true},
-                    "dependencies": []
                 }
             }
         }
@@ -269,10 +245,6 @@
                 "cgap": {
                     "kwargs": {"primary": true, "queue_action": "prod"},
                     "dependencies": []
-                },
-                "cgapwolf": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
-                    "dependencies": []
                 }
             }
         }
@@ -283,10 +255,6 @@
         "schedule": {
             "hourly_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true},
-                    "dependencies": []
-                },
-                "cgapwolf": {
                     "kwargs": {"primary": true},
                     "dependencies": []
                 }

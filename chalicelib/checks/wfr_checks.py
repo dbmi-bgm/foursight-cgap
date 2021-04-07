@@ -461,11 +461,7 @@ def cgap_status(connection, **kwargs):
             s6_input_files = {'input_bam': step5_output,
                               'known-sites-snp': '/files-reference/GAPFI4LJRN98/',
                               'known-sites-indels': '/files-reference/GAPFIAX2PPYB/',
-                              'reference': '/files-reference/GAPFIXRDPDK5/',
-                              'additional_file_parameters': {'input_bam': {"mount": True},
-                                                             'known-sites-snp': {"mount": True},
-                                                             'known-sites-indels': {"mount": True},
-                                                             'reference': {"mount": True}}}
+                              'reference': '/files-reference/GAPFIXRDPDK5/'}
             s6_tag = 'step6_' + a_sample['accession']
             keep, step6_status, step6_output = wfr_utils.stepper(library, keep, s6_tag, step5_output,
                                                                   s6_input_files,  step6_name, 'recalibration_report')

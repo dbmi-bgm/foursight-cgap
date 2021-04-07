@@ -16,14 +16,18 @@ wf_dict = [
     {
         'app_name': 'md5',
         'workflow_uuid': 'c77a117b-9a58-477e-aaa5-291a109a99f6',
-        "config": {"ebs_size": 10}
+        "config": {
+            "ebs_size": 10,
+            "instance_type": 't3.small',
+            'EBS_optimized': True
+        }
     },
     {
         'app_name': 'fastqc',
         'workflow_uuid': '49e96b51-ed6c-4418-a693-d0e9f79adfa5',
         "config": {
             "ebs_size": 10,
-            "instance_type": 't3.micro',
+            "instance_type": 't3.small',
             'EBS_optimized': True
             }
     },
@@ -162,7 +166,7 @@ wf_dict = [
         'workflow_uuid': '455b3056-64ca-4a9b-b546-294b01c9ca92',
         'parameters': {},
         "config": {
-            "instance_type": "t3.small",
+            "instance_type": "t3.medium",
             "ebs_size": "1x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
@@ -178,7 +182,7 @@ wf_dict = [
         'workflow_uuid': '6c9c6f49-f954-4e76-8dfb-d385cddcebd6',
         'parameters': {},
         "config": {
-            "instance_type": "t3.micro",
+            "instance_type": "t3.small",
             "ebs_size": "3.5x",
             "EBS_optimized": True,
             "behavior_on_capacity_limit": "wait_and_retry"
