@@ -50,6 +50,7 @@ foursight_cron_by_schedule = {
         'early_morning_checks': Cron('0', '8', '*', '*', '?', '*'),
         'morning_checks': Cron('30', '10', '*', '*', '?', '*'),
         'morning_checks_2': Cron('45', '10', '*', '*', '?', '*'),
+        'evening_checks': Cron('0', '22', '*', '*', '?', '*'),
         'monday_checks': Cron('30', '9', '?', '*', '2', '*'),
         'monthly_checks': Cron('30', '9', '1', '*', '?', '*'),
         'manual_checks': effectively_never(),
