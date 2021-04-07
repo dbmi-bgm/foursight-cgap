@@ -395,7 +395,7 @@
                 "cgap": {
                     "kwargs": {
                         "primary": true,
-			"queue_action": "prod"
+                        "queue_action": "prod"
                     }
                 }
             }
