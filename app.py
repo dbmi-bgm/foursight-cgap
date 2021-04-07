@@ -93,8 +93,9 @@ def morning_checks(event):
 def morning_checks_2(event):
     app_utils_obj.queue_scheduled_checks('all', 'morning_checks_2')
 
+
 @app.schedule(foursight_cron_by_schedule[STAGE]['evening_checks'])
-def morning_checks_2(event):
+def evening_checks(event):
     app_utils_obj.queue_scheduled_checks('all', 'evening_checks')
 
 
