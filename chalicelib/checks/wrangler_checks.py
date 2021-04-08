@@ -1120,12 +1120,20 @@ def update_variant_genelist(connection, **kwargs):
     from_time = (
         current_datetime - datetime.timedelta(days=days_back)
     ).strftime("%Y-%m-%d %H:%M")
-    genelist_search = ff_utils.search_metadata(
+    created_search = ff_utils.search_metadata(
         'search/?type=GeneList&field=uuid&field=genes.uuid'
-        '&last_modified.date_modified.from=' + from_time, 
+        '&date_created.from=' + from_time,
         key=connection.ff_keys
     )
-    variant_samples_to_index = []
+    modified_search = ff_utils.search_metadata(
+        'search/?type=GeneList&field=uuid&field=genes.uuid'
+        '&last_modified.date_modified.from=' + from_time,  
+        key=connection.ff_keys
+    )
+    genelist_search = created_search
+    for item in modified_search:
+        if item not in genelist_search:
+            genelist_search.append(item)
     for genelist in genelist_search:
         batch = []
         for idx in range(len(genelist['genes'])):
