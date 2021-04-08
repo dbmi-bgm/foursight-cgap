@@ -25,9 +25,10 @@ gitpython = "^3.1.2"
 pytz = "^2020.1"
 ## adding foursight-core
 # use below for deployment
-foursight-core = "0.1.5"
+# foursight-core = "0.1.5" TODO REPLACE THIS WITH VERSION BUMP AFTER TESTING
 # use below for tests but not for deployment
 #foursight-core = { git = "https://github.com/4dn-dcic/foursight-core.git", branch="core2" }
+foursight-core = { git = "https://github.com/4dn-dcic/foursight-core.git", branch="berg_cloudformation_support" }
 pytest = "5.1.2"
 
 [tool.poetry.dev-dependencies]
