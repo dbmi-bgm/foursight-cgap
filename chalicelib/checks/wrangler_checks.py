@@ -1099,22 +1099,30 @@ def share_core_project(connection, **kwargs):
     action.output = action_logs
     return action
 
-@check_function()
+@check_function(days_back=1.02)
 def update_variant_genelist(connection, **kwargs):
     """
     Searches for variant samples with genes in gene lists that are not
-    currently embedded in the item. 
+    currently embedded in the item, only for gene lists uploaded within a
+    certain time frame (default is 1 day and ~30 minutes). 
 
     Because of reverse link from gene to gene list, variant samples are not
     invalidated upon addition of new gene list. This check and the associated
-    action search through variant samples with genes belonging to all current
+    action search through variant samples with genes belonging to recent 
     gene lists and add them to the indexing queue if the gene lists are not
     embedded.
     """
 
     check = CheckResult(connection, 'update_variant_genelist')
+    variant_samples_to_index = []
+    days_back = kwargs.get('days_back')
+    current_datetime = datetime.datetime.utcnow()
+    from_time = (
+        current_datetime - datetime.timedelta(days=days_back)
+    ).strftime("%Y-%m-%d %H:%M")
     genelist_search = ff_utils.search_metadata(
-        'search/?type=GeneList&field=uuid&field=genes.uuid', 
+        'search/?type=GeneList&field=uuid&field=genes.uuid'
+        '&last_modified.date_modified.from=' + from_time, 
         key=connection.ff_keys
     )
     variant_samples_to_index = []
@@ -1146,12 +1154,12 @@ def update_variant_genelist(connection, **kwargs):
     if items_to_index:
         check.status = 'WARN'
         check.summary = (
-                'Some variants/variant samples need to be re-indexed to '
-                'update gene lists.'
+            'Some variant samples need to be re-indexed to reflect recently '
+            'updated gene lists.'
         )
         check.description = (
-                '{} variants/variant samples need to be re-indexed to update '
-                'gene lists.'.format(len(items_to_index))
+            '{} variant samples need to be re-indexed to reflect recently '
+            'updated gene lists.'.format(len(items_to_index))
         )
         check.full_output = items_to_index
         check.allow_action = True
@@ -1159,7 +1167,7 @@ def update_variant_genelist(connection, **kwargs):
     else:
         check.status = 'PASS'
         check.summary = (
-                'All variants and variant samples have up-to-date gene lists.'
+            'All variant samples are up-to-date with recent gene lists.'
         )
         check.description = check.summary
     return check
@@ -1180,7 +1188,7 @@ def queue_variants_to_update_genelist(connection, **kwargs):
         'target_queue': 'primary',
         'strict': True
     }
-    post_url = 'https://cgap.hms.harvard.edu/queue_indexing'
+    post_url = connection.ff_server + 'queue_indexing'
     action_logs = {'post success': [], 'post failure': []}
     try: 
         post_response = ff_utils.authorized_request(
@@ -1189,10 +1197,9 @@ def queue_variants_to_update_genelist(connection, **kwargs):
             verb='POST',
             data=json.dumps(queue_index_post)
         )
+        action_logs['post success'].append(post_response.json())
     except Exception as post_error:
         action_logs['post failure'].append(str(post_error))
-    else:
-        action_logs['post success'].append(post_response.json())
     if action_logs['post failure']:
         action.status = 'FAIL'
     else:
