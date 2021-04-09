@@ -264,7 +264,7 @@ description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
 python-versions = ">=3.6,<3.7"
-develop = true
+develop = false
 
 [package.dependencies]
 click = "^7.1.2"
@@ -282,8 +282,10 @@ python-Levenshtein = "0.12.0"
 pytz = "^2020.1"
 
 [package.source]
-type = "directory"
-url = "../foursight-core"
+type = "git"
+url = "ssh://git@github.com/4dn-dcic/foursight-core.git"
+reference = "berg_cloudformation_support"
+resolved_reference = "9d8c76e1f9d27841039d326413acf3f777d47580"
 
 [[package]]
 name = "future"
@@ -874,7 +876,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.7"
-content-hash = "1429f8b596c003ac0454b5600ff735b298882a38aa6d70fb7821f2cfb0136c8e"
+content-hash = "52957c61f9f893c1b848669f43c050fa56e197c1a4da71db3f5dfa95b31a044d"
 
 [metadata.files]
 ansicon = [
