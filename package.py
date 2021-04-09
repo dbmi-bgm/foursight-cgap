@@ -25,7 +25,7 @@ def main():
     parser.add_argument(
         'output_file',
         type=str,
-        help = 'Directory where generated template should be written')
+        help='Directory where generated template should be written')
     parser.add_argument(
         '--merge_template',
         type=str,
