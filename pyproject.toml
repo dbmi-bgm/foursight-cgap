@@ -28,7 +28,7 @@ pytz = "^2020.1"
 # foursight-core = "^0.1.8"
 # use below for tests but not for deployment
 #foursight-core = { git = "https://github.com/4dn-dcic/foursight-core.git", branch="core2" }
-foursight-core = { path = "../foursight-core", develop = true }
+foursight-core = { path = "/Users/ebberg/code/foursight-core", develop = true }
 pytest = "5.1.2"
 
 [tool.poetry.dev-dependencies]

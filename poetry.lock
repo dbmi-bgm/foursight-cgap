@@ -874,7 +874,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.7"
-content-hash = "80515a7cc8185d2655373b88daf2ebf48cd3e9ebca55f9fa484d2afdb34c6190"
+content-hash = "1429f8b596c003ac0454b5600ff735b298882a38aa6d70fb7821f2cfb0136c8e"
 
 [metadata.files]
 ansicon = [
