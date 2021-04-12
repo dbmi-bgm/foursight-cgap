@@ -259,7 +259,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "0.1.9.1b2"
+version = "0.1.9.1b3"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -483,7 +483,7 @@ i18n = ["Babel (>=0.8)"]
 
 [[package]]
 name = "jinxed"
-version = "1.0.1"
+version = "1.1.0"
 description = "Jinxed Terminal Library"
 category = "dev"
 optional = false
@@ -917,7 +917,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.7"
-content-hash = "7502f032a4bfb2378a22c4a1dd57f2a1a13ee9d57677503c580dc617233bad8d"
+content-hash = "920ee7bd9b7e8bb22abc72a6ca7ebf52f918e6aa9a709d0ea061a498f4d04cf8"
 
 [metadata.files]
 ansicon = [
@@ -1056,8 +1056,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight_core-0.1.9.1b2-py3-none-any.whl", hash = "sha256:c7a33a675829fe7c3aac53516acda12d705819954bfafb1f03281d52e8e0cb4f"},
-    {file = "foursight_core-0.1.9.1b2.tar.gz", hash = "sha256:611a5309e998092953b401211181e84343933d4a8bc2dd10b603cc977c08efaa"},
+    {file = "foursight_core-0.1.9.1b3-py3-none-any.whl", hash = "sha256:e41e1f76da60b394ce6fb35b1206f153bf23e0935c6e20969eb0d93f9c64d2ee"},
+    {file = "foursight_core-0.1.9.1b3.tar.gz", hash = "sha256:1f0ced444fad54e421d03647b5a0658dc38e716ddbb887a81c48c7daa09f8f44"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
@@ -1119,8 +1119,8 @@ jinja2 = [
     {file = "Jinja2-2.10.1.tar.gz", hash = "sha256:065c4f02ebe7f7cf559e49ee5a95fb800a9e4528727aec6f24402a5374c65013"},
 ]
 jinxed = [
-    {file = "jinxed-1.0.1-py2.py3-none-any.whl", hash = "sha256:602f2cb3523c1045456f7b6d79ac19297fd8e933ae3bd9159845dc857f2d519c"},
-    {file = "jinxed-1.0.1.tar.gz", hash = "sha256:bc523c74fe676c99ccc69c68c2dcd7d4d2d7b2541f6dbef74ef211aedd8ad0d3"},
+    {file = "jinxed-1.1.0-py2.py3-none-any.whl", hash = "sha256:6a61ccf963c16aa885304f27e6e5693783676897cea0c7f223270c8b8e78baf8"},
+    {file = "jinxed-1.1.0.tar.gz", hash = "sha256:d8f1731f134e9e6b04d95095845ae6c10eb15cb223a5f0cabdea87d4a279c305"},
 ]
 jmespath = [
     {file = "jmespath-0.10.0-py2.py3-none-any.whl", hash = "sha256:cdf6525904cc597730141d61b36f2e4b8ecc257c420fa2f4549bac2c2d0cb72f"},
