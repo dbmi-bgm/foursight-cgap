@@ -1,6 +1,6 @@
 import boto3
 import json
-from .chalicelib.vars import FOURSIGHT_PREFIX
+from chalicelib.vars import FOURSIGHT_PREFIX
 from foursight_core.buckets import Buckets as Buckets_from_core
 
 class Buckets(Buckets_from_core):
