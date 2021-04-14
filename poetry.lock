@@ -69,20 +69,20 @@ wcwidth = ">=0.1.4"
 
 [[package]]
 name = "boto3"
-version = "1.17.50"
+version = "1.17.51"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
 
 [package.dependencies]
-botocore = ">=1.20.50,<1.21.0"
+botocore = ">=1.20.51,<1.21.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.3.0,<0.4.0"
 
 [[package]]
 name = "botocore"
-version = "1.20.50"
+version = "1.20.51"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -194,7 +194,7 @@ webtest = ">=2.0.34,<3.0.0"
 
 [[package]]
 name = "decorator"
-version = "5.0.6"
+version = "5.0.7"
 description = "Decorators for Humans"
 category = "main"
 optional = false
@@ -259,7 +259,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "0.1.9.1b4"
+version = "0.1.9.1b6"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -746,7 +746,7 @@ pyasn1 = ">=0.1.3"
 
 [[package]]
 name = "s3transfer"
-version = "0.3.6"
+version = "0.3.7"
 description = "An Amazon S3 Transfer Manager"
 category = "main"
 optional = false
@@ -917,7 +917,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.7"
-content-hash = "ff6d4d5079ed6053015abad08a558eafb492f2ab5a3b9141a6a4b8e6b33c46ee"
+content-hash = "61956ae203b735194b7ec2197a7cf1278a806d67579c4774b23315d1401b4431"
 
 [metadata.files]
 ansicon = [
@@ -946,12 +946,12 @@ blessed = [
     {file = "blessed-1.17.6.tar.gz", hash = "sha256:a9a774fc6eda05248735b0d86e866d640ca2fef26038878f7e4d23f7749a1e40"},
 ]
 boto3 = [
-    {file = "boto3-1.17.50-py2.py3-none-any.whl", hash = "sha256:5d62261ceb8e5b8fd4df1b91464a9000550d4caa454241794fa126c6e04d5b69"},
-    {file = "boto3-1.17.50.tar.gz", hash = "sha256:f7447d84c3e1381bb3cc61ceb360dab47e91ebd133725dbd6d98946f11e234d3"},
+    {file = "boto3-1.17.51-py2.py3-none-any.whl", hash = "sha256:73bcd04f6f919e7f8acc27c9d83dab5aee22225fe624c028b2e1c7feaf771098"},
+    {file = "boto3-1.17.51.tar.gz", hash = "sha256:c45e7d3aef8965ae1b42c9855c31ded19fbb38cfad0a34cc37dc880ded3672c2"},
 ]
 botocore = [
-    {file = "botocore-1.20.50-py2.py3-none-any.whl", hash = "sha256:f6c2bfae21eaa4e4f75fc5f48b22b16831356755bfb58516219ee11d74070220"},
-    {file = "botocore-1.20.50.tar.gz", hash = "sha256:a621a4bf60a1197c7ebd8ed0badac8282e36e0cee7241831a099200983ff7c49"},
+    {file = "botocore-1.20.51-py2.py3-none-any.whl", hash = "sha256:ae45ea7451513373666b7571064c173d649e61fd3e8f413f0e1f1f9db26b3513"},
+    {file = "botocore-1.20.51.tar.gz", hash = "sha256:c853d6c2321e2f2328282c7d49d7b1a06201826ba0e7049c6975ab5f22927ea8"},
 ]
 cachetools = [
     {file = "cachetools-4.2.1-py3-none-any.whl", hash = "sha256:1d9d5f567be80f7c07d765e21b814326d78c61eb0c3a637dffc0e5d1796cb2e2"},
@@ -1036,8 +1036,8 @@ dcicutils = [
     {file = "dcicutils-1.14.0.tar.gz", hash = "sha256:d26e789d5c2102af85ff64005e5e7592b954218458102ccf48a009293689ed53"},
 ]
 decorator = [
-    {file = "decorator-5.0.6-py3-none-any.whl", hash = "sha256:d9f2d2863183a3c0df05f4b786f2e6b8752c093b3547a558f287bf3022fd2bf4"},
-    {file = "decorator-5.0.6.tar.gz", hash = "sha256:f2e71efb39412bfd23d878e896a51b07744f2e2250b2e87d158e76828c5ae202"},
+    {file = "decorator-5.0.7-py3-none-any.whl", hash = "sha256:945d84890bb20cc4a2f4a31fc4311c0c473af65ea318617f13a7257c9a58bc98"},
+    {file = "decorator-5.0.7.tar.gz", hash = "sha256:6f201a6c4dac3d187352661f508b9364ec8091217442c9478f1f83c003a0f060"},
 ]
 docker = [
     {file = "docker-4.4.4-py2.py3-none-any.whl", hash = "sha256:f3607d5695be025fa405a12aca2e5df702a57db63790c73b927eb6a94aac60af"},
@@ -1056,8 +1056,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight_core-0.1.9.1b4-py3-none-any.whl", hash = "sha256:c8754486194f979946c78fc7e342be3dfdefd52a6db5576f2d583f0ad92aea24"},
-    {file = "foursight_core-0.1.9.1b4.tar.gz", hash = "sha256:148b4eba1b10d196526ead98016985c98c25f7595f00d1d9aa4c3284ad30d1d1"},
+    {file = "foursight_core-0.1.9.1b6-py3-none-any.whl", hash = "sha256:e17f3b5e8ee43cc025221a9d37b9b7ec8354c6f80894c361314d46b072c8ac1e"},
+    {file = "foursight_core-0.1.9.1b6.tar.gz", hash = "sha256:1bceb7063106d95c561eac8cdeabffecbec96461b9acb1263f89085a9962472d"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
@@ -1348,8 +1348,8 @@ rsa = [
     {file = "rsa-4.7.2.tar.gz", hash = "sha256:9d689e6ca1b3038bc82bf8d23e944b6b6037bc02301a574935b2dd946e0353b9"},
 ]
 s3transfer = [
-    {file = "s3transfer-0.3.6-py2.py3-none-any.whl", hash = "sha256:5d48b1fd2232141a9d5fb279709117aaba506cacea7f86f11bc392f06bfa8fc2"},
-    {file = "s3transfer-0.3.6.tar.gz", hash = "sha256:c5dadf598762899d8cfaecf68eba649cd25b0ce93b6c954b156aaa3eed160547"},
+    {file = "s3transfer-0.3.7-py2.py3-none-any.whl", hash = "sha256:efa5bd92a897b6a8d5c1383828dca3d52d0790e0756d49740563a3fb6ed03246"},
+    {file = "s3transfer-0.3.7.tar.gz", hash = "sha256:35627b86af8ff97e7ac27975fe0a98a312814b46c6333d8a6b889627bcd80994"},
 ]
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},

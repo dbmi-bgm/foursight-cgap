@@ -17,7 +17,7 @@ class PackageDeploy(PackageDeploy_from_core):
 
 
 def main():
-    main_from_core()
+    main_from_core(package_deploy=PackageDeploy)
 
 
 if __name__ == '__main__':
