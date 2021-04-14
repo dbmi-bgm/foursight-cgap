@@ -12,7 +12,7 @@ class PackageDeploy(PackageDeploy_from_core):
     CONFIG_BASE = PackageDeploy_from_core.CONFIG_BASE
     CONFIG_BASE['app_name'] = 'foursight-cgap'
 
-    config_dir = dirname(__file__)
+    config_dir = dirname(dirname(__file__))
 
 
 def main():
