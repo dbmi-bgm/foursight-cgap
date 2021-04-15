@@ -61,7 +61,7 @@ def elastic_search_space(connection, **kwargs):
     return check
 
 
-@check_function
+@check_function()
 def scale_down_elasticsearch_production(connection):
     """ Scales down Elasticsearch (production configuration).
         HOT (0600 to 2000 EST):
@@ -96,7 +96,7 @@ def scale_down_elasticsearch_production(connection):
     return check
 
 
-@check_function
+@check_function()
 def scale_up_elasticsearch_production(connection):
     """ Scales down Elasticsearch (production configuration).
         HOT (0600 to 2000 EST):  This is what we are resizing to
@@ -112,7 +112,7 @@ def scale_up_elasticsearch_production(connection):
         XXX: should probably use constants in ElasticSearchServiceClient
         For now, must be explicitly triggered - but should be put on a schedule.
     """
-    check = CheckResult(connection, 'scale_down_elasticsearch_production')
+    check = CheckResult(connection, 'scale_up_elasticsearch_production')
     es_client = es_utils.ElasticSearchServiceClient()
     success = es_client.resize_elasticsearch_cluster(
                 domain_name=connection.ff_env,
