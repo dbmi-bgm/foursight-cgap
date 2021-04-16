@@ -36,6 +36,7 @@ foursight_cron_by_schedule = {
         'early_morning_checks': Cron('0', '8', '*', '*', '?', '*'),
         'morning_checks': Cron('0', '10', '*', '*', '?', '*'),
         'morning_checks_2': Cron('15', '10', '*', '*', '?', '*'),
+        'evening_checks': Cron('0', '22', '*', '*', '?', '*'),
         'monday_checks': Cron('0', '9', '?', '*', '2', '*'),
         'monthly_checks': Cron('0', '9', '1', '*', '?', '*'),
         'manual_checks': effectively_never(),
@@ -49,6 +50,7 @@ foursight_cron_by_schedule = {
         'early_morning_checks': Cron('0', '8', '*', '*', '?', '*'),
         'morning_checks': Cron('30', '10', '*', '*', '?', '*'),
         'morning_checks_2': Cron('45', '10', '*', '*', '?', '*'),
+        'evening_checks': Cron('0', '22', '*', '*', '?', '*'),
         'monday_checks': Cron('30', '9', '?', '*', '2', '*'),
         'monthly_checks': Cron('30', '9', '1', '*', '?', '*'),
         'manual_checks': effectively_never(),
@@ -90,6 +92,11 @@ def morning_checks(event):
 @app.schedule(foursight_cron_by_schedule[STAGE]['morning_checks_2'])
 def morning_checks_2(event):
     app_utils_obj.queue_scheduled_checks('all', 'morning_checks_2')
+
+
+@app.schedule(foursight_cron_by_schedule[STAGE]['evening_checks'])
+def evening_checks(event):
+    app_utils_obj.queue_scheduled_checks('all', 'evening_checks')
 
 
 @app.schedule(foursight_cron_by_schedule[STAGE]['monday_checks'])
