@@ -398,5 +398,19 @@
         "group": "System checks",
         "schedule": {},
         "display": ["cgap"]
+    },
+    "update_variant_genelist":{
+        "title": "Add gene lists to variants/variant samples",
+        "group": "Metadata checks",
+        "schedule": {
+            "evening_checks": {
+                "cgap": {
+                    "kwargs": {
+                        "primary": true,
+                        "queue_action": "prod"
+                    }
+                }
+            }
+        }
     }
 }
