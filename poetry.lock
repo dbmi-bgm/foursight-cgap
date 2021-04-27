@@ -69,20 +69,20 @@ wcwidth = ">=0.1.4"
 
 [[package]]
 name = "boto3"
-version = "1.17.53"
+version = "1.17.58"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
 
 [package.dependencies]
-botocore = ">=1.20.53,<1.21.0"
+botocore = ">=1.20.58,<1.21.0"
 jmespath = ">=0.7.1,<1.0.0"
-s3transfer = ">=0.3.0,<0.4.0"
+s3transfer = ">=0.4.0,<0.5.0"
 
 [[package]]
 name = "botocore"
-version = "1.20.53"
+version = "1.20.58"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -94,7 +94,7 @@ python-dateutil = ">=2.1,<3.0.0"
 urllib3 = ">=1.25.4,<1.27"
 
 [package.extras]
-crt = ["awscrt (==0.10.8)"]
+crt = ["awscrt (==0.11.11)"]
 
 [[package]]
 name = "cachetools"
@@ -114,7 +114,7 @@ python-versions = "*"
 
 [[package]]
 name = "chalice"
-version = "1.22.3"
+version = "1.22.4"
 description = "Microframework"
 category = "dev"
 optional = false
@@ -172,7 +172,7 @@ toml = ["toml"]
 
 [[package]]
 name = "dcicutils"
-version = "1.14.1"
+version = "1.15.0"
 description = "Utility package for interacting with the 4DN Data Portal and other 4DN resources"
 category = "main"
 optional = false
@@ -187,6 +187,7 @@ elasticsearch = "6.8.1"
 gitpython = ">=3.1.2,<4.0.0"
 pytz = ">=2016.4"
 requests = ">=2.21.0,<3.0.0"
+rfc3986 = ">=1.4.0,<2.0.0"
 structlog = ">=19.2.0,<20.0.0"
 toml = ">=0.10.0,<1"
 urllib3 = ">=1.24.3,<2.0.0"
@@ -259,7 +260,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "0.1.9.1b7"
+version = "0.1.9.1b8"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -327,14 +328,15 @@ smmap = ">=3.0.1,<5"
 
 [[package]]
 name = "gitpython"
-version = "3.1.14"
+version = "3.1.15"
 description = "Python Git Library"
 category = "main"
 optional = false
-python-versions = ">=3.4"
+python-versions = ">=3.5"
 
 [package.dependencies]
 gitdb = ">=4.0.1,<5"
+typing-extensions = ">=3.7.4.0"
 
 [[package]]
 name = "google-api-core"
@@ -376,7 +378,7 @@ uritemplate = ">=3.0.0,<4dev"
 
 [[package]]
 name = "google-auth"
-version = "1.29.0"
+version = "1.30.0"
 description = "Google Authentication Library"
 category = "main"
 optional = false
@@ -441,7 +443,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "importlib-metadata"
-version = "3.10.1"
+version = "4.0.1"
 description = "Read metadata from Python packages"
 category = "main"
 optional = false
@@ -735,6 +737,17 @@ security = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)"]
 socks = ["PySocks (>=1.5.6,!=1.5.7)", "win-inet-pton"]
 
 [[package]]
+name = "rfc3986"
+version = "1.4.0"
+description = "Validating URI References per RFC 3986"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.extras]
+idna2008 = ["idna"]
+
+[[package]]
 name = "rsa"
 version = "4.7.2"
 description = "Pure-Python RSA implementation"
@@ -747,7 +760,7 @@ pyasn1 = ">=0.1.3"
 
 [[package]]
 name = "s3transfer"
-version = "0.3.7"
+version = "0.4.2"
 description = "An Amazon S3 Transfer Manager"
 category = "main"
 optional = false
@@ -755,6 +768,9 @@ python-versions = "*"
 
 [package.dependencies]
 botocore = ">=1.12.36,<2.0a.0"
+
+[package.extras]
+crt = ["botocore[crt] (>=1.20.29,<2.0a.0)"]
 
 [[package]]
 name = "six"
@@ -918,7 +934,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.7"
-content-hash = "d6d5400febd25f4886f3b5fd06c98e6b31f64981ca9cd8e2887cab8c1313f4bb"
+content-hash = "be3ccbca9e1b257f2f3a5b7f0a62beb86567336069ec297db5cf997e1e969553"
 
 [metadata.files]
 ansicon = [
@@ -947,12 +963,12 @@ blessed = [
     {file = "blessed-1.17.6.tar.gz", hash = "sha256:a9a774fc6eda05248735b0d86e866d640ca2fef26038878f7e4d23f7749a1e40"},
 ]
 boto3 = [
-    {file = "boto3-1.17.53-py2.py3-none-any.whl", hash = "sha256:3bf3305571f3c8b738a53e9e7dcff59137dffe94670046c084a17f9fa4599ff3"},
-    {file = "boto3-1.17.53.tar.gz", hash = "sha256:1d26f6e7ae3c940cb07119077ac42485dcf99164350da0ab50d0f5ad345800cd"},
+    {file = "boto3-1.17.58-py2.py3-none-any.whl", hash = "sha256:fcd1a0318919bddf4efd0a8858214ed07d08a870d79d20f9b2d6df5d3092b8d8"},
+    {file = "boto3-1.17.58.tar.gz", hash = "sha256:4caf01511a07e229855b964d43ddbc6b3db1fd88a3747a4a7ca6d398ce04f3d3"},
 ]
 botocore = [
-    {file = "botocore-1.20.53-py2.py3-none-any.whl", hash = "sha256:d5e70d17b91c9b5867be7d6de0caa7dde9ed789bed62f03ea9b60718dc9350bf"},
-    {file = "botocore-1.20.53.tar.gz", hash = "sha256:e303500c4e80f6a706602da53daa6f751cfa8f491665c99a24ee732ab6321573"},
+    {file = "botocore-1.20.58-py2.py3-none-any.whl", hash = "sha256:0de54af6af58d59237377f1bbe43edc4395d88848cddbe00f546703d4026c638"},
+    {file = "botocore-1.20.58.tar.gz", hash = "sha256:2830596e0d92d82abaf78a7926e49a3b7a80c93cdc75e95717a1dd4ea9027283"},
 ]
 cachetools = [
     {file = "cachetools-4.2.1-py3-none-any.whl", hash = "sha256:1d9d5f567be80f7c07d765e21b814326d78c61eb0c3a637dffc0e5d1796cb2e2"},
@@ -963,8 +979,8 @@ certifi = [
     {file = "certifi-2020.12.5.tar.gz", hash = "sha256:1a4995114262bffbc2413b159f2a1a480c969de6e6eb13ee966d470af86af59c"},
 ]
 chalice = [
-    {file = "chalice-1.22.3-py2.py3-none-any.whl", hash = "sha256:895e6c79fca35a59a512b12261d3017a923239a67d8ab547385c533aa0b359c1"},
-    {file = "chalice-1.22.3.tar.gz", hash = "sha256:5a84a73c4a8d8b22bb64e06ff99060d7f222097db4237e58749dcad5165f082d"},
+    {file = "chalice-1.22.4-py2.py3-none-any.whl", hash = "sha256:35a3ae531c29359bab98cdc3f09e2015856473a24c9774203a20f57386715e57"},
+    {file = "chalice-1.22.4.tar.gz", hash = "sha256:acfaaf0b2c7bf79bf0dcf93428e730f4f46e598ac1b0424c8d99008db816b87d"},
 ]
 chardet = [
     {file = "chardet-4.0.0-py2.py3-none-any.whl", hash = "sha256:f864054d66fd9118f2e67044ac8981a54775ec5b67aed0441892edb553d21da5"},
@@ -1033,8 +1049,8 @@ coverage = [
     {file = "coverage-5.5.tar.gz", hash = "sha256:ebe78fe9a0e874362175b02371bdfbee64d8edc42a044253ddf4ee7d3c15212c"},
 ]
 dcicutils = [
-    {file = "dcicutils-1.14.1-py3-none-any.whl", hash = "sha256:3a848553c2c29d3f6b896c3a38295297d15b825fbe8d4ccc5cf9b18518566d31"},
-    {file = "dcicutils-1.14.1.tar.gz", hash = "sha256:6e81d7c3ada3118a8ece1c1f42be12b048922d5b0fde13a4cca6b4ad4c96f8ed"},
+    {file = "dcicutils-1.15.0-py3-none-any.whl", hash = "sha256:1ad2ce8cdae57e42fee5506669af24dc2c181a3188dd07743aba93a87024d04c"},
+    {file = "dcicutils-1.15.0.tar.gz", hash = "sha256:e073cbaee5df83996fafd095620473bad9b31f1be8105a58d7ed39a0077877ee"},
 ]
 decorator = [
     {file = "decorator-5.0.7-py3-none-any.whl", hash = "sha256:945d84890bb20cc4a2f4a31fc4311c0c473af65ea318617f13a7257c9a58bc98"},
@@ -1057,8 +1073,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight_core-0.1.9.1b7-py3-none-any.whl", hash = "sha256:a59d6506f3d08518bf4b10c9d3ae4423b1fe5929a9924f0bb07d8aa29dc423f7"},
-    {file = "foursight_core-0.1.9.1b7.tar.gz", hash = "sha256:b9eda05dfb47e80297ac619103ca5804b12a5099eac228ebe85028c6d2839bed"},
+    {file = "foursight_core-0.1.9.1b8-py3-none-any.whl", hash = "sha256:7214c87fa507656a3fb0ae1c42e6129edafbbc715b62406f6fedabde7df07bfe"},
+    {file = "foursight_core-0.1.9.1b8.tar.gz", hash = "sha256:07e8cfa1107b3dcf329c6cf0a79acfddd74f6bde56adb5ccf71125e106f911b9"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
@@ -1076,8 +1092,8 @@ gitdb = [
     {file = "gitdb-4.0.7.tar.gz", hash = "sha256:96bf5c08b157a666fec41129e6d327235284cca4c81e92109260f353ba138005"},
 ]
 gitpython = [
-    {file = "GitPython-3.1.14-py3-none-any.whl", hash = "sha256:3283ae2fba31c913d857e12e5ba5f9a7772bbc064ae2bb09efafa71b0dd4939b"},
-    {file = "GitPython-3.1.14.tar.gz", hash = "sha256:be27633e7509e58391f10207cd32b2a6cf5b908f92d9cd30da2e514e1137af61"},
+    {file = "GitPython-3.1.15-py3-none-any.whl", hash = "sha256:a77824e516d3298b04fb36ec7845e92747df8fcfee9cacc32dd6239f9652f867"},
+    {file = "GitPython-3.1.15.tar.gz", hash = "sha256:05af150f47a5cca3f4b0af289b73aef8cf3c4fe2385015b06220cbcdee48bb6e"},
 ]
 google-api-core = [
     {file = "google-api-core-1.26.3.tar.gz", hash = "sha256:b914345c7ea23861162693a27703bab804a55504f7e6e9abcaff174d80df32ac"},
@@ -1088,8 +1104,8 @@ google-api-python-client = [
     {file = "google_api_python_client-1.12.8-py2.py3-none-any.whl", hash = "sha256:3c4c4ca46b5c21196bec7ee93453443e477d82cbfa79234d1ce0645f81170eaf"},
 ]
 google-auth = [
-    {file = "google-auth-1.29.0.tar.gz", hash = "sha256:010f011c4e27d3d5eb01106fba6aac39d164842dfcd8709955c4638f5b11ccf8"},
-    {file = "google_auth-1.29.0-py2.py3-none-any.whl", hash = "sha256:f30a672a64d91cc2e3137765d088c5deec26416246f7a9e956eaf69a8d7ed49c"},
+    {file = "google-auth-1.30.0.tar.gz", hash = "sha256:9ad25fba07f46a628ad4d0ca09f38dcb262830df2ac95b217f9b0129c9e42206"},
+    {file = "google_auth-1.30.0-py2.py3-none-any.whl", hash = "sha256:588bdb03a41ecb4978472b847881e5518b5d9ec6153d3d679aa127a55e13b39f"},
 ]
 google-auth-httplib2 = [
     {file = "google-auth-httplib2-0.1.0.tar.gz", hash = "sha256:a07c39fd632becacd3f07718dfd6021bf396978f03ad3ce4321d060015cc30ac"},
@@ -1108,8 +1124,8 @@ idna = [
     {file = "idna-2.10.tar.gz", hash = "sha256:b307872f855b18632ce0c21c5e45be78c0ea7ae4c15c828c20788b26921eb3f6"},
 ]
 importlib-metadata = [
-    {file = "importlib_metadata-3.10.1-py3-none-any.whl", hash = "sha256:2ec0faae539743ae6aaa84b49a169670a465f7f5d64e6add98388cc29fd1f2f6"},
-    {file = "importlib_metadata-3.10.1.tar.gz", hash = "sha256:c9356b657de65c53744046fa8f7358afe0714a1af7d570c00c3835c2d724a7c1"},
+    {file = "importlib_metadata-4.0.1-py3-none-any.whl", hash = "sha256:d7eb1dea6d6a6086f8be21784cc9e3bcfa55872b52309bc5fad53a8ea444465d"},
+    {file = "importlib_metadata-4.0.1.tar.gz", hash = "sha256:8c501196e49fb9df5df43833bdb1e4328f64847763ec8a50703148b73784d581"},
 ]
 inquirer = [
     {file = "inquirer-2.7.0-py2.py3-none-any.whl", hash = "sha256:d15e15de1ad5696f1967e7a23d8e2fce69d2e41a70b008948d676881ed94c3a5"},
@@ -1344,13 +1360,17 @@ requests = [
     {file = "requests-2.25.1-py2.py3-none-any.whl", hash = "sha256:c210084e36a42ae6b9219e00e48287def368a26d03a048ddad7bfee44f75871e"},
     {file = "requests-2.25.1.tar.gz", hash = "sha256:27973dd4a904a4f13b263a19c866c13b92a39ed1c964655f025f3f8d3d75b804"},
 ]
+rfc3986 = [
+    {file = "rfc3986-1.4.0-py2.py3-none-any.whl", hash = "sha256:af9147e9aceda37c91a05f4deb128d4b4b49d6b199775fd2d2927768abdc8f50"},
+    {file = "rfc3986-1.4.0.tar.gz", hash = "sha256:112398da31a3344dc25dbf477d8df6cb34f9278a94fee2625d89e4514be8bb9d"},
+]
 rsa = [
     {file = "rsa-4.7.2-py3-none-any.whl", hash = "sha256:78f9a9bf4e7be0c5ded4583326e7461e3a3c5aae24073648b4bdfa797d78c9d2"},
     {file = "rsa-4.7.2.tar.gz", hash = "sha256:9d689e6ca1b3038bc82bf8d23e944b6b6037bc02301a574935b2dd946e0353b9"},
 ]
 s3transfer = [
-    {file = "s3transfer-0.3.7-py2.py3-none-any.whl", hash = "sha256:efa5bd92a897b6a8d5c1383828dca3d52d0790e0756d49740563a3fb6ed03246"},
-    {file = "s3transfer-0.3.7.tar.gz", hash = "sha256:35627b86af8ff97e7ac27975fe0a98a312814b46c6333d8a6b889627bcd80994"},
+    {file = "s3transfer-0.4.2-py2.py3-none-any.whl", hash = "sha256:9b3752887a2880690ce628bc263d6d13a3864083aeacff4890c1c9839a5eb0bc"},
+    {file = "s3transfer-0.4.2.tar.gz", hash = "sha256:cb022f4b16551edebbb31a377d3f09600dbada7363d8c5db7976e7f47732e1b2"},
 ]
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
