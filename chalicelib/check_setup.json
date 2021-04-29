@@ -387,6 +387,34 @@
             }
         }
     },
+    "scale_down_elasticsearch_production": {
+        "title": "Scale down production ElasticSearch Cluster",
+        "group": "System checks",
+        "schedule": {
+            "friday_autoscaling_checks": {
+                "cgap": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
+        },
+        "display": ["cgap"]
+    },
+    "scale_up_elasticsearch_production": {
+        "title": "Scale up production ElasticSearch Cluster",
+        "group": "System checks",
+        "schedule": {
+            "monday_autoscaling_checks": {
+                "cgap": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
+        },
+        "display": ["cgap"]
+    },
     "update_variant_genelist":{
         "title": "Add gene lists to variants/variant samples",
         "group": "Metadata checks",
