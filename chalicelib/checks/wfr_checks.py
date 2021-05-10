@@ -1257,10 +1257,10 @@ def cgapS3_status(connection, **kwargs):
                                                                         "(Clinvar Pathogenic/Likely Pathogenic, Conflicting Interpretation or Risk Factor)")
                                                 }
                            }
-            s5_tag = print_id + '_full_vcfqc'
+            s7_tag = print_id + '_full_vcfqc'
             keep, step7_status, step7_output = wfr_utils.stepper(library, keep,
-                                                                 s5_tag, step6_output,
-                                                                 s5_input_files,  step7_name, '',
+                                                                 s7_tag, step6_output,
+                                                                 s7_input_files,  step7_name, '',
                                                                  additional_input=update_pars, no_output=True)
         # in principle we can run bamsnap and vcf qc at the same time
         # currently we are waiting for qc to be successful to continue
@@ -1279,11 +1279,11 @@ def cgapS3_status(connection, **kwargs):
                                                              'ref': {"mount": True}
                                                              }
                               }
-            s6_tag = print_id + '_bamsnap'
+            s8_tag = print_id + '_bamsnap'
             update_pars = {"parameters": {"titles": input_titles}}
             keep, step8_status, step8_output = wfr_utils.stepper(library, keep,
-                                                                  s6_tag, step4_output,
-                                                                  s6_input_files,  step8_name, '',
+                                                                  s8_tag, step6_output,
+                                                                  s8_input_files,  step8_name, '',
                                                                   additional_input=update_pars, no_output=True)
 
         final_status = print_id
