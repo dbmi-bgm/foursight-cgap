@@ -13,7 +13,7 @@ from .helpers.confchecks import *
 
 # list of acceptible version
 cgap_partI_version = ['WGS_partI_V11', 'WGS_partI_V12', 'WGS_partI_V13', 'WGS_partI_V15', 'WGS_partI_V16', 'WGS_partI_V17',
-                      'WGS_partI_V18', 'WGS_partI_V19', 'WGS_partI_V20']
+                      'WGS_partI_V18', 'WGS_partI_V19', 'WGS_partI_V20', 'WGS_partI_V22']
 cgap_partII_version = ['WGS_partII_V22']
 cgap_partIII_version = ['WGS_partIII_V22']
 
