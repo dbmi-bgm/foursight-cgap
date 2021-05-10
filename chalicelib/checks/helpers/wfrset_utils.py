@@ -385,11 +385,8 @@ wf_dict = [
         }
     },
     {  # Step5 - dbSNP_ID_fixer
-        'app_name': 'workflow_granite-comHet-check',
-        'workflow_uuid': 'cgap:workflow_granite-comHet-check_v22',
-        'parameters': {
-                # "trio": ["PROBAND_ID", "[PARENT_ID]", "[PARENT_ID]"]
-            },
+        'app_name': 'workflow_dbSNP_ID_fixer-check',
+        'workflow_uuid': 'cgap:workflow_dbSNP_ID_fixer-check_v22',
         "config": {
             "instance_type": "t3.micro",
             "ebs_size": 10,
@@ -403,11 +400,8 @@ wf_dict = [
         }
     },
     {  # Step6 - hg19lo_hgvsg
-        'app_name': 'workflow_granite-comHet-check',
-        'workflow_uuid': 'cgap:workflow_granite-comHet-check_v22',
-        'parameters': {
-                # "trio": ["PROBAND_ID", "[PARENT_ID]", "[PARENT_ID]"]
-            },
+        'app_name': 'workflow_hg19lo_hgvsg-check',
+        'workflow_uuid': 'cgap:workflow_hg19lo_hgvsg-check_v22',
         "config": {
             "instance_type": "t3.micro",
             "ebs_size": 10,

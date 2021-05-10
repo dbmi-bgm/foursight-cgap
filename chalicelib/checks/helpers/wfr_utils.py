@@ -111,6 +111,14 @@ workflow_details = {
         "run_time": 12,
         "accepted_versions": ["v22"]
     },
+    "workflow_dbSNP_ID_fixer-check": {
+        "run_time": 12,
+        "accepted_versions": ["v22"]
+    },
+    "workflow_hg19lo_hgvsg-check": {
+        "run_time": 12,
+        "accepted_versions": ["v22"]
+    },
     "bamsnap": {
         "run_time": 12,
         "accepted_versions": ["v20", "v22"]
