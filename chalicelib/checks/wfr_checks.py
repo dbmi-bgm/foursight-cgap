@@ -1243,7 +1243,7 @@ def cgapS3_status(connection, **kwargs):
         else:
             print('\t\t-> Run vcfqc')
             # Run step 5 vcfqc
-            s5_input_files = {"input_vcf": step6_output,
+            s7_input_files = {"input_vcf": step6_output,
                               'additional_file_parameters': {'input_vcf': {"mount": True}}
                               }
             str_qc_pedigree = str(json.dumps(qc_pedigree))
@@ -1272,7 +1272,7 @@ def cgapS3_status(connection, **kwargs):
             step8_status = 'complete'
         else:
             # BAMSNAP
-            s6_input_files = {'input_bams': input_bams,
+            s8_input_files = {'input_bams': input_bams,
                               'input_vcf': step4_output,
                               'ref': '/files-reference/GAPFIXRDPDK5/',
                               'additional_file_parameters': {'input_vcf': {"mount": True},
