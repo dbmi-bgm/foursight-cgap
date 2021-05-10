@@ -1164,7 +1164,7 @@ def cgapS3_status(connection, **kwargs):
             # Run novoCaller
             if run_mode == 'trio':
                 s3_input_files = {'input_vcf': step2_output,
-                                  'unrelated': '/files-processed/GAPFI344NFZE/',
+                                  'unrelated': '4468e4a2-6c92-4d82-b333-821be68d0a55',
                                   'trio': step1_output,
                                   'additional_file_parameters': {'input_vcf': {"mount": True},
                                                                  'unrelated': {"mount": True},
