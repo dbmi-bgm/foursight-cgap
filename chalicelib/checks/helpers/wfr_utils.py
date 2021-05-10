@@ -26,106 +26,102 @@ workflow_details = {
     },
     "workflow_bwa-mem_no_unzip-check": {
         "run_time": 12,
-        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
+        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20", "v22"]
     },
     "workflow_add-readgroups-check": {
         "run_time": 12,
-        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
+        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20", "v22"]
     },
     "workflow_merge-bam-check": {
         "run_time": 12,
-        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
+        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20", "v22"]
     },
     "workflow_picard-MarkDuplicates-check": {
         "run_time": 12,
-        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
+        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20", "v22"]
     },
     "workflow_sort-bam-check": {
         "run_time": 12,
-        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
+        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20", "v22"]
     },
     "workflow_gatk-BaseRecalibrator": {
         "run_time": 12,
-        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
+        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20", "v22"]
     },
     "workflow_gatk-ApplyBQSR-check": {
         "run_time": 12,
-        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
+        "accepted_versions": ["v9", "v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20", "v22"]
     },
     # new step 8
     'workflow_gatk-HaplotypeCaller': {
         "run_time": 12,
-        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
+        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20", "v22"]
     },
     # step 9
     'workflow_granite-mpileupCounts': {
         "run_time": 12,
-        "accepted_versions": ["v14", "v15", "v16", "v17", "v18", "v19", "v20"]
+        "accepted_versions": ["v14", "v15", "v16", "v17", "v18", "v19", "v20", "v22"]
     },
     # step 10
     'cgap-bamqc': {
         "run_time": 12,
-        "accepted_versions": ["v2", "v3"]
+        "accepted_versions": ["v2", "v3", "v4", "v22"]   # cgap-qc v5 is the same as cgap-pipeline v22
     },
     # # PART II
     # part II step 1
     'workflow_gatk-CombineGVCFs': {
         "run_time": 12,
-        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
+        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20", "v22"]
     },
     # part II step 2
     'workflow_gatk-GenotypeGVCFs-check': {
         "run_time": 12,
-        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
+        "accepted_versions": ["v10", "v11", "v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20", "v22"]
     },
     "workflow_cram2fastq": {
         "run_time": 12,
-        "accepted_versions": ["v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20"]
+        "accepted_versions": ["v12", "v13", "v15", "v16", "v17", "v18", "v19", "v20", "v22"]
     },
     "workflow_cram2bam-check": {
         "run_time": 12,
-        "accepted_versions": ["v13", "v15", "v16", "v17", "v18", "v19", "v20"]
-    },
-    "workflow_vep-parallel": {
-        "run_time": 12,
-        "accepted_versions": ["v17"]
+        "accepted_versions": ["v13", "v15", "v16", "v17", "v18", "v19", "v20", "v22"]
     },
     "workflow_samplegeno": {
         "run_time": 12,
-        "accepted_versions": ["v20"]
+        "accepted_versions": ["v20", "v22"]
     },
     "workflow_vep-annot-check": {
         "run_time": 12,
-        "accepted_versions": ["v20"]
+        "accepted_versions": ["v22"]
     },
     # Part III
     "workflow_granite-rckTar": {
         "run_time": 12,
-        "accepted_versions": ["v16", "v17", "v18", "v19", "v20"]
+        "accepted_versions": ["v16", "v17", "v18", "v19", "v20", "v22"]
     },
     "workflow_granite-filtering-check": {
         "run_time": 12,
-        "accepted_versions": ["v20"]
+        "accepted_versions": ["v20", "v22"]
     },
     "workflow_granite-novoCaller-rck-check": {
         "run_time": 12,
-        "accepted_versions": ["v20"]
+        "accepted_versions": ["v20", "v22"]
     },
     "workflow_granite-comHet-check": {
         "run_time": 12,
-        "accepted_versions": ["v20"]
+        "accepted_versions": ["v22"]
     },
     "bamsnap": {
         "run_time": 12,
-        "accepted_versions": ["v20"]
+        "accepted_versions": ["v20", "v22"]
     },
     "workflow_granite-qcVCF": {
         "run_time": 12,
-        "accepted_versions": ["v4"]
+        "accepted_versions": ["v4", "v22"]  # cgap-qc v5 is the same as cgap-pipeline v22
     },
     "workflow_peddy": {
         "run_time": 12,
-        "accepted_versions": ["v4"]
+        "accepted_versions": ["v4", "v22"]  # cgap-qc v5 is the same as cgap-pipeline v22
     }
 }
 

@@ -284,7 +284,7 @@ wf_dict = [
     },
     {  # SAMPLEGENO
         'app_name': 'workflow_samplegeno',
-        'workflow_uuid': 'cgap:workflow_samplegeno_v20',
+        'workflow_uuid': 'cgap:workflow_samplegeno_v22',
         'parameters': {},
         "config": {
             "instance_type": "t3.small",
@@ -300,11 +300,11 @@ wf_dict = [
     },
     {  # VEP
         'app_name': 'workflow_vep-annot-check',
-        'workflow_uuid': 'cgap:workflow_vep-annot-check_v20',
+        'workflow_uuid': 'cgap:workflow_vep-annot-check_v22',
         'parameters': {"nthreads": 64},
         "config": {
             "instance_type": "c5n.18xlarge",
-            "ebs_size": "0.5x",
+            "ebs_size": "0.25x",
             "EBS_optimized": True
         },
         'custom_pf_fields': {
@@ -320,7 +320,7 @@ wf_dict = [
     # (__)  \_/\_/(__\_) (__)   (__)(__)(__)
     {  # step1a rckTar
         'app_name': 'workflow_granite-rckTar',
-        'workflow_uuid': 'cgap:workflow_granite-rckTar_v20',
+        'workflow_uuid': 'cgap:workflow_granite-rckTar_v22',
         'parameters': {},
         "config": {
             "instance_type": "c5.xlarge",
@@ -336,7 +336,7 @@ wf_dict = [
     },
     {  # Step2 - filtering
         'app_name': 'workflow_granite-filtering-check',
-        'workflow_uuid': 'cgap:workflow_granite-filtering-check_v20',
+        'workflow_uuid': 'cgap:workflow_granite-filtering-check_v22',
         'parameters': {"aftag": "gnomADg_AF", "afthr": 0.01},
         "config": {
             "instance_type": "t3.medium",
@@ -352,7 +352,7 @@ wf_dict = [
     },
     {  # Step3 - novocaller
         'app_name': 'workflow_granite-novoCaller-rck-check',
-        'workflow_uuid': 'cgap:workflow_granite-novoCaller-rck-check_v20',
+        'workflow_uuid': 'cgap:workflow_granite-novoCaller-rck-check_v22',
         'parameters': {},
         "config": {
             "instance_type": "c5.xlarge",
@@ -368,7 +368,7 @@ wf_dict = [
     },
     {  # Step4 - comHet
         'app_name': 'workflow_granite-comHet-check',
-        'workflow_uuid': 'cgap:workflow_granite-comHet-check_v20',
+        'workflow_uuid': 'cgap:workflow_granite-comHet-check_v22',
         'parameters': {
                 # "trio": ["PROBAND_ID", "[PARENT_ID]", "[PARENT_ID]"]
             },
@@ -379,14 +379,50 @@ wf_dict = [
         },
         'custom_pf_fields': {
             'comHet_vcf': {
+                'file_type': 'intermediate file',
+                'description': 'Intermediate VCF file'
+            }
+        }
+    },
+    {  # Step5 - dbSNP_ID_fixer
+        'app_name': 'workflow_granite-comHet-check',
+        'workflow_uuid': 'cgap:workflow_granite-comHet-check_v22',
+        'parameters': {
+                # "trio": ["PROBAND_ID", "[PARENT_ID]", "[PARENT_ID]"]
+            },
+        "config": {
+            "instance_type": "t3.micro",
+            "ebs_size": 10,
+            "EBS_optimized": True
+        },
+        'custom_pf_fields': {
+            'comHet_vcf': {
+                'file_type': 'intermediate file',
+                'description': 'Intermediate VCF file'
+            }
+        }
+    },
+    {  # Step6 - hg19lo_hgvsg
+        'app_name': 'workflow_granite-comHet-check',
+        'workflow_uuid': 'cgap:workflow_granite-comHet-check_v22',
+        'parameters': {
+                # "trio": ["PROBAND_ID", "[PARENT_ID]", "[PARENT_ID]"]
+            },
+        "config": {
+            "instance_type": "t3.micro",
+            "ebs_size": 10,
+            "EBS_optimized": True
+        },
+        'custom_pf_fields': {
+            'comHet_vcf': {
                 'file_type': 'full annotated VCF',
                 'description': 'full annotated VCF file'
             }
         }
     },
-    {  # Step 6 = bamsnap
+    {  # Step 8 = bamsnap
         'app_name': 'bamsnap',
-        'workflow_uuid': 'cgap:bamsnap_v20',
+        'workflow_uuid': 'cgap:bamsnap_v22',
         'parameters': {
                     "nproc": 16
                     # "titles": ["NA12877 (Father)", "NA12878 (Mother)", "NA12879 (Daughter)"]
@@ -413,7 +449,7 @@ wf_dict = [
             "EBS_optimized": True
         }
     },
-    {  # temp
+    {  # template
         'app_name': '',
         'workflow_uuid': '',
         'parameters': {},
