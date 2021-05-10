@@ -393,7 +393,7 @@ wf_dict = [
             "EBS_optimized": True
         },
         'custom_pf_fields': {
-            'comHet_vcf': {
+            'vcf': {
                 'file_type': 'intermediate file',
                 'description': 'Intermediate VCF file'
             }
@@ -408,7 +408,7 @@ wf_dict = [
             "EBS_optimized": True
         },
         'custom_pf_fields': {
-            'comHet_vcf': {
+            'vcf': {
                 'file_type': 'full annotated VCF',
                 'description': 'full annotated VCF file'
             }
