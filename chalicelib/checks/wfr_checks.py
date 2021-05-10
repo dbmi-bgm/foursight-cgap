@@ -1236,7 +1236,8 @@ def cgapS3_status(connection, **kwargs):
             s6_tag = print_id + 'hg19lo_hgvsg'
             keep, step6_status, step6_output = wfr_utils.stepper(library, keep,
                                                                  s6_tag, step5_output,
-                                                                 s6_input_files,  step6_name, 'vcf')
+                                                                 s6_input_files,  step6_name, 'vcf',
+                                                                 additional_input=update_file_metadata)
         if step6_status != 'complete':
             step7_status = ""
         else:
