@@ -815,12 +815,12 @@ def cgapS2_status(connection, **kwargs):
                               'spliceai_snv': "/files-reference/GAPFISUOC64Q/",
                               'spliceai_indel': "/files-reference/GAPFIZOPCWIU/",
                               'gnomad': "/files-reference/GAPFIJOMA2Q8/",
-                              'gnomad2': "dd6f0384-d0b5-47d6-99a8-395c0b72feed",
-                              'CADD_snv': "672de47f-d058-4dbd-9fc4-3e134cfe71d8",
-                              'CADD_indel': "b9f123dd-be05-4a14-957a-5e1e5a5ce254",
-                              'phylop100bw': "af93aecb-6b8e-4c8b-b159-eefb3f9d0ffb",
-                              'phylop30bw': "f6809af1-f7b9-43c0-882a-16764ccc431d",
-                              'phastc100bw': "19f03828-175b-4594-ba1a-52ddabcf640d",
+                              'gnomad2': "/files-reference/GAPFIC5416E6/",
+                              'CADD_snv': "/files-reference/GAPFI566QQCV/",
+                              'CADD_indel': "/files-reference/GAPFI1GC6AXF/",
+                              'phylop100bw': "/files-reference/GAPFIMQ7MHGA/",
+                              'phylop30bw': "/files-reference/GAPFI5MRTDLN/",
+                              'phastc100bw': "/files-reference/GAPFI6KXAQMV/",
                               'additional_file_parameters': {'input_vcf': {"mount": True},
                                                              'reference': {"mount": True},
                                                              'regions': {"mount": True},
@@ -867,9 +867,7 @@ def cgapS2_status(connection, **kwargs):
         else:
             print('\t\t-> Run peddy')
             # step 5b peddy qc
-            s5b_input_files = {"input_vcf": step4_output,
-                                'additional_file_parameters': {'input_vcf': {"mount": True}}
-                                }
+            s5b_input_files = {"input_vcf": step4_output}
             str_qc_pedigree = str(json.dumps(qc_pedigree))
             update_pars = {"parameters": {"pedigree": str_qc_pedigree,
                                           "family": "FAMILY"}
@@ -1164,7 +1162,7 @@ def cgapS3_status(connection, **kwargs):
             # Run novoCaller
             if run_mode == 'trio':
                 s3_input_files = {'input_vcf': step2_output,
-                                  'unrelated': '4468e4a2-6c92-4d82-b333-821be68d0a55',
+                                  'unrelated': '/files-reference/GAPFIXD5LCRG/',
                                   'trio': step1_output,
                                   'additional_file_parameters': {'input_vcf': {"mount": True},
                                                                  'unrelated': {"mount": True},
@@ -1203,8 +1201,8 @@ def cgapS3_status(connection, **kwargs):
             print('\t\t-> Run dbSNP_ID_fixer')
             # Run step 5 Run dbSNP_ID_fixer
             s5_input_files = {"input_vcf": step4_output,
-                              "dbSNP_ref_vcf": "aa542c8e-b31c-4cff-b2d4-aa4037bb913c",
-                              "region_file": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+                              "dbSNP_ref_vcf": "/files-reference/GAPFIF4JKLTH/",
+                              "region_file": "/files-reference/GAPFIBGEOI72/",
                               'additional_file_parameters': {'input_vcf': {"mount": True},
                                                              'dbSNP_ref_vcf': {"mount": True},
                                                              'region_file': {"mount": True}
@@ -1221,7 +1219,7 @@ def cgapS3_status(connection, **kwargs):
             print('\t\t-> hg19lo_hgvsg')
             # Run step 6 hg19lo_hgvsg
             s6_input_files = {"input_vcf": step5_output,
-                              "chainfile": "297c872a-5b6b-4fc3-83d3-f4a853f8805c",
+                              "chainfile": "/files-reference/GAPFIYPTSAU8/",
                               'additional_file_parameters': {'input_vcf': {"mount": True},
                                                              'chainfile': {"mount": True}
                                                             }

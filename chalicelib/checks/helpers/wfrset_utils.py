@@ -278,7 +278,7 @@ wf_dict = [
         'parameters': {},
         "config": {
             "instance_type": "t3.small",
-            "ebs_size": "20x",
+            "ebs_size": "10x",
             "EBS_optimized": True
         }
     },
@@ -439,7 +439,7 @@ wf_dict = [
                        "ti_tv": True},
         "config": {
             "instance_type": "t3.small",
-            "ebs_size": "1.5x",
+            "ebs_size": "1x",
             "EBS_optimized": True
         }
     },
