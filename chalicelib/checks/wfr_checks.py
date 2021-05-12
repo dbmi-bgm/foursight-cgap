@@ -820,7 +820,7 @@ def cgapS2_status(connection, **kwargs):
                               'CADD_indel': "/files-reference/GAPFI1GC6AXF/",
                               'phylop100bw': "/files-reference/GAPFIMQ7MHGA/",
                               'phylop30bw': "/files-reference/GAPFI5MRTDLN/",
-                              'phastc100bw': /files-reference/GAPFI6KXAQMV/",
+                              'phastc100bw': "/files-reference/GAPFI6KXAQMV/",
                               'additional_file_parameters': {'input_vcf': {"mount": True},
                                                              'reference': {"mount": True},
                                                              'regions': {"mount": True},
