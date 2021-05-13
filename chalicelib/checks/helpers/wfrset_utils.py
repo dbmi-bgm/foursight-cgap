@@ -274,7 +274,7 @@ wf_dict = [
     },
     {  # peddy_qc
         'app_name': 'workflow_peddy',
-        'workflow_uuid': '2ba8440c-b157-4394-9e86-c634aa15129d',
+        'workflow_uuid': 'cgap:workflow_peddy_v22',
         'parameters': {},
         "config": {
             "instance_type": "t3.small",
@@ -430,7 +430,7 @@ wf_dict = [
     },
     {  # VCFQC used in Part III & Part II
         'app_name': 'workflow_granite-qcVCF',
-        'workflow_uuid': '29085493-c13d-4ee6-b5b4-8e1cf36b6209',
+        'workflow_uuid': 'cgap:workflow_granite-qcVCF_v22',
         'parameters': {
                        # "pedigree": "",
                        # "samples": [""],
