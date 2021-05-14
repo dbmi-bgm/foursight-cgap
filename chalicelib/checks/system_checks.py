@@ -22,6 +22,7 @@ from .helpers.confchecks import *
 
 
 # XXX: put into utils?
+CGAP_PROD_ES_DOMAIN_NAME = 'cgap-green-6-8'  # XXX: resolve from health page
 CGAP_TEST_CLUSTER = 'search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443'
 TEST_ES_CLUSTERS = [
     CGAP_TEST_CLUSTER,
@@ -81,7 +82,7 @@ def scale_down_elasticsearch_production(connection, **kwargs):
     check = CheckResult(connection, 'scale_down_elasticsearch_production')
     es_client = es_utils.ElasticSearchServiceClient()
     success = es_client.resize_elasticsearch_cluster(
-                domain_name=connection.ff_env,
+                domain_name=CGAP_PROD_ES_DOMAIN_NAME,
                 master_node_type='t2.medium.elasticsearch',  # discarded
                 master_node_count=0,
                 data_node_type='c5.large.elasticsearch',
@@ -115,7 +116,7 @@ def scale_up_elasticsearch_production(connection, **kwargs):
     check = CheckResult(connection, 'scale_up_elasticsearch_production')
     es_client = es_utils.ElasticSearchServiceClient()
     success = es_client.resize_elasticsearch_cluster(
-                domain_name=connection.ff_env,
+                domain_name=CGAP_PROD_ES_DOMAIN_NAME,
                 master_node_type='c5.large.elasticsearch',
                 master_node_count=3,
                 data_node_type='c5.2xlarge.elasticsearch',
