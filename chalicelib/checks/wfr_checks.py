@@ -858,9 +858,9 @@ def cgapS2_status(connection, **kwargs):
                                           "ti_tv": True}}
             s5_tag = print_id + '_vep_vcfqc_' + step4_output.split('/')[2]
             keep, step5_status, step5_output = wfr_utils.stepper(library, keep,
-                                                                  s5_tag, step4_output,
-                                                                  s5_input_files,  step5_name, '',
-                                                                  additional_input=update_pars, no_output=True)
+                                                                 s5_tag, step4_output,
+                                                                 s5_input_files,  step5_name, '',
+                                                                 additional_input=update_pars, no_output=True)
 
         if step5_status != 'complete':
             step5b_status = ""
@@ -1271,7 +1271,7 @@ def cgapS3_status(connection, **kwargs):
         else:
             # BAMSNAP
             s8_input_files = {'input_bams': input_bams,
-                              'input_vcf': step4_output,
+                              'input_vcf': step6_output,
                               'ref': '/files-reference/GAPFIXRDPDK5/',
                               'additional_file_parameters': {'input_vcf': {"mount": True},
                                                              'input_bams': {"mount": True},
@@ -1281,9 +1281,9 @@ def cgapS3_status(connection, **kwargs):
             s8_tag = print_id + '_bamsnap'
             update_pars = {"parameters": {"titles": input_titles}}
             keep, step8_status, step8_output = wfr_utils.stepper(library, keep,
-                                                                  s8_tag, step6_output,
-                                                                  s8_input_files,  step8_name, '',
-                                                                  additional_input=update_pars, no_output=True)
+                                                                 s8_tag, step6_output,
+                                                                 s8_input_files,  step8_name, '',
+                                                                 additional_input=update_pars, no_output=True)
 
         final_status = print_id
         completed = []
