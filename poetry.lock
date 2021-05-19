@@ -69,20 +69,20 @@ wcwidth = ">=0.1.4"
 
 [[package]]
 name = "boto3"
-version = "1.17.74"
+version = "1.17.75"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
 
 [package.dependencies]
-botocore = ">=1.20.74,<1.21.0"
+botocore = ">=1.20.75,<1.21.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.4.0,<0.5.0"
 
 [[package]]
 name = "botocore"
-version = "1.20.74"
+version = "1.20.75"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -260,7 +260,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "0.1.9.1b9"
+version = "0.1.9.1b10"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -931,7 +931,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.7"
-content-hash = "aacd45ab62ff01206e1570863517fe149964beda6b87a2db7160b22244dcdc87"
+content-hash = "32775e58f54f434012da68d9b2c4f409ce0199162682fb83ef8b7fc6ac35973f"
 
 [metadata.files]
 ansicon = [
@@ -960,12 +960,12 @@ blessed = [
     {file = "blessed-1.17.6.tar.gz", hash = "sha256:a9a774fc6eda05248735b0d86e866d640ca2fef26038878f7e4d23f7749a1e40"},
 ]
 boto3 = [
-    {file = "boto3-1.17.74-py2.py3-none-any.whl", hash = "sha256:c83a33fff7d20027386552967355508ce71fb7406ab0cc8e627e257c94754d43"},
-    {file = "boto3-1.17.74.tar.gz", hash = "sha256:0a21893db156c0938d0a06b622c3dd3d2da2dcd9d06d343c8f9536ac9de4ec7f"},
+    {file = "boto3-1.17.75-py2.py3-none-any.whl", hash = "sha256:7059b3dbb6b474c6ef836aa3bb53eb7b3e474133f3e4cb2a3a3adcc55e2b2b9d"},
+    {file = "boto3-1.17.75.tar.gz", hash = "sha256:bc8b6e98375f71dde0f51e08d415a72e3d8389042ea07d216ac82c98060e7149"},
 ]
 botocore = [
-    {file = "botocore-1.20.74-py2.py3-none-any.whl", hash = "sha256:2061cf3d17615aa4114c91dbed8917adc5287a88354a7693c96aa8e9f9dedd6e"},
-    {file = "botocore-1.20.74.tar.gz", hash = "sha256:6937954ce6dabc00eb157e9fbd21edd45b4dfe3de738e68dbca4c042bfda0954"},
+    {file = "botocore-1.20.75-py2.py3-none-any.whl", hash = "sha256:80fc9a463bcc6368ed95d4b10717f5bb87288b930b3ccf96ce480d1c65e20e5c"},
+    {file = "botocore-1.20.75.tar.gz", hash = "sha256:ab1bd5d5f86a4fdd194129a6102e5193209d3c4676dd76881769d6894bbaab7e"},
 ]
 cachetools = [
     {file = "cachetools-4.2.2-py3-none-any.whl", hash = "sha256:2cc0b89715337ab6dbba85b5b50effe2b0c74e035d83ee8ed637cf52f12ae001"},
@@ -1070,8 +1070,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight_core-0.1.9.1b9-py3-none-any.whl", hash = "sha256:fe3fdedbffb77f0303e3db85e7c12361275432f1cbbebc465a3487e25c2a3913"},
-    {file = "foursight_core-0.1.9.1b9.tar.gz", hash = "sha256:af111d4db9ea69546e0760a2f4546d17f61f32d5df41fbf59821f9246c22ff85"},
+    {file = "foursight_core-0.1.9.1b10-py3-none-any.whl", hash = "sha256:735dbba831ba5b0197a0f0ac200c2f832d3dfe46fee99796cce45be818ca5b2c"},
+    {file = "foursight_core-0.1.9.1b10.tar.gz", hash = "sha256:d3c147f3db12ddd25aa560e15f2e966c001b923640230d2602532d27404daf2e"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
