@@ -29,3 +29,36 @@ def ecs_status(connection, **kwargs):
         check.summary = 'See full output for ECS Metadata'
     check.full_output = full_output
     return check
+
+
+@check_function()
+def update_ecs_application_versions(connection, cluster_name=None, **kwargs):
+    """ This check is intended to be run AFTER the user has finished pushing
+        the relevant images to ECR. Triggers an update on all services for
+        the CGAP cluster. If no cluster_name is passed, Foursight will infer
+        one if there is only a single option - otherwise error is raised.
+
+        Note that this check just kicks the process - it does not block until
+        the cluster update has finished.
+    """
+    check = CheckResult(connection, 'update_ecs_application_versions')
+    client = ECSUtils()
+    cluster_arns = client.list_ecs_clusters()
+    if not cluster_name:
+        cgap_candidate = list(filter(lambda arn: 'CGAP' in arn, cluster_arns))
+        if len(cgap_candidate) > 1:
+            check.status = 'FAIL'
+            check.summary = 'Ambiguous cluster setup (not proceeding): %s' % cgap_candidate
+        else:
+            client.update_all_services(cluster_name=cgap_candidate[0])
+            check.status = 'PASS'
+            check.summary = 'Triggered cluster update for %s - updating all services.' % cgap_candidate[0]
+    else:
+        if cluster_name not in cluster_arns:
+            check.status = 'FAIL'
+            check.summary = 'Given cluster name does not exist! Gave: %s, Resolved: %s' % (cluster_name, cluster_arns)
+        else:
+            client.update_all_services(cluster_name=cluster_name)
+            check.status = 'PASS'
+            check.summary = 'Triggered cluster update for %s - updating all services.' % cluster_name
+    return check
