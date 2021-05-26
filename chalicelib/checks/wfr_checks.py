@@ -13,9 +13,9 @@ from .helpers.confchecks import *
 
 # list of acceptible version
 cgap_partI_version = ['WGS_partI_V11', 'WGS_partI_V12', 'WGS_partI_V13', 'WGS_partI_V15', 'WGS_partI_V16', 'WGS_partI_V17',
-                      'WGS_partI_V18', 'WGS_partI_V19', 'WGS_partI_V20']
-cgap_partII_version = ['WGS_partII_V20']
-cgap_partIII_version = ['WGS_partIII_V20']
+                      'WGS_partI_V18', 'WGS_partI_V19', 'WGS_partI_V20', 'WGS_partI_V22']
+cgap_partII_version = ['WGS_partII_V22']
+cgap_partIII_version = ['WGS_partIII_V22']
 
 
 @check_function(file_type='File', start_date=None)
@@ -806,24 +806,36 @@ def cgapS2_status(connection, **kwargs):
             print('\t\t-> Run VEP')
             # run step4 VEP
             s4_input_files = {'input_vcf': step3_output,
-                            'reference': "/files-reference/GAPFIXRDPDK5/",
-                            'regions': "/files-reference/GAPFIBGEOI72/",
-                            'vep': "/files-reference/GAPFIPK4VGWV/",
-                            'clinvar': "/files-reference/GAPFI121RWQE/",
-                            'dbnsfp': "/files-reference/GAPFIKJ66FKY/",
-                            'maxent': "/files-reference/GAPFI6BNNTKA/",
-                            'spliceai_snv': "/files-reference/GAPFISUOC64Q/",
-                            'spliceai_indel': "/files-reference/GAPFIZOPCWIU/",
-                            'gnomad': "/files-reference/GAPFIJOMA2Q8/",
-                            'additional_file_parameters': {'input_vcf': {"mount": True},
-                                                           'reference': {"mount": True},
-                                                           'regions': {"mount": True},
-                                                           'clinvar': {"mount": True},
-                                                           'dbnsfp': {"mount": True},
-                                                           'spliceai_snv': {"mount": True},
-                                                           'spliceai_indel': {"mount": True},
-                                                           'gnomad': {"mount": True}
-                                                             }
+                              'reference': "/files-reference/GAPFIXRDPDK5/",
+                              'regions': "/files-reference/GAPFIBGEOI72/",
+                              'vep': "/files-reference/GAPFIPK4VGWV/",
+                              'clinvar': "/files-reference/GAPFI121RWQE/",
+                              'dbnsfp': "/files-reference/GAPFIKJ66FKY/",
+                              'maxent': "/files-reference/GAPFI6BNNTKA/",
+                              'spliceai_snv': "/files-reference/GAPFISUOC64Q/",
+                              'spliceai_indel': "/files-reference/GAPFIZOPCWIU/",
+                              'gnomad': "/files-reference/GAPFIJOMA2Q8/",
+                              'gnomad2': "/files-reference/GAPFIC5416E6/",
+                              'CADD_snv': "/files-reference/GAPFI566QQCV/",
+                              'CADD_indel': "/files-reference/GAPFI1GC6AXF/",
+                              'phylop100bw': "/files-reference/GAPFIMQ7MHGA/",
+                              'phylop30bw': "/files-reference/GAPFI5MRTDLN/",
+                              'phastc100bw': "/files-reference/GAPFI6KXAQMV/",
+                              'additional_file_parameters': {'input_vcf': {"mount": True},
+                                                             'reference': {"mount": True},
+                                                             'regions': {"mount": True},
+                                                             'clinvar': {"mount": True},
+                                                             'dbnsfp': {"mount": True},
+                                                             'spliceai_snv': {"mount": True},
+                                                             'spliceai_indel': {"mount": True},
+                                                             'gnomad': {"mount": True},
+                                                             'gnomad2': {"mount": True},
+                                                             'CADD_snv': {"mount": True},
+                                                             'CADD_indel': {"mount": True},
+                                                             'phylop100bw': {"mount": True},
+                                                             'phylop30bw': {"mount": True},
+                                                             'phastc100bw': {"mount": True}
+                                                           }
                               }
             s4_tag = print_id + '_VEP_' + step3_output.split('/')[2]
             keep, step4_status, step4_output = wfr_utils.stepper(library, keep,
@@ -855,9 +867,7 @@ def cgapS2_status(connection, **kwargs):
         else:
             print('\t\t-> Run peddy')
             # step 5b peddy qc
-            s5b_input_files = {"input_vcf": step4_output,
-                                'additional_file_parameters': {'input_vcf': {"mount": True}}
-                                }
+            s5b_input_files = {"input_vcf": step4_output}
             str_qc_pedigree = str(json.dumps(qc_pedigree))
             update_pars = {"parameters": {"pedigree": str_qc_pedigree,
                                           "family": "FAMILY"}
@@ -1000,8 +1010,10 @@ def cgapS3_status(connection, **kwargs):
     step2_name = 'workflow_granite-filtering-check'
     step3_name = 'workflow_granite-novoCaller-rck-check'
     step4_name = 'workflow_granite-comHet-check'
-    step5_name = 'workflow_granite-qcVCF'
-    step6_name = 'bamsnap'
+    step5_name = 'workflow_dbSNP_ID_fixer-check'
+    step6_name = 'workflow_hg19lo_hgvsg-check'
+    step7_name = 'workflow_granite-qcVCF'
+    step8_name = 'bamsnap'
     # collect all wf for wf version check
     all_system_wfs = ff_utils.search_metadata('/search/?type=Workflow&status=released', my_auth)
     wf_errs = wfr_utils.check_latest_workflow_version(all_system_wfs)
@@ -1150,7 +1162,7 @@ def cgapS3_status(connection, **kwargs):
             # Run novoCaller
             if run_mode == 'trio':
                 s3_input_files = {'input_vcf': step2_output,
-                                  'unrelated': '/files-processed/GAPFI344NFZE/',
+                                  'unrelated': '/files-reference/GAPFIXD5LCRG/',
                                   'trio': step1_output,
                                   'additional_file_parameters': {'input_vcf': {"mount": True},
                                                                  'unrelated': {"mount": True},
@@ -1177,12 +1189,6 @@ def cgapS3_status(connection, **kwargs):
             proband_first_sample_list = list(reversed(sample_ids))  # proband first sample ids
             update_pars = {"parameters": {"trio": proband_first_sample_list}}
 
-            # if ingestion needs to be skipped, we need to pass metadata to the vcf file
-            if skip_ingestion:
-                update_file_metadata = {'custom_pf_fields': {'comHet_vcf': {'file_ingestion_status': 'Ingestion disabled'}}}
-            else:
-                update_file_metadata = {}
-
             s4_tag = print_id + '_comhet'
             keep, step4_status, step4_output = wfr_utils.stepper(library, keep,
                                                                   s4_tag, step3_output,
@@ -1192,9 +1198,50 @@ def cgapS3_status(connection, **kwargs):
         if step4_status != 'complete':
             step5_status = ""
         else:
+            print('\t\t-> Run dbSNP_ID_fixer')
+            # Run step 5 Run dbSNP_ID_fixer
+            s5_input_files = {"input_vcf": step4_output,
+                              "dbSNP_ref_vcf": "/files-reference/GAPFIF4JKLTH/",
+                              "region_file": "/files-reference/GAPFIBGEOI72/",
+                              'additional_file_parameters': {'input_vcf': {"mount": True},
+                                                             'dbSNP_ref_vcf': {"mount": True},
+                                                             'region_file': {"mount": True}
+                                                            }
+                             }
+
+            s5_tag = print_id + '_dbSNP_ID_fixer'
+            keep, step5_status, step5_output = wfr_utils.stepper(library, keep,
+                                                                 s5_tag, step4_output,
+                                                                 s5_input_files,  step5_name, 'vcf')
+        if step5_status != 'complete':
+            step6_status = ""
+        else:
+            print('\t\t-> hg19lo_hgvsg')
+            # Run step 6 hg19lo_hgvsg
+            s6_input_files = {"input_vcf": step5_output,
+                              "chainfile": "/files-reference/GAPFIYPTSAU8/",
+                              'additional_file_parameters': {'input_vcf': {"mount": True},
+                                                             'chainfile': {"mount": True}
+                                                            }
+                             }
+
+            # if ingestion needs to be skipped, we need to pass metadata to the vcf file
+            if skip_ingestion:
+                update_file_metadata = {'custom_pf_fields': {'vcf': {'file_ingestion_status': 'Ingestion disabled'}}}
+            else:
+                update_file_metadata = {}
+
+            s6_tag = print_id + 'hg19lo_hgvsg'
+            keep, step6_status, step6_output = wfr_utils.stepper(library, keep,
+                                                                 s6_tag, step5_output,
+                                                                 s6_input_files,  step6_name, 'vcf',
+                                                                 additional_input=update_file_metadata)
+        if step6_status != 'complete':
+            step7_status = ""
+        else:
             print('\t\t-> Run vcfqc')
             # Run step 5 vcfqc
-            s5_input_files = {"input_vcf": step4_output,
+            s7_input_files = {"input_vcf": step6_output,
                               'additional_file_parameters': {'input_vcf': {"mount": True}}
                               }
             str_qc_pedigree = str(json.dumps(qc_pedigree))
@@ -1209,21 +1256,21 @@ def cgapS3_status(connection, **kwargs):
                                                                         "(Clinvar Pathogenic/Likely Pathogenic, Conflicting Interpretation or Risk Factor)")
                                                 }
                            }
-            s5_tag = print_id + '_full_vcfqc'
-            keep, step5_status, step5_output = wfr_utils.stepper(library, keep,
-                                                                 s5_tag, step4_output,
-                                                                 s5_input_files,  step5_name, '',
+            s7_tag = print_id + '_full_vcfqc'
+            keep, step7_status, step7_output = wfr_utils.stepper(library, keep,
+                                                                 s7_tag, step6_output,
+                                                                 s7_input_files,  step7_name, '',
                                                                  additional_input=update_pars, no_output=True)
         # in principle we can run bamsnap and vcf qc at the same time
         # currently we are waiting for qc to be successful to continue
-        if step5_status != 'complete':
-            step6_status = ""
+        if step7_status != 'complete':
+            step8_status = ""
         # if skipping ingestion, skip bamsnap too
         elif skip_ingestion:
-            step6_status = 'complete'
+            step8_status = 'complete'
         else:
             # BAMSNAP
-            s6_input_files = {'input_bams': input_bams,
+            s8_input_files = {'input_bams': input_bams,
                               'input_vcf': step4_output,
                               'ref': '/files-reference/GAPFIXRDPDK5/',
                               'additional_file_parameters': {'input_vcf': {"mount": True},
@@ -1231,17 +1278,13 @@ def cgapS3_status(connection, **kwargs):
                                                              'ref': {"mount": True}
                                                              }
                               }
-            s6_tag = print_id + '_bamsnap'
+            s8_tag = print_id + '_bamsnap'
             update_pars = {"parameters": {"titles": input_titles}}
-            keep, step6_status, step6_output = wfr_utils.stepper(library, keep,
-                                                                  s6_tag, step4_output,
-                                                                  s6_input_files,  step6_name, '',
+            keep, step8_status, step8_output = wfr_utils.stepper(library, keep,
+                                                                  s8_tag, step6_output,
+                                                                  s8_input_files,  step8_name, '',
                                                                   additional_input=update_pars, no_output=True)
 
-        # try:
-        #     print('\t\t-> final output, ' + step5_output)
-        # except:
-        #     print('\t\t-> final output, ' + 'NO OUTPUT')
         final_status = print_id
         completed = []
         pipeline_tag = cgap_partIII_version[-1]
@@ -1253,14 +1296,14 @@ def cgapS3_status(connection, **kwargs):
         running = keep['running']
         problematic_run = keep['problematic_run']
 
-        if step6_status == 'complete':
+        if step8_status == 'complete':
             final_status += ' completed'
             # existing_pf = [i['@id'] for i in an_msa['processed_files']]
             completed = [
                 an_msa['@id'],
-                {'processed_files': previous_files + [step4_output, ],
+                {'processed_files': previous_files + [step6_output, ],
                  'completed_processes': previous_tags + [pipeline_tag, ]}]
-            print('COMPLETED', step4_output)
+            print('COMPLETED', step6_output)
         else:
             if missing_run:
                 final_status += ' |Missing: ' + " ".join([i[0] for i in missing_run])
