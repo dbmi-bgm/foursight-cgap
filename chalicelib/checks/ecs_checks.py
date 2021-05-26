@@ -16,10 +16,11 @@ def ecs_status(connection, **kwargs):
     client = ECSUtils()
     cluster_arns = client.list_ecs_clusters()
     for cluster_arn in cluster_arns:
-        cluster_services = client.list_ecs_services(cluster_name=cluster_arn)
-        full_output['ECSMeta']['clusters'][cluster_arn] = {
-            'services': cluster_services
-        }
+        if 'CGAP' in cluster_arn:
+            cluster_services = client.list_ecs_services(cluster_name=cluster_arn)
+            full_output['ECSMeta']['clusters'][cluster_arn] = {
+                'services': cluster_services
+            }
     if not full_output['ECSMeta']['clusters']:
         check.status = 'WARN'
         check.summary = 'No clusters detected! Has ECS been orchestrated?'
