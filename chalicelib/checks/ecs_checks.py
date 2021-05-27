@@ -1,4 +1,8 @@
 from dcicutils.ecs_utils import ECSUtils
+from dcicutils.cloudformation_utils import get_ecr_repo_url
+from dcicutils.docker_utils import DockerUtils
+from dcicutils.ecr_utils import ECRUtils
+from .deployment_checks import clone_repo_to_temporary_dir
 from .helpers.confchecks import *
 
 
@@ -61,4 +65,43 @@ def update_ecs_application_versions(connection, cluster_name=None, **kwargs):
             client.update_all_services(cluster_name=cluster_name)
             check.status = 'PASS'
             check.summary = 'Triggered cluster update for %s - updating all services.' % cluster_name
+    return check
+
+
+@check_function
+def trigger_docker_build(connection, github_repo_url='https://github.com/dbmi-bgm/cgap-portal.git',
+                         github_repo_branch='c4_519', ecr_repo_url=None, env=None, tag='latest', **kwargs):
+    """ Triggers a docker build on Lambda, uploading the result to ECR under the given
+        repository and tag. ecr_repo_url takes priority over env if both are passed.
+    """
+    url = None
+    if ecr_repo_url:
+        url = ecr_repo_url
+    elif env:
+        url = get_ecr_repo_url(env)
+    else:
+        raise Exception('Did not pass correct arguments to the check. You need to specify'
+                        ' either "ecr_repo_url" or an "env" to resolve from.')
+    check = CheckResult(connection, 'trigger_docker_build')
+    full_output = {}
+    repo_location = clone_repo_to_temporary_dir(github_repo_url,
+                                                name='cgap-portal', branch=github_repo_branch)
+    docker_client = DockerUtils()
+    ecr_client = ECRUtils()
+    auth_info = ecr_client.authorize_user()
+    ecr_pass = ecr_client.extract_ecr_password_from_authorization(authorization=auth_info)
+    docker_client.login(ecr_repo_uri=auth_info['proxyEndpoint'],
+                        ecr_user='AWS',
+                        ecr_pass=ecr_pass)
+
+    image, build_log = docker_client.build_image(path=repo_location, tag=tag, rm=True)
+    full_output['build_log'] = build_log
+    docker_client.tag_image(image=image, tag=tag, ecr_repo_name=url)
+    docker_client.push_image(tag=tag, ecr_repo_name=url, auth_config={
+        'username': 'AWS',
+        'password': ecr_pass
+    })
+    check.status = 'PASS'
+    check.summary = 'Successfully built/tagged/pushed image to ECR.\n' \
+                    'Repo: %s, Tag: %s' % (url, tag)
     return check
