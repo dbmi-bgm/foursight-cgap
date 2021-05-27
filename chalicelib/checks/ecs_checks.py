@@ -68,13 +68,17 @@ def update_ecs_application_versions(connection, cluster_name=None, **kwargs):
     return check
 
 
-@check_function()
-def trigger_docker_build(connection, github_repo_url='https://github.com/dbmi-bgm/cgap-portal.git',
-                         github_repo_branch='c4_519', ecr_repo_url=None, env=None, tag='latest', **kwargs):
+@check_function(github_repo_url='https://github.com/dbmi-bgm/cgap-portal.git',
+                github_repo_branch='c4_519', ecr_repo_url=None, env='cgap-mastertest', tag='latest')
+def trigger_docker_build(connection, **kwargs):
     """ Triggers a docker build on Lambda, uploading the result to ECR under the given
         repository and tag. ecr_repo_url takes priority over env if both are passed.
     """
-    url = None
+    github_repo_url = kwargs.get('github_repo_url')
+    github_repo_branch = kwargs.get('github_repo_branch')
+    ecr_repo_url = kwargs.get('ecr_repo_url')
+    env = kwargs.get('env')
+    tag = kwargs.get('tag')
     if ecr_repo_url:
         url = ecr_repo_url
     elif env:
@@ -82,6 +86,8 @@ def trigger_docker_build(connection, github_repo_url='https://github.com/dbmi-bg
     else:
         raise Exception('Did not pass correct arguments to the check. You need to specify'
                         ' either "ecr_repo_url" or an "env" to resolve from.')
+    if not url:
+        raise Exception('Could not resolve repo URL for env %s: %s' % (env, url))
     check = CheckResult(connection, 'trigger_docker_build')
     full_output = {}
     repo_location = clone_repo_to_temporary_dir(github_repo_url,
