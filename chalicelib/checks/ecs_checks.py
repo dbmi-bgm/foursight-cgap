@@ -68,7 +68,7 @@ def update_ecs_application_versions(connection, cluster_name=None, **kwargs):
     return check
 
 
-@check_function
+@check_function()
 def trigger_docker_build(connection, github_repo_url='https://github.com/dbmi-bgm/cgap-portal.git',
                          github_repo_branch='c4_519', ecr_repo_url=None, env=None, tag='latest', **kwargs):
     """ Triggers a docker build on Lambda, uploading the result to ECR under the given
