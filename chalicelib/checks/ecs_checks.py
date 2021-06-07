@@ -35,8 +35,8 @@ def ecs_status(connection, **kwargs):
     return check
 
 
-@check_function()
-def update_ecs_application_versions(connection, cluster_name=None, **kwargs):
+@check_function(cluster_name=None)
+def update_ecs_application_versions(connection, **kwargs):
     """ This check is intended to be run AFTER the user has finished pushing
         the relevant images to ECR. Triggers an update on all services for
         the CGAP cluster. If no cluster_name is passed, Foursight will infer
@@ -47,10 +47,14 @@ def update_ecs_application_versions(connection, cluster_name=None, **kwargs):
     """
     check = CheckResult(connection, 'update_ecs_application_versions')
     client = ECSUtils()
+    cluster_name = kwargs.get('cluster_name')
     cluster_arns = client.list_ecs_clusters()
     if not cluster_name:
-        cgap_candidate = list(filter(lambda arn: 'CGAP' in arn, cluster_arns))
-        if len(cgap_candidate) > 1:
+        cgap_candidate = list(filter(lambda arn: 'cgap' in arn.lower(), cluster_arns))
+        if not cgap_candidate:
+            check.status = 'FAIL'
+            check.summary = 'No clusters could be resolved from %s' % cluster_arns
+        elif len(cgap_candidate) > 1:
             check.status = 'FAIL'
             check.summary = 'Ambiguous cluster setup (not proceeding): %s' % cgap_candidate
         else:
@@ -68,46 +72,3 @@ def update_ecs_application_versions(connection, cluster_name=None, **kwargs):
     return check
 
 
-@check_function(github_repo_url='https://github.com/dbmi-bgm/cgap-portal.git',
-                github_repo_branch='c4_519', ecr_repo_url=None, env='cgap-mastertest', tag='latest')
-def trigger_docker_build(connection, **kwargs):
-    """ Triggers a docker build on Lambda, uploading the result to ECR under the given
-        repository and tag. ecr_repo_url takes priority over env if both are passed.
-    """
-    github_repo_url = kwargs.get('github_repo_url')
-    github_repo_branch = kwargs.get('github_repo_branch')
-    ecr_repo_url = kwargs.get('ecr_repo_url')
-    env = kwargs.get('env')
-    tag = kwargs.get('tag')
-    if ecr_repo_url:
-        url = ecr_repo_url
-    elif env:
-        url = get_ecr_repo_url(env)
-    else:
-        raise Exception('Did not pass correct arguments to the check. You need to specify'
-                        ' either "ecr_repo_url" or an "env" to resolve from.')
-    if not url:
-        raise Exception('Could not resolve repo URL for env %s: %s' % (env, url))
-    check = CheckResult(connection, 'trigger_docker_build')
-    full_output = {}
-    repo_location = clone_repo_to_temporary_dir(github_repo_url,
-                                                name='cgap-portal', branch=github_repo_branch)
-    docker_client = DockerUtils()
-    ecr_client = ECRUtils()
-    auth_info = ecr_client.authorize_user()
-    ecr_pass = ecr_client.extract_ecr_password_from_authorization(authorization=auth_info)
-    docker_client.login(ecr_repo_uri=auth_info['proxyEndpoint'],
-                        ecr_user='AWS',
-                        ecr_pass=ecr_pass)
-
-    image, build_log = docker_client.build_image(path=repo_location, tag=tag, rm=True)
-    full_output['build_log'] = build_log
-    docker_client.tag_image(image=image, tag=tag, ecr_repo_name=url)
-    docker_client.push_image(tag=tag, ecr_repo_name=url, auth_config={
-        'username': 'AWS',
-        'password': ecr_pass
-    })
-    check.status = 'PASS'
-    check.summary = 'Successfully built/tagged/pushed image to ECR.\n' \
-                    'Repo: %s, Tag: %s' % (url, tag)
-    return check
