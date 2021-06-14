@@ -20,8 +20,8 @@ def effectively_never():
 
 
 def end_of_day_on_weekdays():
-    """ Cron schedule that runs at 6pm EST (22:00 UTC) on weekdays. Used for deployments. """
-    return Cron('0', '22', '?', '*', 'MON-FRI', '*')
+    """ Cron schedule that runs at 11pm EST (03:00 UTC) on weekdays. Used for deployments. """
+    return Cron('0', '3', '?', '*', 'MON-FRI', '*')
 
 
 def friday_at_8_pm_est():
