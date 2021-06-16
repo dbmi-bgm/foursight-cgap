@@ -5,7 +5,6 @@ import datetime
 import time
 import itertools
 import random
-from fuzzywuzzy import fuzz
 import boto3
 from collections import Counter
 from dcicutils import ff_utils
@@ -1027,9 +1026,9 @@ def core_project_status(connection, **kwargs):
     """
     Ensure CGAP Core projects have their objects shared.
 
-    Default behavior is to check only VariantSample objects, but defining 
+    Default behavior is to check only VariantSample objects, but defining
     'item_type' in check_setup.json will override the default and check status
-    for all objects defined there. 
+    for all objects defined there.
     """
 
     check = CheckResult(connection, 'core_project_status')
@@ -1052,7 +1051,7 @@ def core_project_status(connection, **kwargs):
         check.status = 'WARN'
         check.summary = 'Some CGAP Core items are not shared'
         check.description = ('{} CGAP Core items do not have shared'
-                             ' status'.format(sum([len(x) for x in 
+                             ' status'.format(sum([len(x) for x in
                                                   full_output.values()])))
         brief_output = {key: len(value) for key, value in full_output.items()}
         check.brief_output = brief_output
@@ -1063,15 +1062,15 @@ def core_project_status(connection, **kwargs):
         check.status = 'PASS'
         check.summary = 'All CGAP Core items are shared.'
         check.description = ('All CGAP Core items are shared:'
-                             ' {}'.format(item_type)) 
+                             ' {}'.format(item_type))
     return check
 
 @action_function()
 def share_core_project(connection, **kwargs):
     """
-    Change CGAP Core project item status to shared. 
+    Change CGAP Core project item status to shared.
 
-    Patches the status of the output of core_project_status above. 
+    Patches the status of the output of core_project_status above.
     """
 
     action = ActionResult(connection, 'share_core_project')
@@ -1081,7 +1080,7 @@ def share_core_project(connection, **kwargs):
     if 'FileProcessed' in check_full_output:
         check_full_output.pop('FileProcessed')
     # Concatenate list of lists from full_output to single list of uuids
-    uuids_to_patch = [item for sublist in check_full_output.values() 
+    uuids_to_patch = [item for sublist in check_full_output.values()
                       for item in sublist]
     action_logs = {'patch_success': [], 'patch_failure': []}
     for uuid in uuids_to_patch:
@@ -1104,11 +1103,11 @@ def update_variant_genelist(connection, **kwargs):
     """
     Searches for variant samples with genes in gene lists that are not
     currently embedded in the item, only for gene lists uploaded within a
-    certain time frame (default is 1 day and ~30 minutes). 
+    certain time frame (default is 1 day and ~30 minutes).
 
     Because of reverse link from gene to gene list, variant samples are not
     invalidated upon addition of new gene list. This check and the associated
-    action search through variant samples with genes belonging to recent 
+    action search through variant samples with genes belonging to recent
     gene lists and add them to the indexing queue if the gene lists are not
     embedded.
     """
@@ -1127,7 +1126,7 @@ def update_variant_genelist(connection, **kwargs):
     )
     modified_search = ff_utils.search_metadata(
         'search/?type=GeneList&field=uuid&field=genes.uuid'
-        '&last_modified.date_modified.from=' + from_time,  
+        '&last_modified.date_modified.from=' + from_time,
         key=connection.ff_keys
     )
     genelist_search = created_search
@@ -1146,7 +1145,7 @@ def update_variant_genelist(connection, **kwargs):
                     for uuid in batch
                 ]
                 variant_sample_search_term = (
-                    'search/?type=VariantSample' + ''.join(batch_terms) 
+                    'search/?type=VariantSample' + ''.join(batch_terms)
                     + '&field=uuid'
                 )
                 variant_sample_search = ff_utils.search_metadata(
@@ -1183,9 +1182,9 @@ def update_variant_genelist(connection, **kwargs):
 @action_function()
 def queue_variants_to_update_genelist(connection, **kwargs):
     """
-    Add variant samples to indexing queue to update gene lists. 
+    Add variant samples to indexing queue to update gene lists.
 
-    Works with output of update_variant_genelist() above. 
+    Works with output of update_variant_genelist() above.
     """
 
     action = ActionResult(connection, 'update_variant_genelist')
@@ -1198,9 +1197,9 @@ def queue_variants_to_update_genelist(connection, **kwargs):
     }
     post_url = connection.ff_server + 'queue_indexing'
     action_logs = {'post success': [], 'post failure': []}
-    try: 
+    try:
         post_response = ff_utils.authorized_request(
-            post_url, 
+            post_url,
             auth=connection.ff_keys,
             verb='POST',
             data=json.dumps(queue_index_post)
