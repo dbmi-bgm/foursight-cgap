@@ -183,7 +183,7 @@
         "schedule": {
             "hourly_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
+                    "kwargs": {"primary": true},
                     "dependencies": []
                 }
             }
@@ -195,7 +195,7 @@
         "schedule": {
             "hourly_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
+                    "kwargs": {"primary": true},
                     "dependencies": []
                 }
             }
@@ -207,7 +207,7 @@
         "schedule": {
             "hourly_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
+                    "kwargs": {"primary": true},
                     "dependencies": []
                 }
             }
@@ -219,7 +219,7 @@
         "schedule": {
             "hourly_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
+                    "kwargs": {"primary": true},
                     "dependencies": []
                 }
             }
@@ -243,7 +243,7 @@
         "schedule": {
             "hourly_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
+                    "kwargs": {"primary": true},
                     "dependencies": []
                 }
             }
