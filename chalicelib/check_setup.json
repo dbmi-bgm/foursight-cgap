@@ -201,6 +201,18 @@
             }
         }
     },
+    "ingest_vcf_status" : {
+        "title": "d) CGAP trigger VCF ingestion",
+        "group": "Pipeline checks",
+        "schedule": {
+            "hourly_checks": {
+                "cgap": {
+                    "kwargs": {"primary": true},
+                    "dependencies": []
+                }
+            }
+        }
+    },
     "problematic_wfrs_status" : {
         "title": "x) Errored Runs",
         "group": "Pipeline checks",
