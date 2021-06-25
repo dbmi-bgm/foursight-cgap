@@ -1,4 +1,6 @@
 import json
+import random
+from magma_ff import run_metawfr, status_metawfr, reset_metawfr
 from datetime import datetime
 from dcicutils import ff_utils, s3Utils
 from .helpers import wfr_utils
@@ -176,7 +178,163 @@ def md5runCGAP_start(connection, **kwargs):
     return action
 
 
-@check_function(start_date=None)
+@action_function()
+def run_metawfrs(connection, **kwargs):
+    start = datetime.utcnow()
+    sfn = 'tibanna_zebra'  # may change it later according to env
+    action = ActionResult(connection, 'run_metawfrs')
+    action_logs = {'runs_checked_or_kicked': []}
+    my_auth = connection.ff_keys
+    env = connection.ff_env
+    check_result = action.get_associated_check_result(kwargs).get('full_output', {})
+    action_logs['check_output'] = check_result
+    metawfr_uuids = check_result.get('metawfrs_to_run', {}).get('uuids', [])
+    random.shuffle(metawfr_uuids)  # if always the same order, we may never get to the later ones.
+    for metawfr_uuid in metawfr_uuids:
+        now = datetime.utcnow()
+        if (now-start).seconds > lambda_limit:
+            action.description = 'Did not complete action due to time limitations'
+            break
+        try:
+            run_metawfr.run_metawfr(metawfr_uuid, my_auth, verbose=True, sfn=sfn, env=env)
+            action_logs['runs_checked_or_kicked'].append(metawfr_uuid)
+        except Exception as e:
+            action_logs['error'] = str(e)
+            break
+    action.output = action_logs
+    action.status = 'DONE'
+    return action
+
+
+@check_function()
+def metawfrs_to_run(connection, **kwargs):
+    """Find metaworkflowruns that may need kicking
+    - those with final_status pending, inactive and running.
+    pending means no workflow run has started.
+    inactive means some workflow runs are complete but others are pending.
+    running means some workflow runs are actively running.
+    """
+    check = CheckResult(connection, 'metawfrs_to_run')
+    my_auth = connection.ff_keys
+    check.action = "run_metawfrs"
+    check.description = "Find metaworkflow runs that has workflow runs to be kicked."
+    check.brief_output = []
+    check.summary = ""
+    check.full_output = {}
+    check.status = 'PASS'
+
+    # check indexing queue
+    env = connection.ff_env
+    indexing_queue = ff_utils.stuff_in_queues(env, check_secondary=True)
+
+    if indexing_queue:
+        check.status = 'PASS'  # maybe use warn?
+        check.brief_output = ['Waiting for indexing queue to clear']
+        check.summary = 'Waiting for indexing queue to clear'
+        check.full_output = {}
+        return check
+
+    query = '/search/?type=MetaWorkflowRun' + \
+            ''.join(['&final_status=' + st for st in ['pending', 'inactive', 'running']])
+    # temporarily added to only run the new cram data
+    query += '&meta_workflow.title=WGS+Proband-only+Cram+V23&project.display_title=PROACTIVE'
+    search_res = ff_utils.search_metadata(query, key=my_auth)
+
+    # nothing to run
+    if not search_res:
+        check.summary = 'All Good!'
+        return check
+
+    metawfr_uuids = [r['uuid'] for r in search_res]
+    metawfr_titles = [r['title'] for r in search_res]
+
+    check.allow_action = True
+    check.summary = 'Some metawfrs may have wfrs to be kicked.'
+    check.status = 'WARN'
+    msg = str(len(metawfr_uuids)) + ' metawfrs may have wfrs to be kicked'
+    check.brief_output.append(msg)
+    check.full_output['metawfrs_to_run'] = {'titles': metawfr_titles, 'uuids': metawfr_uuids}
+    return check
+
+
+@action_function()
+def checkstatus_metawfrs(connection, **kwargs):
+    start = datetime.utcnow()
+    sfn = 'tibanna_zebra'  # may change it later according to env
+    action = ActionResult(connection, 'checkstatus_metawfrs')
+    action_logs = {'runs_checked': []}
+    my_auth = connection.ff_keys
+    env = connection.ff_env
+    check_result = action.get_associated_check_result(kwargs).get('full_output', {})
+    action_logs['check_output'] = check_result
+    metawfr_uuids = check_result.get('metawfrs_to_check', {}).get('uuids', [])
+    random.shuffle(metawfr_uuids)  # if always the same order, we may never get to the later ones.
+    for metawfr_uuid in metawfr_uuids:
+        now = datetime.utcnow()
+        if (now-start).seconds > lambda_limit:
+            action.description = 'Did not complete action due to time limitations'
+            break
+        try:
+            run_metawfr.run_metawfr(metawfr_uuid, my_auth, verbose=True, sfn=sfn, env=env)
+            action_logs['runs_checked'].append(metawfr_uuid)
+        except Exception as e:
+            action_logs['error'] = str(e)
+            break
+    action.output = action_logs
+    action.status = 'DONE'
+    return action
+
+
+@check_function()
+def metawfrs_to_checkstatus(connection, **kwargs):
+    """Find metaworkflowruns that may need status-checking
+    - those with final_status running.
+    running means some workflow runs are actively running.
+    """
+    check = CheckResult(connection, 'metawfrs_to_checkstatus')
+    my_auth = connection.ff_keys
+    check.action = "checkstatus_metawfrs"
+    check.description = "Find metaworkflow runs that has workflow runs to be status-checked."
+    check.brief_output = []
+    check.summary = ""
+    check.full_output = {}
+    check.status = 'PASS'
+
+    # check indexing queue
+    env = connection.ff_env
+    indexing_queue = ff_utils.stuff_in_queues(env, check_secondary=True)
+
+    if indexing_queue:
+        check.status = 'PASS'  # maybe use warn?
+        check.brief_output = ['Waiting for indexing queue to clear']
+        check.summary = 'Waiting for indexing queue to clear'
+        check.full_output = {}
+        return check
+
+    query = '/search/?type=MetaWorkflowRun' + \
+            ''.join(['&final_status=' + st for st in ['running']])
+    # temporarily added to only run the new cram data
+    query += '&meta_workflow.title=WGS+Proband-only+Cram+V23&project.display_title=PROACTIVE'
+    search_res = ff_utils.search_metadata(query, key=my_auth)
+
+    # nothing to run
+    if not search_res:
+        check.summary = 'All Good!'
+        return check
+
+    metawfr_uuids = [r['uuid'] for r in search_res]
+    metawfr_titles = [r['title'] for r in search_res]
+
+    check.allow_action = True
+    check.summary = 'Some metawfrs may have wfrs to be status-checked.'
+    check.status = 'WARN'
+    msg = str(len(metawfr_uuids)) + ' metawfrs may have wfrs to be status-checked'
+    check.brief_output.append(msg)
+    check.full_output['metawfrs_to_check'] = {'titles': metawfr_titles, 'uuids': metawfr_uuids}
+    return check
+
+
+#@check_function(start_date=None)
 def fastqcCGAP_status(connection, **kwargs):
     """Searches for fastq files that don't have fastqcCGAP
     Keyword arguments:
@@ -229,7 +387,7 @@ def fastqcCGAP_status(connection, **kwargs):
     return check
 
 
-@action_function(start_missing_run=True, start_missing_meta=True)
+#@action_function(start_missing_run=True, start_missing_meta=True)
 def fastqcCGAP_start(connection, **kwargs):
     """Start fastqcCGAP runs by sending compiled input_json to run_workflow endpoint"""
     start = datetime.utcnow()
@@ -263,7 +421,7 @@ def fastqcCGAP_start(connection, **kwargs):
     return action
 
 
-@check_function(start_date=None)
+#@check_function(start_date=None)
 def cgap_status(connection, **kwargs):
     """
     Keyword arguments:
@@ -587,7 +745,7 @@ def cgap_status(connection, **kwargs):
     return check
 
 
-@action_function(start_runs=True, patch_completed=True)
+#@action_function(start_runs=True, patch_completed=True)
 def cgap_start(connection, **kwargs):
     """Start runs by sending compiled input_json to run_workflow endpoint"""
     start = datetime.utcnow()
@@ -605,7 +763,7 @@ def cgap_start(connection, **kwargs):
     return action
 
 
-@check_function(start_date=None)
+#@check_function(start_date=None)
 def cgapS2_status(connection, **kwargs):
     """
     Keyword arguments:
@@ -949,7 +1107,7 @@ def cgapS2_status(connection, **kwargs):
     return check
 
 
-@action_function(start_runs=True, patch_completed=True)
+#@action_function(start_runs=True, patch_completed=True)
 def cgapS2_start(connection, **kwargs):
     """Start runs by sending compiled input_json to run_workflow endpoint"""
     start = datetime.utcnow()
@@ -967,7 +1125,7 @@ def cgapS2_start(connection, **kwargs):
     return action
 
 
-@check_function(start_date=None)
+#@check_function(start_date=None)
 def cgapS3_status(connection, **kwargs):
     """
     Keyword arguments:
@@ -1351,7 +1509,7 @@ def cgapS3_status(connection, **kwargs):
     return check
 
 
-@action_function(start_runs=True, patch_completed=True)
+#@action_function(start_runs=True, patch_completed=True)
 def cgapS3_start(connection, **kwargs):
     """Start runs by sending compiled input_json to run_workflow endpoint"""
     start = datetime.utcnow()
@@ -1441,7 +1599,7 @@ def ingest_vcf_start(connection, **kwargs):
     return action
 
 
-@check_function()
+#@check_function()
 def bamqcCGAP_status(connection, **kwargs):
     """Searches for bam files that don't have bamqcCGAP
     Keyword arguments:
@@ -1492,7 +1650,7 @@ def bamqcCGAP_status(connection, **kwargs):
     return check
 
 
-@action_function(start_missing_run=True, start_missing_meta=True)
+#@action_function(start_missing_run=True, start_missing_meta=True)
 def bamqcCGAP_start(connection, **kwargs):
     """Start bamqcCGAP runs by sending compiled input_json to run_workflow endpoint"""
     start = datetime.utcnow()
@@ -1525,7 +1683,7 @@ def bamqcCGAP_start(connection, **kwargs):
     return action
 
 
-@check_function()
+#@check_function()
 def cram_status(connection, **kwargs):
     start = datetime.utcnow()
     check = CheckResult(connection, 'cram_status')
@@ -1664,7 +1822,7 @@ def cram_status(connection, **kwargs):
     return check
 
 
-@action_function(start_runs=True, patch_completed=True)
+#@action_function(start_runs=True, patch_completed=True)
 def cram_start(connection, **kwargs):
     """Start runs by sending compiled input_json to run_workflow endpoint"""
     start = datetime.utcnow()

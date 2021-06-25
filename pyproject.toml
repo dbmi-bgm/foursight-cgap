@@ -26,6 +26,7 @@ pytz = "^2020.1"
 foursight-core = "0.1.11"
 # use below for tests but not for deployment
 #foursight-core = { git = "https://github.com/4dn-dcic/foursight-core.git", branch="core2" }
+magma-suite = { git = "https://github.com/dbmi-bgm/magma.git", branch="master" }
 pytest = "5.1.2"
 
 [tool.poetry.dev-dependencies]

@@ -165,11 +165,11 @@
             }
         }
     },
-    "md5runCGAP_status" : {
-        "title": "a) md5 runs",
+    "metawfrs_to_run" : {
+        "title": "Metawfrs_to_run",
         "group": "Pipeline checks",
         "schedule": {
-            "hourly_checks": {
+            "hourly_checks_2": {
                 "cgap": {
                     "kwargs": {"primary": true, "queue_action": "prod"},
                     "dependencies": []
@@ -177,73 +177,25 @@
             }
         }
     },
-    "fastqcCGAP_status" : {
-        "title": "b) fastqc runs",
+    "metawfrs_to_checkstatus" : {
+        "title": "Metawfrs to check status",
         "group": "Pipeline checks",
         "schedule": {
-            "hourly_checks": {
+            "thirty_min_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {"primary": true, "queue_action": "prod"},
                     "dependencies": []
                 }
             }
         }
     },
-    "cgap_status" : {
-        "title": "c) CGAP pipeline Part I",
+    "md5runCGAP_status" : {
+        "title": "a) md5 runs",
         "group": "Pipeline checks",
         "schedule": {
             "hourly_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true},
-                    "dependencies": []
-                }
-            }
-        }
-    },
-    "cgapS2_status" : {
-        "title": "d) CGAP pipeline Part II",
-        "group": "Pipeline checks",
-        "schedule": {
-            "hourly_checks": {
-                "cgap": {
-                    "kwargs": {"primary": true},
-                    "dependencies": []
-                }
-            }
-        }
-    },
-    "cgapS3_status" : {
-        "title": "d) CGAP pipeline Part III",
-        "group": "Pipeline checks",
-        "schedule": {
-            "hourly_checks": {
-                "cgap": {
-                    "kwargs": {"primary": true},
-                    "dependencies": []
-                }
-            }
-        }
-    },
-    "ingest_vcf_status" : {
-        "title": "d) CGAP trigger VCF ingestion",
-        "group": "Pipeline checks",
-        "schedule": {
-            "hourly_checks": {
-                "cgap": {
-                    "kwargs": {"primary": true},
-                    "dependencies": []
-                }
-            }
-        }
-    },
-    "cram_status" : {
-        "title": "e) CGAP pipeline cram2fastq",
-        "group": "Pipeline checks",
-        "schedule": {
-            "hourly_checks": {
-                "cgap": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {"primary": true, "queue_action": "prod"},
                     "dependencies": []
                 }
             }
