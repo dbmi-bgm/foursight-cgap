@@ -173,6 +173,32 @@ def md5runCGAP_start(connection, **kwargs):
 
 
 @action_function()
+def line_count_test(connection, **kwargs):
+    start = datetime.utcnow()
+    action = ActionResult(connection, 'run_metawfrs')
+    action_logs = {'metawfrs_that_passed_linecount_test': []}
+    my_auth = connection.ff_keys
+    env = connection.ff_env
+    check_result = action.get_associated_check_result(kwargs).get('full_output', {})
+    action_logs['check_output'] = check_result
+    metawfr_uuids = check_result.get('metawfrs_to_run', {}).get('uuids', [])
+    for metawfr_uuid in metawfr_uuids:
+        now = datetime.utcnow()
+        if (now-start).seconds > lambda_limit:
+            action.description = 'Did not complete action due to time limitations'
+            break
+        try:
+            linecount_result = check_lines(metawfr_uuid, ff_key, steps=steps_dict, fastqs=fastqs_dict)
+            action_logs['metawfrs_that_passed_linecount_test'].append(linecount_result)
+        except Exception as e:
+            action_logs['error'] = str(e)
+            break
+    action.output = action_logs
+    action.status = 'DONE'
+    return action
+
+
+@action_function()
 def run_metawfrs(connection, **kwargs):
     start = datetime.utcnow()
     sfn = 'tibanna_zebra'  # may change it later according to env
