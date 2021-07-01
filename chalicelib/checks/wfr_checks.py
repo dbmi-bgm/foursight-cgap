@@ -172,6 +172,55 @@ def md5runCGAP_start(connection, **kwargs):
     return action
 
 
+@check_function()
+def metawfrs_to_check_linecount(connection, **kwargs):
+    """Find metaworkflowruns that may need kicking
+    - those with final_status pending, inactive and running.
+    pending means no workflow run has started.
+    inactive means some workflow runs are complete but others are pending.
+    running means some workflow runs are actively running.
+    """
+    check = CheckResult(connection, 'metawfrs_to_check_linecount')
+    my_auth = connection.ff_keys
+    check.action = "line_count_test"
+    check.description = "Find metaworkflow runs that need linecount qc check."
+    check.brief_output = []
+    check.summary = ""
+    check.full_output = {}
+    check.status = 'PASS'
+
+    # check indexing queue
+    env = connection.ff_env
+    indexing_queue = ff_utils.stuff_in_queues(env, check_secondary=True)
+
+    if indexing_queue:
+        check.status = 'PASS'  # maybe use warn?
+        check.brief_output = ['Waiting for indexing queue to clear']
+        check.summary = 'Waiting for indexing queue to clear'
+        check.full_output = {}
+        return check
+
+    query = '/search/?type=MetaWorkflowRun' + \
+            ''.join(['&final_status=' + st for st in ['complete']])
+    search_res = ff_utils.search_metadata(query, key=my_auth)
+
+    # nothing to run
+    if not search_res:
+        check.summary = 'All Good!'
+        return check
+
+    metawfr_uuids = [r['uuid'] for r in search_res]
+    metawfr_titles = [r['title'] for r in search_res]
+
+    check.allow_action = True
+    check.summary = 'Some metawfrs may have wfrs to be checked linecounts.'
+    check.status = 'WARN'
+    msg = str(len(metawfr_uuids)) + ' metawfrs may have wfrs to be checked linecounts'
+    check.brief_output.append(msg)
+    check.full_output['metawfrs_to_run'] = {'titles': metawfr_titles, 'uuids': metawfr_uuids}
+    return check
+
+
 @action_function()
 def line_count_test(connection, **kwargs):
     start = datetime.utcnow()

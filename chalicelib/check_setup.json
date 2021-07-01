@@ -201,6 +201,18 @@
             }
         }
     },
+    "metawfrs_to_check_linecount": {
+        "title": "Metawfrs to run line count qc",
+        "group": "Pipeline checks",
+        "schedule": {
+            "hourly_checks": {
+                "cgap": {
+                    "kwargs": {"primary": true},
+                    "dependencies": []
+                }
+            }
+        }
+    },
     "md5runCGAP_status" : {
         "title": "a) md5 runs",
         "group": "Pipeline checks",
