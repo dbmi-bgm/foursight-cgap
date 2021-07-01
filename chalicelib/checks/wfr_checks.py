@@ -1,6 +1,7 @@
 import json
 import random
 from magma_ff import run_metawfr, status_metawfr, reset_metawfr
+from pipeline_utils.check_lines import *
 from datetime import datetime
 from dcicutils import ff_utils, s3Utils
 from .helpers import wfr_utils
@@ -11,13 +12,6 @@ from .helpers.wfrset_utils import lambda_limit
 # individually - they're now part of class Decorators in foursight-core::decorators
 # that requires initialization with foursight prefix.
 from .helpers.confchecks import *
-
-
-# list of acceptible version
-cgap_partI_version = ['WGS_partI_V11', 'WGS_partI_V12', 'WGS_partI_V13', 'WGS_partI_V15', 'WGS_partI_V16', 'WGS_partI_V17',
-                      'WGS_partI_V18', 'WGS_partI_V19', 'WGS_partI_V20', 'WGS_partI_V22']
-cgap_partII_version = ['WGS_partII_V22']
-cgap_partIII_version = ['WGS_partIII_V22']
 
 
 @check_function(file_type='File', start_date=None)
@@ -236,8 +230,6 @@ def metawfrs_to_run(connection, **kwargs):
 
     query = '/search/?type=MetaWorkflowRun' + \
             ''.join(['&final_status=' + st for st in ['pending', 'inactive', 'running']])
-    # temporarily added to only run the new cram data
-    query += '&meta_workflow.title=WGS+Proband-only+Cram+V23&project.display_title=PROACTIVE'
     search_res = ff_utils.search_metadata(query, key=my_auth)
 
     # nothing to run
@@ -313,8 +305,6 @@ def metawfrs_to_checkstatus(connection, **kwargs):
 
     query = '/search/?type=MetaWorkflowRun' + \
             ''.join(['&final_status=' + st for st in ['running']])
-    # temporarily added to only run the new cram data
-    query += '&meta_workflow.title=WGS+Proband-only+Cram+V23&project.display_title=PROACTIVE'
     search_res = ff_utils.search_metadata(query, key=my_auth)
 
     # nothing to run
@@ -387,8 +377,6 @@ def metawfrs_to_patch_samples_and_sample_processings(connection, **kwargs):
 
     query = '/search/?type=MetaWorkflowRun' + \
             ''.join(['&final_status=' + st for st in ['running', 'inactive', 'completed', 'failed']])
-    # temporarily added to only run the new cram data
-    query += '&meta_workflow.title=WGS+Proband-only+Cram+V23&project.display_title=PROACTIVE'
     search_res = ff_utils.search_metadata(query, key=my_auth)
 
     # nothing to run

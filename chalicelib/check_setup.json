@@ -189,6 +189,18 @@
             }
         }
     },
+    "metawfrs_to_patch_samples_and_sample_processings": {
+        "title": "Metawfrs to patch samples and sample processings",
+        "group": "Pipeline checks",
+        "schedule": {
+            "hourly_checks_2": {
+                "cgap": {
+                    "kwargs": {"primary": true},
+                    "dependencies": []
+                }
+            }
+        }
+    },
     "md5runCGAP_status" : {
         "title": "a) md5 runs",
         "group": "Pipeline checks",
