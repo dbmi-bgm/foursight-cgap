@@ -171,7 +171,7 @@
         "schedule": {
             "hourly_checks_2": {
                 "cgap": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
+                    "kwargs": {"primary": true},
                     "dependencies": []
                 }
             }
@@ -183,7 +183,7 @@
         "schedule": {
             "thirty_min_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
+                    "kwargs": {"primary": true},
                     "dependencies": []
                 }
             }
@@ -195,7 +195,7 @@
         "schedule": {
             "hourly_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
+                    "kwargs": {"primary": true},
                     "dependencies": []
                 }
             }
