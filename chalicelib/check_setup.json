@@ -169,7 +169,7 @@
         "title": "Metawfrs_to_run",
         "group": "Pipeline checks",
         "schedule": {
-            "hourly_checks_2": {
+            "fifteen_min_checks_3": {
                 "cgap": {
                     "kwargs": {"primary": true, "queue_action": "prod"},
                     "dependencies": []
@@ -181,7 +181,19 @@
         "title": "Metawfrs to check status",
         "group": "Pipeline checks",
         "schedule": {
-            "thirty_min_checks": {
+            "fifteen_min_checks": {
+                "cgap": {
+                    "kwargs": {"primary": true, "queue_action": "prod"},
+                    "dependencies": []
+                }
+            }
+        }
+    },
+    "failed_metawfrs" : {
+        "title": "Failed Metawfrs",
+        "group": "Pipeline checks",
+        "schedule": {
+            "fifteen_min_checks_2": {
                 "cgap": {
                     "kwargs": {"primary": true, "queue_action": "prod"},
                     "dependencies": []

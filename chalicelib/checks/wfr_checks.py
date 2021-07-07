@@ -384,6 +384,7 @@ def metawfrs_to_checkstatus(connection, **kwargs):
 
     query = '/search/?type=MetaWorkflowRun' + \
             ''.join(['&final_status=' + st for st in ['running']])
+    query += ''.join(['&meta_workflow.title=' + mwf for mwf in default_pipelines_to_run])
     search_res = ff_utils.search_metadata(query, key=my_auth)
 
     # nothing to run
@@ -400,6 +401,103 @@ def metawfrs_to_checkstatus(connection, **kwargs):
     msg = str(len(metawfr_uuids)) + ' metawfrs may have wfrs to be status-checked'
     check.brief_output.append(msg)
     check.full_output['metawfrs_to_check'] = {'titles': metawfr_titles, 'uuids': metawfr_uuids}
+    return check
+
+
+@action_function(reset_all_failed=False)
+def reset_failed_metawfrs(connection, **kwargs):
+    start = datetime.utcnow()
+    sfn = 'tibanna_zebra'  # may change it later according to env
+    action = ActionResult(connection, 'failed_metawfrs')
+    action_logs = {'runs_reset': []}
+    my_auth = connection.ff_keys
+    env = connection.ff_env
+    check_result = action.get_associated_check_result(kwargs).get('full_output', {})
+    action_logs['check_output'] = check_result
+    metawfr_uuids = check_result.get('metawfrs_that_failed', {}).get('uuids', [])
+    reset_all_failed = kwargs.get('reset_all_failed', False)
+    random.shuffle(metawfr_uuids)  # if always the same order, we may never get to the later ones.
+    for metawfr_uuid in metawfr_uuids:
+        now = datetime.utcnow()
+        if (now-start).seconds > lambda_limit:
+            action.description = 'Did not complete action due to time limitations'
+            break
+        try:
+            metawfr_meta = ff_utils.get_metadata(metawfr_uuid, key=my_auth, add_on='?frame=raw')
+            for wfr in metawfr_meta['workflow_runs']:
+                if wfr['status'] == 'failed':
+                    if wfr.get('workflow_run'):
+                        res = ff_utils.get_metadata(wfr['workflow_run'], key=my_auth)
+                    res = ff_utils.search_metadata('/search/?type=WorkflowRunAwsem&awsem_job_id=%s' % wfr['jobid'], key=my_auth)
+                    if len(res) == 1:
+                        res = res[0]
+                    elif len(res) > 1:
+                        raise Exception("multiple workflow runs for job id %s" % wfr['jobid'])
+                    else:
+                        raise Exception("No workflow run found for job id %s" % wfr['jobid'])
+                    # reset spot-failed shards
+                    if 'EC2 unintended termination' in res.get('description', '') or \
+                       'EC2 Idle error' in res.get('description', ''):
+                        shard_name = wfr['name'] + ':' + str(wfr['shard'])
+                        reset_metawfr.reset_shards(metawfr_uuid, [shard_name], my_auth, verbose=True)
+                        action_logs['runs_reset'].append(metawfr_uuid)
+                    elif reset_all_failed:
+                        shard_name = wfr['name'] + ':' + str(wfr['shard'])
+                        reset_metawfr.reset_shards(metawfr_uuid, [shard_name], my_auth, verbose=True)
+                        action_logs['runs_reset'].append(metawfr_uuid)
+        except Exception as e:
+            action_logs['error'] = str(e)
+            break
+    action.output = action_logs
+    action.status = 'DONE'
+    return action
+
+
+@check_function()
+def failed_metawfrs(connection, **kwargs):
+    """Find metaworkflowruns that may need status-checking
+    - those with final_status running.
+    running means some workflow runs are actively running.
+    """
+    check = CheckResult(connection, 'failed_metawfrs')
+    my_auth = connection.ff_keys
+    check.action = "reset_failed_metawfrs"
+    check.description = "Find metaworkflow runs that has failed workflow runs."
+    check.brief_output = []
+    check.summary = ""
+    check.full_output = {}
+    check.status = 'PASS'
+
+    # check indexing queue
+    env = connection.ff_env
+    indexing_queue = ff_utils.stuff_in_queues(env, check_secondary=True)
+
+    if indexing_queue:
+        check.status = 'PASS'  # maybe use warn?
+        check.brief_output = ['Waiting for indexing queue to clear']
+        check.summary = 'Waiting for indexing queue to clear'
+        check.full_output = {}
+        return check
+
+    query = '/search/?type=MetaWorkflowRun' + \
+            ''.join(['&final_status=' + st for st in ['failed']])
+    query += ''.join(['&meta_workflow.title=' + mwf for mwf in default_pipelines_to_run])
+    search_res = ff_utils.search_metadata(query, key=my_auth)
+
+    # nothing to run
+    if not search_res:
+        check.summary = 'All Good!'
+        return check
+
+    metawfr_uuids = [r['uuid'] for r in search_res]
+    metawfr_titles = [r['title'] for r in search_res]
+
+    check.allow_action = True
+    check.summary = 'Some metawfrs have failed wfrs.'
+    check.status = 'WARN'
+    msg = str(len(metawfr_uuids)) + ' metawfrs may have failed wfrs'
+    check.brief_output.append(msg)
+    check.full_output['metawfrs_that_failed'] = {'titles': metawfr_titles, 'uuids': metawfr_uuids}
     return check
 
 
