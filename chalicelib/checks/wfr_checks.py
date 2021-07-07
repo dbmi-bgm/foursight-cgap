@@ -14,6 +14,9 @@ from .helpers.wfrset_utils import lambda_limit
 from .helpers.confchecks import *
 
 
+default_pipelines_to_run = ['WGS Trio V23']
+
+
 @check_function(file_type='File', start_date=None)
 def md5runCGAP_status(connection, **kwargs):
     """Searches for files that are uploaded to s3, but not went though md5 run.
@@ -305,6 +308,7 @@ def metawfrs_to_run(connection, **kwargs):
 
     query = '/search/?type=MetaWorkflowRun' + \
             ''.join(['&final_status=' + st for st in ['pending', 'inactive', 'running']])
+    query += ''.join(['&meta_workflow.title=' + mwf for mwf in default_pipelines_to_run])
     search_res = ff_utils.search_metadata(query, key=my_auth)
 
     # nothing to run
@@ -342,7 +346,7 @@ def checkstatus_metawfrs(connection, **kwargs):
             action.description = 'Did not complete action due to time limitations'
             break
         try:
-            run_metawfr.run_metawfr(metawfr_uuid, my_auth, verbose=True, sfn=sfn, env=env)
+            status_metawfr.status_metawfr(metawfr_uuid, my_auth, verbose=True, env=env)
             action_logs['runs_checked'].append(metawfr_uuid)
         except Exception as e:
             action_logs['error'] = str(e)
