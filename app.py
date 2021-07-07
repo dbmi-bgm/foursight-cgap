@@ -82,6 +82,21 @@ def ten_min_checks(event):
     app_utils_obj.queue_scheduled_checks('all', 'ten_min_checks')
 
 
+@app.schedule(foursight_cron_by_schedule[STAGE]['fifteen_min_checks'])
+def fifteen_min_checks(event):
+    app_utils_obj.queue_scheduled_checks('all', 'fifteen_min_checks')
+
+
+@app.schedule(foursight_cron_by_schedule[STAGE]['fifteen_min_checks_2'])
+def fifteen_min_checks_2(event):
+    app_utils_obj.queue_scheduled_checks('all', 'fifteen_min_checks_2')
+
+
+@app.schedule(foursight_cron_by_schedule[STAGE]['fifteen_min_checks_3'])
+def fifteen_min_checks_3(event):
+    app_utils_obj.queue_scheduled_checks('all', 'fifteen_min_checks_3')
+
+
 @app.schedule(foursight_cron_by_schedule[STAGE]['thirty_min_checks'])
 def thirty_min_checks(event):
     app_utils_obj.queue_scheduled_checks('all', 'thirty_min_checks')
