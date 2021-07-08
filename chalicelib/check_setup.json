@@ -201,8 +201,20 @@
             }
         }
     },
-    "metawfrs_to_patch_samples_and_sample_processings": {
-        "title": "Metawfrs to patch samples and sample processings",
+    "metawfrs_to_patch_samples": {
+        "title": "Metawfrs to patch samples with processed files",
+        "group": "Pipeline checks",
+        "schedule": {
+            "hourly_checks_2": {
+                "cgap": {
+                    "kwargs": {"primary": true},
+                    "dependencies": []
+                }
+            }
+        }
+    },
+    "metawfrs_to_patch_sample_processing": {
+        "title": "Metawfrs to patch sample processing with processed files",
         "group": "Pipeline checks",
         "schedule": {
             "hourly_checks_2": {

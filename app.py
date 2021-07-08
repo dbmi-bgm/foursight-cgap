@@ -60,6 +60,9 @@ foursight_cron_by_schedule = {
     },
     'dev': {
         'ten_min_checks': Cron('5/10', '*', '*', '*', '?', '*'),
+        'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
+        'fifteen_min_checks_2': Cron('5/15', '*', '*', '*', '?', '*'),
+        'fifteen_min_checks_3': Cron('10/15', '*', '*', '*', '?', '*'),
         'thirty_min_checks': Cron('15/30', '*', '*', '*', '?', '*'),
         'hourly_checks': Cron('30', '0/1', '*', '*', '?', '*'),
         'hourly_checks_2': Cron('45', '0/1', '*', '*', '?', '*'),
