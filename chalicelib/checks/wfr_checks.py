@@ -614,7 +614,7 @@ def metawfrs_to_patch_sample_processing(connection, **kwargs):
     for r in search_res:
         if len(r['sample_processing'].get('processed_files', [])) < 2:  # vep vcf and final vcf
             filtered_res.append(r)
-        elif len(r['sample_processing'].get('completed_processes', []) < 1:
+        elif len(r['sample_processing'].get('completed_processes', [])) < 1:
             filtered_res.append(r)
 
     # nothing to run
