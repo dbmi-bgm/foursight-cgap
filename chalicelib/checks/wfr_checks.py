@@ -250,34 +250,6 @@ def line_count_test(connection, **kwargs):
     return action
 
 
-@action_function()
-def run_metawfrs(connection, **kwargs):
-    start = datetime.utcnow()
-    sfn = 'tibanna_zebra'  # may change it later according to env
-    action = ActionResult(connection, 'run_metawfrs')
-    action_logs = {'runs_checked_or_kicked': []}
-    my_auth = connection.ff_keys
-    env = connection.ff_env
-    check_result = action.get_associated_check_result(kwargs).get('full_output', {})
-    action_logs['check_output'] = check_result
-    metawfr_uuids = check_result.get('metawfrs_to_run', {}).get('uuids', [])
-    random.shuffle(metawfr_uuids)  # if always the same order, we may never get to the later ones.
-    for metawfr_uuid in metawfr_uuids:
-        now = datetime.utcnow()
-        if (now-start).seconds > lambda_limit:
-            action.description = 'Did not complete action due to time limitations'
-            break
-        try:
-            run_metawfr.run_metawfr(metawfr_uuid, my_auth, verbose=True, sfn=sfn, env=env)
-            action_logs['runs_checked_or_kicked'].append(metawfr_uuid)
-        except Exception as e:
-            action_logs['error'] = str(e)
-            break
-    action.output = action_logs
-    action.status = 'DONE'
-    return action
-
-
 @check_function()
 def metawfrs_to_run(connection, **kwargs):
     """Find metaworkflowruns that may need kicking
@@ -329,16 +301,16 @@ def metawfrs_to_run(connection, **kwargs):
 
 
 @action_function()
-def checkstatus_metawfrs(connection, **kwargs):
+def run_metawfrs(connection, **kwargs):
     start = datetime.utcnow()
     sfn = 'tibanna_zebra'  # may change it later according to env
-    action = ActionResult(connection, 'checkstatus_metawfrs')
-    action_logs = {'runs_checked': []}
+    action = ActionResult(connection, 'run_metawfrs')
+    action_logs = {'runs_checked_or_kicked': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
     check_result = action.get_associated_check_result(kwargs).get('full_output', {})
     action_logs['check_output'] = check_result
-    metawfr_uuids = check_result.get('metawfrs_to_check', {}).get('uuids', [])
+    metawfr_uuids = check_result.get('metawfrs_to_run', {}).get('uuids', [])
     random.shuffle(metawfr_uuids)  # if always the same order, we may never get to the later ones.
     for metawfr_uuid in metawfr_uuids:
         now = datetime.utcnow()
@@ -346,8 +318,8 @@ def checkstatus_metawfrs(connection, **kwargs):
             action.description = 'Did not complete action due to time limitations'
             break
         try:
-            status_metawfr.status_metawfr(metawfr_uuid, my_auth, verbose=True, env=env)
-            action_logs['runs_checked'].append(metawfr_uuid)
+            run_metawfr.run_metawfr(metawfr_uuid, my_auth, verbose=True, sfn=sfn, env=env)
+            action_logs['runs_checked_or_kicked'].append(metawfr_uuid)
         except Exception as e:
             action_logs['error'] = str(e)
             break
@@ -404,18 +376,17 @@ def metawfrs_to_checkstatus(connection, **kwargs):
     return check
 
 
-@action_function(reset_all_failed=False)
-def reset_failed_metawfrs(connection, **kwargs):
+@action_function()
+def checkstatus_metawfrs(connection, **kwargs):
     start = datetime.utcnow()
     sfn = 'tibanna_zebra'  # may change it later according to env
-    action = ActionResult(connection, 'failed_metawfrs')
-    action_logs = {'runs_reset': []}
+    action = ActionResult(connection, 'checkstatus_metawfrs')
+    action_logs = {'runs_checked': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
     check_result = action.get_associated_check_result(kwargs).get('full_output', {})
     action_logs['check_output'] = check_result
-    metawfr_uuids = check_result.get('metawfrs_that_failed', {}).get('uuids', [])
-    reset_all_failed = kwargs.get('reset_all_failed', False)
+    metawfr_uuids = check_result.get('metawfrs_to_check', {}).get('uuids', [])
     random.shuffle(metawfr_uuids)  # if always the same order, we may never get to the later ones.
     for metawfr_uuid in metawfr_uuids:
         now = datetime.utcnow()
@@ -423,28 +394,8 @@ def reset_failed_metawfrs(connection, **kwargs):
             action.description = 'Did not complete action due to time limitations'
             break
         try:
-            metawfr_meta = ff_utils.get_metadata(metawfr_uuid, key=my_auth, add_on='?frame=raw')
-            for wfr in metawfr_meta['workflow_runs']:
-                if wfr['status'] == 'failed':
-                    if wfr.get('workflow_run'):
-                        res = ff_utils.get_metadata(wfr['workflow_run'], key=my_auth)
-                    res = ff_utils.search_metadata('/search/?type=WorkflowRunAwsem&awsem_job_id=%s' % wfr['jobid'], key=my_auth)
-                    if len(res) == 1:
-                        res = res[0]
-                    elif len(res) > 1:
-                        raise Exception("multiple workflow runs for job id %s" % wfr['jobid'])
-                    else:
-                        raise Exception("No workflow run found for job id %s" % wfr['jobid'])
-                    # reset spot-failed shards
-                    if 'EC2 unintended termination' in res.get('description', '') or \
-                       'EC2 Idle error' in res.get('description', ''):
-                        shard_name = wfr['name'] + ':' + str(wfr['shard'])
-                        reset_metawfr.reset_shards(metawfr_uuid, [shard_name], my_auth, verbose=True)
-                        action_logs['runs_reset'].append(metawfr_uuid)
-                    elif reset_all_failed:
-                        shard_name = wfr['name'] + ':' + str(wfr['shard'])
-                        reset_metawfr.reset_shards(metawfr_uuid, [shard_name], my_auth, verbose=True)
-                        action_logs['runs_reset'].append(metawfr_uuid)
+            status_metawfr.status_metawfr(metawfr_uuid, my_auth, verbose=True, env=env)
+            action_logs['runs_checked'].append(metawfr_uuid)
         except Exception as e:
             action_logs['error'] = str(e)
             break
@@ -501,16 +452,18 @@ def failed_metawfrs(connection, **kwargs):
     return check
 
 
-@action_function()
-def patch_samples_and_sample_processings(connection, **kwargs):
+@action_function(reset_all_failed=False)
+def reset_failed_metawfrs(connection, **kwargs):
     start = datetime.utcnow()
-    action = ActionResult(connection, 'patch_samples_and_sample_processings')
-    action_logs = {'runs_checked_for_patching': []}
+    sfn = 'tibanna_zebra'  # may change it later according to env
+    action = ActionResult(connection, 'failed_metawfrs')
+    action_logs = {'runs_reset': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
     check_result = action.get_associated_check_result(kwargs).get('full_output', {})
     action_logs['check_output'] = check_result
-    metawfr_uuids = check_result.get('metawfrs_to_check', {}).get('uuids', [])
+    metawfr_uuids = check_result.get('metawfrs_that_failed', {}).get('uuids', [])
+    reset_all_failed = kwargs.get('reset_all_failed', False)
     random.shuffle(metawfr_uuids)  # if always the same order, we may never get to the later ones.
     for metawfr_uuid in metawfr_uuids:
         now = datetime.utcnow()
@@ -518,8 +471,28 @@ def patch_samples_and_sample_processings(connection, **kwargs):
             action.description = 'Did not complete action due to time limitations'
             break
         try:
-            patch_processed_files_to_sample_and_sample_processing(metawfr_uuid, my_auth)
-            action_logs['runs_checked_for_patching'].append(metawfr_uuid)
+            metawfr_meta = ff_utils.get_metadata(metawfr_uuid, key=my_auth, add_on='?frame=raw')
+            for wfr in metawfr_meta['workflow_runs']:
+                if wfr['status'] == 'failed':
+                    if wfr.get('workflow_run'):
+                        res = ff_utils.get_metadata(wfr['workflow_run'], key=my_auth)
+                    res = ff_utils.search_metadata('/search/?type=WorkflowRunAwsem&awsem_job_id=%s' % wfr['jobid'], key=my_auth)
+                    if len(res) == 1:
+                        res = res[0]
+                    elif len(res) > 1:
+                        raise Exception("multiple workflow runs for job id %s" % wfr['jobid'])
+                    else:
+                        raise Exception("No workflow run found for job id %s" % wfr['jobid'])
+                    # reset spot-failed shards
+                    if 'EC2 unintended termination' in res.get('description', '') or \
+                       'EC2 Idle error' in res.get('description', ''):
+                        shard_name = wfr['name'] + ':' + str(wfr['shard'])
+                        reset_metawfr.reset_shards(metawfr_uuid, [shard_name], my_auth, verbose=True)
+                        action_logs['runs_reset'].append(metawfr_uuid)
+                    elif reset_all_failed:
+                        shard_name = wfr['name'] + ':' + str(wfr['shard'])
+                        reset_metawfr.reset_shards(metawfr_uuid, [shard_name], my_auth, verbose=True)
+                        action_logs['runs_reset'].append(metawfr_uuid)
         except Exception as e:
             action_logs['error'] = str(e)
             break
@@ -529,13 +502,13 @@ def patch_samples_and_sample_processings(connection, **kwargs):
 
 
 @check_function()
-def metawfrs_to_patch_samples_and_sample_processings(connection, **kwargs):
-    """Find metaworkflowruns that may need samples or sample_processings patched
+def metawfrs_to_patch_samples(connection, **kwargs):
+    """Find metaworkflowruns that may need samples patched with processed files
     """
-    check = CheckResult(connection, 'metawfrs_to_patch_samples_and_sample_processings')
+    check = CheckResult(connection, 'metawfrs_to_patch_samples')
     my_auth = connection.ff_keys
-    check.action = "patch_samples_and_sample_processings"
-    check.description = "Find metaworkflow runs that may need samples or sample_processings patched."
+    check.action = "patch_pfs_to_samples"
+    check.description = "Find metaworkflow runs that may need samples to be patched."
     check.brief_output = []
     check.summary = ""
     check.full_output = {}
@@ -552,27 +525,143 @@ def metawfrs_to_patch_samples_and_sample_processings(connection, **kwargs):
         check.full_output = {}
         return check
 
-    query = '/search/?type=MetaWorkflowRun' + \
-            ''.join(['&final_status=' + st for st in ['running', 'inactive', 'completed', 'failed']])
+    # start with cases with a metawfr and no ingested final vcf
+    query = '/search/?type=Case&meta_workflow_run!=No+value&vcf_file.file_ingestion_status!=Ingested'
     search_res = ff_utils.search_metadata(query, key=my_auth)
 
+    # filter those whose samples do not have processed_files
+    filtered_res = []
+    for r in search_res:
+        for s in r['sample_processing']['samples']:
+            if len(s.get('processed_files', [])) < 2:  # bam and gvcf.
+                filtered_res.append(r)
+                break
+
     # nothing to run
-    if not search_res:
+    if not filtered_res:
         check.summary = 'All Good!'
         return check
 
-    metawfr_uuids = [r['uuid'] for r in search_res]
-    metawfr_titles = [r['title'] for r in search_res]
+    metawfr_uuids = [r['meta_workflow_run']['uuid'] for r in filtered_res]
+    metawfr_titles = [r['meta_workflow_run']['display_title'] for r in filtered_res]
 
     check.allow_action = True
-    check.summary = 'Some metawfrs may need patching samples and sample_processings.'
+    check.summary = 'Some metawfrs may need patching samples.'
     check.status = 'WARN'
-    msg = str(len(metawfr_uuids)) + ' metawfrs may need patching samples and sample_processings'
+    msg = str(len(metawfr_uuids)) + ' metawfrs may need patching samples'
     check.brief_output.append(msg)
     check.full_output['metawfrs_to_check'] = {'titles': metawfr_titles, 'uuids': metawfr_uuids}
     return check
 
-def patch_processed_files_to_sample_and_sample_processing(metawfr_uuid, ff_key):
+
+@action_function()
+def patch_pfs_to_samples(connection, **kwargs):
+    start = datetime.utcnow()
+    action = ActionResult(connection, 'patch_pfs_to_samples')
+    action_logs = {'runs_checked_for_patching': []}
+    my_auth = connection.ff_keys
+    env = connection.ff_env
+    check_result = action.get_associated_check_result(kwargs).get('full_output', {})
+    action_logs['check_output'] = check_result
+    metawfr_uuids = check_result.get('metawfrs_to_check', {}).get('uuids', [])
+    random.shuffle(metawfr_uuids)  # if always the same order, we may never get to the later ones.
+    for metawfr_uuid in metawfr_uuids:
+        now = datetime.utcnow()
+        if (now-start).seconds > lambda_limit:
+            action.description = 'Did not complete action due to time limitations'
+            break
+        try:
+            patch_processed_files_to_sample(metawfr_uuid, my_auth)
+            action_logs['runs_checked_for_patching'].append(metawfr_uuid)
+        except Exception as e:
+            action_logs['error'] = str(e)
+            break
+    action.output = action_logs
+    action.status = 'DONE'
+    return action
+
+
+@check_function()
+def metawfrs_to_patch_sample_processing(connection, **kwargs):
+    """Find metaworkflowruns that may need sample_processing patched with processed files
+    """
+    check = CheckResult(connection, 'metawfrs_to_patch_sample_processing')
+    my_auth = connection.ff_keys
+    check.action = "patch_pfs_to_sample_processing"
+    check.description = "Find metaworkflow runs that may need sample processing to be patched."
+    check.brief_output = []
+    check.summary = ""
+    check.full_output = {}
+    check.status = 'PASS'
+
+    # check indexing queue
+    env = connection.ff_env
+    indexing_queue = ff_utils.stuff_in_queues(env, check_secondary=True)
+
+    if indexing_queue:
+        check.status = 'PASS'  # maybe use warn?
+        check.brief_output = ['Waiting for indexing queue to clear']
+        check.summary = 'Waiting for indexing queue to clear'
+        check.full_output = {}
+        return check
+
+    # start with cases with a metawfr and no ingested final vcf
+    query = '/search/?type=Case&meta_workflow_run!=No+value&vcf_file.file_ingestion_status!=Ingested'
+    search_res = ff_utils.search_metadata(query, key=my_auth)
+
+    # filter those whose samples do not have processed_files
+    filtered_res = []
+    for r in search_res:
+        if len(r['sample_processing'].get('processed_files', [])) < 2:  # vep vcf and final vcf
+            filtered_res.append(r)
+        elif len(r['sample_processing'].get('completed_processes', []) < 1:
+            filtered_res.append(r)
+
+    # nothing to run
+    if not filtered_res:
+        check.summary = 'All Good!'
+        return check
+
+    metawfr_uuids = [r['meta_workflow_run']['uuid'] for r in filtered_res]
+    metawfr_titles = [r['meta_workflow_run']['display_title'] for r in filtered_res]
+
+    check.allow_action = True
+    check.summary = 'Some metawfrs may need patching sample processing.'
+    check.status = 'WARN'
+    msg = str(len(metawfr_uuids)) + ' metawfrs may need patching sample processing'
+    check.brief_output.append(msg)
+    check.full_output['metawfrs_to_check'] = {'titles': metawfr_titles, 'uuids': metawfr_uuids}
+    return check
+
+
+@action_function()
+def patch_pfs_to_sample_processing(connection, **kwargs):
+    start = datetime.utcnow()
+    action = ActionResult(connection, 'patch_pfs_to_sample_processing')
+    action_logs = {'runs_checked_for_patching': []}
+    my_auth = connection.ff_keys
+    env = connection.ff_env
+    check_result = action.get_associated_check_result(kwargs).get('full_output', {})
+    action_logs['check_output'] = check_result
+    metawfr_uuids = check_result.get('metawfrs_to_check', {}).get('uuids', [])
+    random.shuffle(metawfr_uuids)  # if always the same order, we may never get to the later ones.
+    for metawfr_uuid in metawfr_uuids:
+        now = datetime.utcnow()
+        if (now-start).seconds > lambda_limit:
+            action.description = 'Did not complete action due to time limitations'
+            break
+        try:
+            patch_processed_files_to_sample_processing(metawfr_uuid, my_auth)
+            action_logs['runs_checked_for_patching'].append(metawfr_uuid)
+        except Exception as e:
+            action_logs['error'] = str(e)
+            break
+    action.output = action_logs
+    action.status = 'DONE'
+    return action
+
+
+def patch_processed_files_to_sample(metawfr_uuid, ff_key):
     """This currently works only for proband-only cases.
     patches samples with final bam and sample gvcf,
     patches sample_processing with vep vcf and final vcf and completed_processes."""
@@ -581,6 +670,8 @@ def patch_processed_files_to_sample_and_sample_processing(metawfr_uuid, ff_key):
     case_meta = ff_utils.get_metadata(case_acc, add_on='?frame=raw', key=ff_key)
     sp_uuid = case_meta['sample_processing']
     sp_meta = ff_utils.get_metadata(sp_uuid, add_on='?frame=object', key=ff_key)
+
+    # modify this to support trio - need shard matching
     if len(sp_meta['samples']) > 1:
         raise Exception("currently applicable only to proband-only")
 
@@ -593,6 +684,16 @@ def patch_processed_files_to_sample_and_sample_processing(metawfr_uuid, ff_key):
             sample_gvcf = wfr['output'][0]['file']['uuid']
     if final_bam and sample_gvcf:
         ff_utils.patch_metadata({'processed_files': [final_bam, sample_gvcf]}, sp_meta['samples'][0], key=ff_key)
+
+
+def patch_processed_files_to_sample_processing(metawfr_uuid, ff_key):
+    """This currently works only for proband-only cases.
+    patches samples with final bam and sample gvcf,
+    patches sample_processing with vep vcf and final vcf and completed_processes."""
+    metawfr_meta = ff_utils.get_metadata(metawfr_uuid, key=ff_key)
+    case_acc = metawfr_meta['title'].split(' ')[-1]
+    case_meta = ff_utils.get_metadata(case_acc, add_on='?frame=raw', key=ff_key)
+    sp_uuid = case_meta['sample_processing']
 
     vep_vcf = ''
     final_vcf = ''
@@ -607,7 +708,7 @@ def patch_processed_files_to_sample_and_sample_processing(metawfr_uuid, ff_key):
     if metawfr_meta['final_status'] == 'completed':
         patch_body.update({'completed_processes': [metawfr_meta['meta_workflow']['title']]})
     if patch_body:
-        ff_utils.patch_metadata(patch_body, sp_meta['uuid'], key=ff_key)
+        ff_utils.patch_metadata(patch_body, sp_uuid, key=ff_key)
 
 
 @check_function(start_date=None, file_accessions="")
