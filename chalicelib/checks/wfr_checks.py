@@ -404,7 +404,7 @@ def checkstatus_metawfrs(connection, **kwargs):
     return action
 
 
-@check_function()
+@check_function(reset_all_failed=False)
 def failed_metawfrs(connection, **kwargs):
     """Find metaworkflowruns that may need status-checking
     - those with final_status running.
@@ -449,10 +449,13 @@ def failed_metawfrs(connection, **kwargs):
     msg = str(len(metawfr_uuids)) + ' metawfrs may have failed wfrs'
     check.brief_output.append(msg)
     check.full_output['metawfrs_that_failed'] = {'titles': metawfr_titles, 'uuids': metawfr_uuids}
+    if kwargs.get('reset_all_failed'):
+        check.full_output['options'] = ['reset_all_failed']
+
     return check
 
 
-@action_function(reset_all_failed=False)
+@action_function()
 def reset_failed_metawfrs(connection, **kwargs):
     start = datetime.utcnow()
     sfn = 'tibanna_zebra'  # may change it later according to env
@@ -463,7 +466,8 @@ def reset_failed_metawfrs(connection, **kwargs):
     check_result = action.get_associated_check_result(kwargs).get('full_output', {})
     action_logs['check_output'] = check_result
     metawfr_uuids = check_result.get('metawfrs_that_failed', {}).get('uuids', [])
-    reset_all_failed = kwargs.get('reset_all_failed', False)
+    reset_all_failed = 'reset_all_failed' in check_result.get('options', [])  # pass ths option from check
+
     random.shuffle(metawfr_uuids)  # if always the same order, we may never get to the later ones.
     for metawfr_uuid in metawfr_uuids:
         now = datetime.utcnow()
