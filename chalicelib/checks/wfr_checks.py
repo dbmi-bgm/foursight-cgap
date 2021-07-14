@@ -14,7 +14,7 @@ from .helpers.wfrset_utils import lambda_limit
 from .helpers.confchecks import *
 
 
-default_pipelines_to_run = ['WGS Trio V23']
+default_pipelines_to_run = ['WGS Trio V23', 'WGS Proband-only Cram V24']
 
 
 @check_function(file_type='File', start_date=None)
