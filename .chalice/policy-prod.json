@@ -6,6 +6,7 @@
         "s3:*",
         "elasticbeanstalk:*",
         "lambda:*",
+        "states:*",
         "sqs:*",
         "es:*",
         "rds:*",

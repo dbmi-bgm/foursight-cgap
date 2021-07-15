@@ -41,6 +41,9 @@ def monday_at_2_am_est():
 foursight_cron_by_schedule = {
     'prod': {
         'ten_min_checks': Cron('0/10', '*', '*', '*', '?', '*'),
+        'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
+        'fifteen_min_checks_2': Cron('5/15', '*', '*', '*', '?', '*'),
+        'fifteen_min_checks_3': Cron('10/15', '*', '*', '*', '?', '*'),
         'thirty_min_checks': Cron('0/30', '*', '*', '*', '?', '*'),
         'hourly_checks': Cron('0', '0/1', '*', '*', '?', '*'),
         'hourly_checks_2': Cron('15', '0/1', '*', '*', '?', '*'),
@@ -57,6 +60,9 @@ foursight_cron_by_schedule = {
     },
     'dev': {
         'ten_min_checks': Cron('5/10', '*', '*', '*', '?', '*'),
+        'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
+        'fifteen_min_checks_2': Cron('5/15', '*', '*', '*', '?', '*'),
+        'fifteen_min_checks_3': Cron('10/15', '*', '*', '*', '?', '*'),
         'thirty_min_checks': Cron('15/30', '*', '*', '*', '?', '*'),
         'hourly_checks': Cron('30', '0/1', '*', '*', '?', '*'),
         'hourly_checks_2': Cron('45', '0/1', '*', '*', '?', '*'),
@@ -77,6 +83,21 @@ foursight_cron_by_schedule = {
 @app.schedule(foursight_cron_by_schedule[STAGE]['ten_min_checks'])
 def ten_min_checks(event):
     app_utils_obj.queue_scheduled_checks('all', 'ten_min_checks')
+
+
+@app.schedule(foursight_cron_by_schedule[STAGE]['fifteen_min_checks'])
+def fifteen_min_checks(event):
+    app_utils_obj.queue_scheduled_checks('all', 'fifteen_min_checks')
+
+
+@app.schedule(foursight_cron_by_schedule[STAGE]['fifteen_min_checks_2'])
+def fifteen_min_checks_2(event):
+    app_utils_obj.queue_scheduled_checks('all', 'fifteen_min_checks_2')
+
+
+@app.schedule(foursight_cron_by_schedule[STAGE]['fifteen_min_checks_3'])
+def fifteen_min_checks_3(event):
+    app_utils_obj.queue_scheduled_checks('all', 'fifteen_min_checks_3')
 
 
 @app.schedule(foursight_cron_by_schedule[STAGE]['thirty_min_checks'])

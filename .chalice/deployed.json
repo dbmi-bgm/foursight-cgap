@@ -7,6 +7,18 @@
           "arn": "arn:aws:lambda:us-east-1:643366669028:function:foursight-cgap-prod-ten_min_checks",
           "type": "scheduled_event"
         },
+        "foursight-cgap-prod-fifteen_min_checks": {
+          "arn": "arn:aws:lambda:us-east-1:643366669028:function:foursight-cgap-prod-fifteen_min_checks",
+          "type": "scheduled_event"
+        },
+        "foursight-cgap-prod-fifteen_min_checks_2": {
+          "arn": "arn:aws:lambda:us-east-1:643366669028:function:foursight-cgap-prod-fifteen_min_checks_2",
+          "type": "scheduled_event"
+        },
+        "foursight-cgap-prod-fifteen_min_checks_3": {
+          "arn": "arn:aws:lambda:us-east-1:643366669028:function:foursight-cgap-prod-fifteen_min_checks_3",
+          "type": "scheduled_event"
+        },
         "foursight-cgap-prod-thirty_min_checks": {
           "arn": "arn:aws:lambda:us-east-1:643366669028:function:foursight-cgap-prod-thirty_min_checks",
           "type": "scheduled_event"
