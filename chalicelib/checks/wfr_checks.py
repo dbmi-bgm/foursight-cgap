@@ -303,7 +303,6 @@ def metawfrs_to_run(connection, **kwargs):
 @action_function()
 def run_metawfrs(connection, **kwargs):
     start = datetime.utcnow()
-    #sfn = 'tibanna_zebra'  # may change it later according to env
     action = ActionResult(connection, 'run_metawfrs')
     action_logs = {'runs_checked_or_kicked': []}
     my_auth = connection.ff_keys
@@ -475,6 +474,7 @@ def reset_failed_metawfrs(connection, **kwargs):
             break
         try:
             metawfr_meta = ff_utils.get_metadata(metawfr_uuid, key=my_auth, add_on='?frame=raw')
+            shards_to_reset = []
             for wfr in metawfr_meta['workflow_runs']:
                 if wfr['status'] == 'failed':
                     if wfr.get('workflow_run'):
@@ -486,16 +486,16 @@ def reset_failed_metawfrs(connection, **kwargs):
                         raise Exception("multiple workflow runs for job id %s" % wfr['jobid'])
                     else:
                         raise Exception("No workflow run found for job id %s" % wfr['jobid'])
-                    # reset spot-failed shards
-                    if 'EC2 unintended termination' in res.get('description', '') or \
+                    if reset_all_failed:
+                        shard_name = wfr['name'] + ':' + str(wfr['shard'])
+                        shards_to_reset.append(shard_name)
+                    elif 'EC2 unintended termination' in res.get('description', '') or \
                        'EC2 Idle error' in res.get('description', ''):
+                        # reset spot-failed shards
                         shard_name = wfr['name'] + ':' + str(wfr['shard'])
-                        reset_metawfr.reset_shards(metawfr_uuid, [shard_name], my_auth, verbose=True)
-                        action_logs['runs_reset'].append(metawfr_uuid)
-                    elif reset_all_failed:
-                        shard_name = wfr['name'] + ':' + str(wfr['shard'])
-                        reset_metawfr.reset_shards(metawfr_uuid, [shard_name], my_auth, verbose=True)
-                        action_logs['runs_reset'].append(metawfr_uuid)
+                        shards_to_reset.append(shard_name)
+            reset_metawfr.reset_shards(metawfr_uuid, shards_to_reset, my_auth, verbose=True)
+            action_logs['runs_reset'].append({'metawfr': metawfr_uuid, 'shards': shards_to_reset})
         except Exception as e:
             action_logs['error'] = str(e)
             break
