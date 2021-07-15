@@ -279,7 +279,7 @@ def metawfrs_to_run(connection, **kwargs):
         return check
 
     query = '/search/?type=MetaWorkflowRun' + \
-            ''.join(['&final_status=' + st for st in ['pending', 'inactive', 'running']])
+            ''.join(['&final_status=' + st for st in ['pending', 'inactive', 'running', 'failed']])
     query += ''.join(['&meta_workflow.title=' + mwf for mwf in default_pipelines_to_run])
     search_res = ff_utils.search_metadata(query, key=my_auth)
 
