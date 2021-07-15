@@ -1,7 +1,7 @@
 # 1. case -> get SampleProcessing
 # 2. clone samples, patch to individuals
 # 3. clone cases, add new Sample + SP items
-
+# case title is a calc prop, should add version - prop in SP item?
 
 class CaseToClone:
 
@@ -11,11 +11,10 @@ class CaseToClone:
     def __init__(self, accession, key, new_version):
         self.accession = accession
         self.key = key
+        self.new_version = new_version
         self.case_metadata = self.get_case_metadata()
         self.old_sample_processing = self.metadata.get('sample_processing')
         self.sp_metadata = self.get_sp_metadata()
-        # self.old_title = self.metadata.get('case_title')
-        # self.new_title = self.old_title + f' ({new_version})'
         self.old_samples = self.sp_metadata.get('samples')
         self.sample_info = self.clone_samples()
         self.patch_individual_samples()
@@ -29,7 +28,6 @@ class CaseToClone:
             return ff_utils.get_metadata(self.old_sample_processing + '?frame=object', key=self.key)
 
     def clone_samples(self):
-        # remove_fields_sample = ['individual']
         results = []
         for item in self.old_samples:
             try:
@@ -42,7 +40,7 @@ class CaseToClone:
         for result in results:
             sample_info[result['@id']] = {}
             sample_info[result['@id']]['individual'] = result.get('individual')
-            for field in remove_fields + remove_fields_sample:
+            for field in remove_fields:
                 if field in result:
                     del result[field]
             # change title? bam_sample_id? etc?
@@ -81,7 +79,7 @@ class CaseToClone:
 
     def clone_cases(self):
         keep_fields_case = [
-            'family', 'individual', 'description', 'extra_variant_sample_facets', 'active_filterset'
+            'family', 'individual', 'description', 'extra_variant_sample_facets', 'active_filterset', 'case_id'
         ]
         cases = self.sp_metadata.get('cases')
         new_cases = []
@@ -94,11 +92,6 @@ class CaseToClone:
             for field in keep_fields + keep_fields_case:
                 new_case_metadata[field] = old_case_metadata.get(field)
             new_case_metadata['sample_processing'] = self.new_sp_item
-            old_case_id = old_case_metadata.get('case_id')
-            if old_case_id:
-                if old_case_id.endswith(''):
-                    pass
-            new_case_metadata['case_id'] = None
             try:
                 post_resp = ff_utils.post_metadata(new_case_metadata, 'case', key=self.key)
             except Exception:
