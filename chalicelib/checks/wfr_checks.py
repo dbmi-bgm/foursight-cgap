@@ -303,11 +303,12 @@ def metawfrs_to_run(connection, **kwargs):
 @action_function()
 def run_metawfrs(connection, **kwargs):
     start = datetime.utcnow()
-    sfn = 'tibanna_zebra'  # may change it later according to env
+    #sfn = 'tibanna_zebra'  # may change it later according to env
     action = ActionResult(connection, 'run_metawfrs')
     action_logs = {'runs_checked_or_kicked': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
+    sfn = 'tibanna_zebra_' + env.replace('fourfront-', '')
     check_result = action.get_associated_check_result(kwargs).get('full_output', {})
     action_logs['check_output'] = check_result
     metawfr_uuids = check_result.get('metawfrs_to_run', {}).get('uuids', [])
@@ -379,7 +380,6 @@ def metawfrs_to_checkstatus(connection, **kwargs):
 @action_function()
 def checkstatus_metawfrs(connection, **kwargs):
     start = datetime.utcnow()
-    sfn = 'tibanna_zebra'  # may change it later according to env
     action = ActionResult(connection, 'checkstatus_metawfrs')
     action_logs = {'runs_checked': []}
     my_auth = connection.ff_keys
@@ -458,7 +458,6 @@ def failed_metawfrs(connection, **kwargs):
 @action_function()
 def reset_failed_metawfrs(connection, **kwargs):
     start = datetime.utcnow()
-    sfn = 'tibanna_zebra'  # may change it later according to env
     action = ActionResult(connection, 'failed_metawfrs')
     action_logs = {'runs_reset': []}
     my_auth = connection.ff_keys
