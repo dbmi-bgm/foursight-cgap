@@ -3,6 +3,9 @@
 # 3. clone cases, add new Sample + SP items
 # case title is a calc prop, should add version - prop in SP item?
 
+pattern = re.compile(r'-v[0-9]+$')
+
+
 class CaseToClone:
 
     keep_fields = ['project', 'institution']
@@ -13,12 +16,19 @@ class CaseToClone:
         self.key = key
         self.new_version = new_version
         self.case_metadata = self.get_case_metadata()
-        self.old_sample_processing = self.metadata.get('sample_processing')
+        self.old_sample_processing = self.case_metadata.get('sample_processing')
         self.sp_metadata = self.get_sp_metadata()
         self.old_samples = self.sp_metadata.get('samples')
         self.sample_info = self.clone_samples()
         self.patch_individual_samples()
         self.new_sp_item = self.clone_sample_processing()
+        self.new_cases = self.clone_cases()
+
+    def append_version_to_value(self, value):
+        if isinstance(value, list):
+            return [self.append_version_to_value(item) for item in value]
+        new_value = re.sub(pattern, '', value)
+        new_value = new_value + '-v' + self.new_version
 
     def get_case_metadata(self):
         return ff_utils.get_metadata(self.accession + '?frame=raw', key=self.key)
@@ -29,27 +39,35 @@ class CaseToClone:
 
     def clone_samples(self):
         results = []
-        for item in self.old_samples:
+        for sample in self.old_samples:
             try:
-                resp = ff_utils.get_metadata(sample + '?frame=object', key=self.key)
-            except Exception:
-                pass
+                print('1')
+                resp = ff_utils.get_metadata(sample + '?frame=raw', key=self.key)
+            except Exception as e:
+                print(e)
             else:
                 results.append(resp)
         sample_info = {}
+        sample_ids = [result['uuid'] for result in results]
+        search_url = f'search/?type=Sample&uuid={"&uuid=".join(sample_ids)}&field=individual&frame=object'
+        sample_individual_search = ff_utils.search_metadata(search_url, key=self.key)
+        for search_result in sample_individual_search:
+            print(search_result)
+            sample_info[search_result['@id']] = {'individual': search_result['individual']['@id']}
+        print(results)
         for result in results:
-            sample_info[result['@id']] = {}
-            sample_info[result['@id']]['individual'] = result.get('individual')
-            for field in remove_fields:
+            for field in self.remove_fields:
                 if field in result:
                     del result[field]
             # change title? bam_sample_id? etc?
+            for field in ['bam_sample_id', 'aliases']:
+                result[field] = self.append_version_to_value(result[field])
             try:
                 post_resp = ff_utils.post_metadata(result, 'sample', key=self.key)
-            except Exception:
-                pass
+            except Exception as e:
+                print(e)
             else:
-                sample_info[result['@id']]['new_id'] = post_resp['@id']
+                sample_info[result['uuid']]['new_id'] = post_resp['@graph'][0]['@id']
         return sample_info
 
     def patch_individual_samples(self):
@@ -67,7 +85,7 @@ class CaseToClone:
     def clone_sample_processing(self):
         keep_fields_sp = ['analysis_type', 'families']
         new_sp_metadata = {}
-        for item in keep_fields + keep_fields_sp:
+        for item in self.keep_fields + keep_fields_sp:
             new_sp_metadata[item] = self.sp_metadata[item]
         new_sp_metadata['samples'] = [item['new_id'] for item in self.sample_info.values()]
         # might need to add back some processed files, etc if pipeline is only being rerun at a particular step
@@ -75,7 +93,8 @@ class CaseToClone:
             resp = ff_utils.post_metadata(new_sp_metadata, 'sample_processing', key=self.key)
         except Exception:
             pass
-        return resp['@id']
+        else:
+            return resp['@graph'][0]['@id']
 
     def clone_cases(self):
         keep_fields_case = [
@@ -85,17 +104,20 @@ class CaseToClone:
         new_cases = []
         for case in cases:
             try:
-                old_case_metadata = ff_utils.get_metadata(case, key=self.key)
-            except Exception:
-                continue
+                old_case_metadata = ff_utils.get_metadata(case + '?frame=object', key=self.key)
+            except Exception as e:
+                print(e)
             new_case_metadata = {}
-            for field in keep_fields + keep_fields_case:
-                new_case_metadata[field] = old_case_metadata.get(field)
+            for field in self.keep_fields + keep_fields_case:
+                if field in old_case_metadata:
+                    new_case_metadata[field] = old_case_metadata.get(field)
             new_case_metadata['sample_processing'] = self.new_sp_item
             try:
                 post_resp = ff_utils.post_metadata(new_case_metadata, 'case', key=self.key)
-            except Exception:
-                continue
-            new_cases.append(post_resp['@id'])
+                new_cases.append(post_resp['@graph'][0]['@id'])
+            except Exception as e:
+                print(e)
+#             else:
+#                 new_cases.append(post_resp['@graph'][0]['@id'])
 
     # something for meta-workflow-run
