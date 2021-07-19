@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "foursight-cgap"
-version = "0.4.9.1b23"
+version = "0.4.9.1b24"
 description = "Serverless Chalice Application for Monitoring"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -10,24 +10,24 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.6,<3.7"
-dcicutils = "^1.16.0.1b6"  # minimum version
+dcicutils = "^1.19.0"  # minimum version
 click = "^7.1.2"
 PyJWT = "1.5.3"
 Jinja2 = "2.10.1"
 MarkupSafe = "1.1.1"
 google-api-python-client = "^1.12.5"
 geocoder = "1.38.1"
-fuzzywuzzy = "0.17.0"
 elasticsearch = "^6.8.1"
 elasticsearch-dsl = "^6.4.0"
-python-Levenshtein = "^0.12.2"
 gitpython = "^3.1.2"
 pytz = "^2020.1"
 ## adding foursight-core
 # use below for deployment
-foursight-core = "^0.1.9.1b11"
 # use below for tests but not for deployment
 #foursight-core = {git = "ssh://git@github.com/4dn-dcic/foursight-core.git", rev = "branch_name"}
+foursight-core = "^0.1.9.1b11"
+magma-suite = "0.2.3"
+cgap-pipeline-utils = "23.0"
 pytest = "5.1.2"
 
 [tool.poetry.dev-dependencies]

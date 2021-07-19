@@ -14,7 +14,7 @@ class Buckets(Buckets_from_core):
         if env == 'cgap':
             return 'https://cgap.hms.harvard.edu/'
         else:
-            return 'https://%s.9wzadzju3p.us-east-1.elasticbeanstalk.com/' % self.ff_env(env)
+            return 'http://%s.9wzadzju3p.us-east-1.elasticbeanstalk.com/' % self.ff_env(env)
 
     def es_url(self, env):
         if env == 'cgap':
