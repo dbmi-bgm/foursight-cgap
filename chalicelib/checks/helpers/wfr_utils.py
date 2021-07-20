@@ -831,8 +831,7 @@ def run_missing_wfr(input_json, input_files_and_params, run_name, auth, env, sfn
     input_json['public_postrun_json'] = True
     try:
         #e = ff_utils.post_metadata(input_json, 'WorkflowRun/run', key=auth)
-        res = API().run_workflow(input_json, sfn=sfn)
-        print(res)
+        res = API().run_workflow(input_json, sfn=sfn, verbose=False)
         url = res['_tibanna']['url']
         return url
     except Exception as e:
