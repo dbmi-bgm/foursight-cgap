@@ -833,7 +833,7 @@ urllib3 = ">=1.24"
 
 [[package]]
 name = "tibanna-ff"
-version = "0.20.1b0"
+version = "0.20.1b1"
 description = "Tibanna runs portable pipelines (in CWL/WDL) on the AWS Cloud."
 category = "main"
 optional = false
@@ -961,7 +961,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.7"
-content-hash = "34ec99169ec1eb758ce9a1bef9b4d2558a80638566d1c7123993dc8194030891"
+content-hash = "ab82b68fb903e7e6aa69d770ec5867e306103493b067164ae88fd69554fbdbd2"
 
 [metadata.files]
 ansicon = [
@@ -1412,9 +1412,9 @@ tibanna = [
     {file = "tibanna-1.4.0b0.tar.gz", hash = "sha256:66c657d26292dd8775b331d49381a45c802f8b87fb477cdf1b15be2d39cf8c5f"},
 ]
 tibanna-ff = [
-    {file = "tibanna_ff-0.20.1b0-py3-none-any.whl", hash = "sha256:b2b9b9dff30914cb187d745e9a9e922eced2d8fbd63848998b912a9c1e292a1b"},
-    {file = "tibanna_ff-0.20.1b0-py3.6.egg", hash = "sha256:073b4d1545583cfa3a7d37f617431b6441f7df0c9775347b6a5df06b238d0ee9"},
-    {file = "tibanna_ff-0.20.1b0.tar.gz", hash = "sha256:376ff2584861e9273db5e5138eaf3b0ccce8e40d60c2daadcb968de4fb47d42e"},
+    {file = "tibanna_ff-0.20.1b1-py3-none-any.whl", hash = "sha256:04a8fa3fbeb40f15072af0bd8d15ab6ae0c65fb49db9adfa2731a5b98a0863ff"},
+    {file = "tibanna_ff-0.20.1b1-py3.6.egg", hash = "sha256:7195c59e327b3a8604b993c830a578e6c6952fd64520d5615a7cb55b1e96eca3"},
+    {file = "tibanna_ff-0.20.1b1.tar.gz", hash = "sha256:b63f532fbf90397caa880932544842177d508c9a86a620f9db65ab8ea14e5b15"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
