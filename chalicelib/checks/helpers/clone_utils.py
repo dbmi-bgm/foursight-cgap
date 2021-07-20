@@ -1,7 +1,8 @@
-# 1. case -> get SampleProcessing
-# 2. clone samples, patch to individuals
-# 3. clone cases, add new Sample + SP items
-# case title is a calc prop, should add version - prop in SP item?
+from magma_ff import import_metawfr
+
+# add report?
+# still need to figure if we need to add processed files to sample, sample_processing
+# hold off on meta-wfrs for now?
 
 pattern = re.compile(r'-v[0-9]+$')
 
@@ -11,19 +12,36 @@ class CaseToClone:
     keep_fields = ['project', 'institution']
     remove_fields = ['uuid', 'submitted_by', 'last_modified', 'schema_version', 'date_created', 'accession']
 
-    def __init__(self, accession, key, new_version):
+    def __init__(self, accession, key, metawf_uuid, new_version, steps_to_rerun,
+                 add_bam_to_sample=False, add_gvcf_to_sample=False, add_rck_to_sample=False,
+                 add_vep_to_sp=False, add_fullvcf_to_sp=False):
         self.accession = accession
         self.key = key
-        self.new_version = new_version
+        self.metawf_uuid = metawf_uuid
+        self.new_version = new_version  # get version from metawfr uuid instead?
+        self.steps_to_rerun = steps_to_rerun
+        self.add_procfiles_to_sample = {
+            'bam': add_bam_to_sample,
+            'gvcf': add_gvcf_to_sample,
+            'rck': add_rck_to_sample
+        }
+        self.add_procfiles_to_sp = {
+            'vep': add_vep_to_sp,
+            'full': add_fullvcf_to_sp
+        }
         self.errors = []
         self.case_metadata = self.get_case_metadata()
         self.old_sample_processing = self.case_metadata.get('sample_processing')
         self.sp_metadata = self.get_sp_metadata()
         self.old_samples = self.sp_metadata.get('samples')
+        self.samples_metadata = self.get_sample_metadata()
         self.sample_info = self.clone_samples()
         self.patch_individual_samples()
         self.new_sp_item = self.clone_sample_processing()
         self.new_cases = self.clone_cases()
+        self.analysis_type = self.get_analysis_type()
+        # if self.metawf_uuid:
+        #     self.meta_wfr = self.add_metawfr()
 
     def append_version_to_value(self, value):
         if value is None:
@@ -33,6 +51,14 @@ class CaseToClone:
         new_value = re.sub(pattern, '', value)
         return new_value + '-v' + self.new_version
 
+    def try_request(self, func, *args, **kwargs):
+        try:
+            resp = func(*args, **kwargs)
+        except Exception as e:
+            self.errors.append(e)
+        else:
+            return resp
+
     def get_case_metadata(self):
         return ff_utils.get_metadata(self.accession + '?frame=raw', key=self.key)
 
@@ -40,66 +66,92 @@ class CaseToClone:
         if self.old_sample_processing:
             return ff_utils.get_metadata(self.old_sample_processing + '?frame=object', key=self.key)
 
+    def get_sample_metadata(self):
+        samples_metadata = []
+        if self.old_samples:
+            for sample in self.old_samples:
+                resp = try_request(ff_utils.get_metadata, sample + '?frame=raw', key=self.key)
+                if resp:
+                    samples_metadata.append(resp)
+        return samples_metadata
+
     def clone_samples(self):
         # need to remove processed_files, completed_processes?
         # remove_fields_sample = []
-        results = []
-        for sample in self.old_samples:
-            try:
-                resp = ff_utils.get_metadata(sample + '?frame=raw', key=self.key)
-            except Exception as e:
-                self.errors.append(e)
-            else:
-                results.append(resp)
+        if not self.samples_metadata:
+            return
         sample_info = {}
-        sample_ids = [result['uuid'] for result in results]
-        search_url = f'search/?type=Sample&uuid={"&uuid=".join(sample_ids)}&field=individual&frame=object'
+        sample_ids = [result['uuid'] for result in self.samples_metadata]
+        search_url = f'search/?type=Sample&uuid={"&uuid=".join(sample_ids)}&field=individual&field=processed_files'
         sample_individual_search = ff_utils.search_metadata(search_url, key=self.key)
         for search_result in sample_individual_search:
-            sample_info[search_result['@id']] = {'individual': search_result['individual']['@id']}
-        for result in results:
-            old_accession = result['accession']
+            # find individual which will need to be patched with new sample
+            if 'individual' in search_result:
+                sample_info[search_result['@id']] = {'individual': search_result['individual']['@id']}
+            # find processed files
+            if 'processed_files' in search_result:
+                sample_info[search_result['@id']]['processed_files'] = []
+                for procfile in search_result['processed_files']:
+                    sample_info[search_result['@id']]['processed_files'].append(
+                        {'@id': procfile['@id'], 'filename': procfile['display_title']}
+                    )
+        for result in self.samples_metadata:
+            sample_id = f'/samples/{result["accession"]}/'
             for field in self.remove_fields:
                 if field in result:
                     del result[field]
-            # change title? bam_sample_id? etc?
+            # change unique fields
             for field in ['bam_sample_id', 'aliases']:
                 if field in result:
                     result[field] = self.append_version_to_value(result[field])
-            print(result)
-            try:
-                post_resp = ff_utils.post_metadata(result, 'sample', key=self.key)
-            except Exception as e:
-                self.errors.append(e)
-            else:
-                sample_info[f'/samples/{old_accession}/']['new_id'] = post_resp['@graph'][0]['@id']
+            # add indicated processed files to post json
+            result['processed_files'] = []
+            for k, v in self.add_procfiles_to_sample.items():
+                if v:
+                    matching_files = [item['@id'] for item in sample_info[sample_id]['processed_files']
+                                     if k in item['display_title']]
+                    if matching_files:
+                        result['processed_files'].extend(matching_files)
+            if not result['processed_files']:
+                del result['processed_files']
+            post_resp = try_request(ff_utils.post_metadata, result, 'sample', key=self.key)
+            if post_resp and sample_id in sample_info:
+                sample_info[sample_id]['new_id'] = post_resp['@graph'][0]['@id']
         return sample_info
 
     def patch_individual_samples(self):
         for v in self.sample_info.values():
-            try:
-                individual_metadata = ff_utils.get_metadata(v['individual'] + '?frame=object', key=self.key)
-            except Exception as e:
-                self.errors.append(e)
-                continue
-            try:
+            if v.get('individual'):
+                individual_metadata = try_request(
+                    ff_utils.get_metadata, v['individual'] + '?frame=object', key=self.key
+                )
+                if not individual_metadata:
+                    continue
                 sample_patch = {'samples': individual_metadata.get('samples', []) + [v['new_id']]}
-                resp = ff_utils.patch_metadata(sample_patch, v['individual'], key=self.key)
-            except Exception as e:
-                self.errors.append(e)
+                resp = try_request(ff_utils.patch_metadata, sample_patch, v['individual'], key=self.key)
 
     def clone_sample_processing(self):
         keep_fields_sp = ['analysis_type', 'families']
         new_sp_metadata = {}
         for item in self.keep_fields + keep_fields_sp:
-            new_sp_metadata[item] = self.sp_metadata[item]
+            if item in self.sp_metadata:
+                new_sp_metadata[item] = self.sp_metadata.get(item)
         new_sp_metadata['samples'] = [item['new_id'] for item in self.sample_info.values()]
-        # might need to add back some processed files, etc if pipeline is only being rerun at a particular step
-        try:
-            resp = ff_utils.post_metadata(new_sp_metadata, 'sample_processing', key=self.key)
-        except Exception:
-            pass
-        else:
+
+        # add back some processed files, etc if pipeline is only being rerun at a particular step
+        if self.sp_metadata.get('processed_files'):
+            if self.add_procfiles_to_sp['vep'] or self.add_procfiles_to_sp['full']:
+                new_sp_metadata['processed_files'] = []
+                for pfile in self.sp_metadata['processed_files']:
+                    file_resp = try_request(ff_utils.get_metadata, pfile + '?frame=raw', key=self.key)
+                    if file_resp:
+                        for key in self.add_procfiles_to_sp:
+                            if key in file_resp.get('file_type', '') and self.add_procfiles_to_sp[key]:
+                                new_sp_metadata['processed_files'].append(file_resp['@id'])
+                                break
+
+        resp = try_request(ff_utils.post_metadata, new_sp_metadata, 'sample_processing', key=self.key)
+        if resp:
             return resp['@graph'][0]['@id']
 
     def clone_cases(self):
@@ -110,21 +162,43 @@ class CaseToClone:
         cases = self.sp_metadata.get('cases')
         new_cases = []
         for case in cases:
-            try:
-                old_case_metadata = ff_utils.get_metadata(case + '?frame=object', key=self.key)
-            except Exception as e:
-                self.errors.append(e)
+            old_case_metadata = try_request(ff_utils.get_metadata, case + '?frame=object', key=self.key)
+            if not old_case_metadata:
+                continue
             new_case_metadata = {}
             for field in self.keep_fields + keep_fields_case:
                 if field in old_case_metadata:
                     new_case_metadata[field] = old_case_metadata.get(field)
             new_case_metadata['sample_processing'] = self.new_sp_item
-            try:
-                post_resp = ff_utils.post_metadata(new_case_metadata, 'case', key=self.key)
+            post_resp = try_request(ff_utils.post_metadata, new_case_metadata, 'case', key=self.key)
+            if post_resp:
                 new_cases.append(post_resp['@graph'][0]['@id'])
-            except Exception as e:
-                self.errors.append(e)
-#             else:
-#                 new_cases.append(post_resp['@graph'][0]['@id'])
 
-    # something for meta-workflow-run
+    def get_analysis_type(self):
+        # figure out if analysis will be trio or proband only or proband-only cram
+        sp_type = self.sp_metadata.get('analysis_type', '')
+        if sp_type.endswith('Trio'):
+            return 'trio'
+        elif sp_type.endswith('Group'):
+            # figure out if trio+ or if parents aren't present
+            sample_relations = [item.get('relationship') for item in self.sp_metadata.get('samples_pedigree', [{}])]
+            if all(relation in sample_relations for item in ['proband', 'mother', 'father']):
+                return 'trio'
+        # if not yet returned, then it is a proband-only analysis
+        if all(sample.get('cram_files') for sample in self.samples_metadata):
+            return 'cram proband'
+        return 'proband'
+
+    # def add_metawfr(self):
+    #     metawfr_json = import_metawfr.import_metawfr(
+    #         metawf_uuid=self.metawf_uuid,
+    #         metawfr_uuid=self.case_metadata['meta_workflow_run'],
+    #         case_uuid=self.case_metadata['uuid'],
+    #         steps_name=self.steps_to_rerun,
+    #         create_metawfr=create_metawfr.create_metawfr_from_case,
+    #         type=f'WGS {self.analysis_type}',
+    #         ff_key=self.key,
+    #         post=False,
+    #         verbose=False
+    #     )
+    #     return metawfr_json
