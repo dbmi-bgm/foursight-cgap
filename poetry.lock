@@ -373,7 +373,7 @@ uritemplate = ">=3.0.0,<4dev"
 
 [[package]]
 name = "google-auth"
-version = "1.33.0"
+version = "1.33.1"
 description = "Google Authentication Library"
 category = "main"
 optional = false
@@ -487,7 +487,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "magma-suite"
-version = "0.2.5"
+version = "0.2.6"
 description = "Collection of tools to manage meta-workflows automation"
 category = "main"
 optional = false
@@ -961,7 +961,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.7"
-content-hash = "ab82b68fb903e7e6aa69d770ec5867e306103493b067164ae88fd69554fbdbd2"
+content-hash = "cb2d9a90cc51da4799d9e504730b78d374d4ebbaeee0a94f6bdefd96ecc47827"
 
 [metadata.files]
 ansicon = [
@@ -1137,8 +1137,8 @@ google-api-python-client = [
     {file = "google_api_python_client-1.7.4-py3-none-any.whl", hash = "sha256:7cc47cf80b25ecd7f3d917ea247bb6c62587514e40604ae29c47c0e4ebd1174b"},
 ]
 google-auth = [
-    {file = "google-auth-1.33.0.tar.gz", hash = "sha256:9bd25d835c01ca3dd9045ea0b50f036e3fe3868ee2c5a9773a661925bbdf46ca"},
-    {file = "google_auth-1.33.0-py2.py3-none-any.whl", hash = "sha256:a756a33978fac611e4f00b69715b80e35467c30cc6262132d29d33a0e398ac55"},
+    {file = "google-auth-1.33.1.tar.gz", hash = "sha256:7665c04f2df13cc938dc7d9066cddb1f8af62b038bc8b2306848c1b23121865f"},
+    {file = "google_auth-1.33.1-py2.py3-none-any.whl", hash = "sha256:036dd68c1e8baa422b6b61619b8e02793da2e20f55e69514612de6c080468755"},
 ]
 google-auth-httplib2 = [
     {file = "google-auth-httplib2-0.1.0.tar.gz", hash = "sha256:a07c39fd632becacd3f07718dfd6021bf396978f03ad3ce4321d060015cc30ac"},
@@ -1173,9 +1173,9 @@ jmespath = [
     {file = "jmespath-0.10.0.tar.gz", hash = "sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9"},
 ]
 magma-suite = [
-    {file = "magma-suite-0.2.5.tar.gz", hash = "sha256:ed8e2fe194cc17cb35961d27d177dc908281d482cac5de9f519a6906d98a2790"},
-    {file = "magma_suite-0.2.5-py3-none-any.whl", hash = "sha256:b13f59ead55a117339e374c7e1f3ea415e81e1b5a70885b718900d30632f513b"},
-    {file = "magma_suite-0.2.5-py3.6.egg", hash = "sha256:89d9fd44a46bce6582c6af9ee712a63225bad8926de9c3e99d824fb8c6e2da19"},
+    {file = "magma-suite-0.2.6.tar.gz", hash = "sha256:ef1b033b4367b9b319b46878d87bb39dcdb49388a85b59843ee9f55bcd1e9f5c"},
+    {file = "magma_suite-0.2.6-py3-none-any.whl", hash = "sha256:15296723630491fe9c7345de8d3fefc2760aec8b01f8fd43691e670c7668a335"},
+    {file = "magma_suite-0.2.6-py3.7.egg", hash = "sha256:2c814f1cdd1b95ab064802dd2f1c82c9fa179930ee462d8dd7ecdc88648abb3a"},
 ]
 markupsafe = [
     {file = "MarkupSafe-1.1.1-cp27-cp27m-macosx_10_6_intel.whl", hash = "sha256:09027a7803a62ca78792ad89403b1b7a73a01c8cb65909cd876f7fcebd79b161"},
