@@ -156,6 +156,7 @@ def md5runCGAP_start(connection, **kwargs):
         targets.extend(md5runCGAP_check_result.get('files_with_run_and_wrong_status', []))
     action_logs['targets'] = targets
     for a_target in targets:
+        print("processing target %s" % a_target)
         now = datetime.utcnow()
         if (now-start).seconds > lambda_limit:
             action.description = 'Did not complete action due to time limitations'

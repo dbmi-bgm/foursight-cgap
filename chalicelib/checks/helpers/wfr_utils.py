@@ -749,58 +749,14 @@ def get_attribution(file_json):
     return attributions
 
 
-def extract_file_info(obj_id, arg_name, additional_parameters, auth, env, rename=[]):
+def extract_file_info(obj_id, arg_name, additional_parameters, auth):
     """Takes file id, and creates info dict for tibanna"""
-    my_s3_util = s3Utils(env=env)
-    raw_bucket = my_s3_util.raw_file_bucket
-    out_bucket = my_s3_util.outfile_bucket
-    """Creates the formatted dictionary for files.
-    """
     # start a dictionary
     template = {"workflow_argument_name": arg_name}
-    if rename:
-        change_from = rename[0]
-        change_to = rename[1]
-    # if it is list of items, change the structure
-    if isinstance(obj_id, list):
-        object_key = []
-        uuid = []
-        buckets = []
-        for obj in obj_id:
-            metadata = ff_utils.get_metadata(obj, key=auth)
-            object_key.append(metadata['display_title'])
-            uuid.append(metadata['uuid'])
-            # get the bucket
-            if 'FileProcessed' in metadata['@type']:
-                my_bucket = out_bucket
-            else:  # covers cases of FileFastq, FileReference, FileMicroscopy
-                my_bucket = raw_bucket
-            buckets.append(my_bucket)
-        # check bucket consistency
-        assert len(list(set(buckets))) == 1
-        template['object_key'] = object_key
-        template['uuid'] = uuid
-        template['bucket_name'] = buckets[0]
-        if rename:
-            template['rename'] = [i.replace(change_from, change_to) for i in template['object_key']]
-        if additional_parameters:
-            template.update(additional_parameters)
-
-    # if obj_id is a string
-    else:
-        metadata = ff_utils.get_metadata(obj_id, key=auth)
-        template['object_key'] = metadata['display_title']
-        template['uuid'] = metadata['uuid']
-        # get the bucket
-        if 'FileProcessed' in metadata['@type']:
-            my_bucket = out_bucket
-        else:  # covers cases of FileFastq, FileReference, FileMicroscopy
-            my_bucket = raw_bucket
-        template['bucket_name'] = my_bucket
-        if rename:
-            template['rename'] = template['object_key'].replace(change_from, change_to)
-        if additional_parameters:
-            template.update(additional_parameters)
+    metadata = ff_utils.get_metadata(obj_id, key=auth)
+    template['uuid'] = metadata['uuid']
+    if additional_parameters:
+        template.update(additional_parameters)
     return template
 
 
@@ -812,7 +768,7 @@ def run_missing_wfr(input_json, input_files_and_params, run_name, auth, env, sfn
     input_file_parameters = input_files_and_params.get('additional_file_parameters', {})
     for arg, files in input_files.items():
         additional_params = input_file_parameters.get(arg, {})
-        inp = extract_file_info(files, arg, additional_params, auth, env)
+        inp = extract_file_info(files, arg, additional_params, auth)
         all_inputs.append(inp)
     # tweak to get bg2bw working
     all_inputs = sorted(all_inputs, key=itemgetter('workflow_argument_name'))
@@ -821,103 +777,23 @@ def run_missing_wfr(input_json, input_files_and_params, run_name, auth, env, sfn
     # (even less since repeats need unique names)
     if len(run_name) > 30:
         run_name = run_name[:30] + '...'
-    """Creates the trigger json that is used by foufront endpoint.
-    """
+    """Creates the trigger json that is used by tibanna."""
     input_json['input_files'] = all_inputs
     input_json["_tibanna"] = {
         "env": env,
         "run_type": input_json['app_name'],
-        "run_id": run_name}
+        "run_id": run_name
+    }
     input_json['public_postrun_json'] = True
+    print("input_json=" + str(input_json))
     try:
         #e = ff_utils.post_metadata(input_json, 'WorkflowRun/run', key=auth)
         res = API().run_workflow(input_json, sfn=sfn, verbose=False)
+        print("run_workflow res=" + str(res))
         url = res['_tibanna']['url']
         return url
     except Exception as e:
         return str(e)
-
-
-def find_fastq_info(my_sample, fastq_files, organism='human'):
-    """Find fastq files from sample
-    expects my_rep_set to be set response in frame object (search result)
-    will check if files are paired or not, and if paired will give list of lists for sample
-    if not paired, with just give list of files for sample.
-
-    result is 2 lists
-    - file [file1, file2, file3, file4]  # unpaired
-      file [ [file1, file2], [file3, file4]] # paired
-    - refs keys  {pairing, organism, bwa_ref, f_size}
-    """
-    # # TODO: re word for samples
-    files = []
-    refs = {}
-    # check pairing for the first file, and assume all same
-    paired = ""
-    # check if files are FileFastq or FileProcessed
-    f_type = ""
-    total_f_size = 0
-    sample_files = my_sample['files']
-    # Assumption: Fastq files are either all FileFastq or File processed
-    # File Processed ones don't have paired end information
-    # Assumption: File Processed fastq files are paired end in the order they are in sample files
-    types = [i['@id'].split('/')[1] for i in fastq_files]
-    f_type = list(set(types))
-    msg = '{} has mixed fastq files types {}'.format(my_sample['accession'], f_type)
-    assert len(f_type) == 1, msg
-    f_type = f_type[0]
-
-    if f_type == 'files-processed':
-        for fastq_file in sample_files:
-            file_resp = [i for i in fastq_files if i['uuid'] == fastq_file['uuid']][0]
-            if file_resp.get('file_size'):
-                total_f_size += file_resp['file_size']
-        # we are assuming that this files are processed
-        # # TODO: make sure that this is encoded in the metadata
-        paired = 'Yes'
-        file_ids = [i['@id'] for i in sample_files]
-        files = [file_ids[i:i+2] for i in range(0, len(file_ids), 2)]
-
-    elif f_type == 'files-fastq':
-        for fastq_file in sample_files:
-            file_resp = [i for i in fastq_files if i['uuid'] == fastq_file['uuid']][0]
-            if file_resp.get('file_size'):
-                total_f_size += file_resp['file_size']
-            # skip pair no 2
-            if file_resp.get('paired_end') == '2':
-                continue
-            # check that file has a pair
-            f1 = file_resp['@id']
-            f2 = ""
-            # assign pairing info by the first file
-            if not paired:
-                try:
-                    relations = file_resp['related_files']
-                    paired_files = [relation['file']['@id'] for relation in relations
-                                    if relation['relationship_type'] == 'paired with']
-                    assert len(paired_files) == 1
-                    paired = "Yes"
-                except:
-                    paired = "No"
-
-            if paired == 'No':
-                files.append(f1)
-            elif paired == 'Yes':
-                relations = file_resp['related_files']
-                paired_files = [relation['file']['@id'] for relation in relations
-                                if relation['relationship_type'] == 'paired with']
-                assert len(paired_files) == 1
-                f2 = paired_files[0]
-                files.append((f1, f2))
-    bwa = bwa_index.get(organism)
-    # chrsize = chr_size.get(organism)
-
-    f_size = int(total_f_size / (1024 * 1024 * 1024))
-    refs = {'pairing': paired,
-            'organism': organism,
-            'bwa_ref': bwa,
-            'f_size': str(f_size)+'GB'}
-    return files, refs
 
 
 def check_runs_without_output(res, check, run_name, my_auth, start):
