@@ -291,7 +291,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "0.1.11"
+version = "0.2.0"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -373,7 +373,7 @@ uritemplate = ">=3.0.0,<4dev"
 
 [[package]]
 name = "google-auth"
-version = "1.33.0"
+version = "1.33.1"
 description = "Google Authentication Library"
 category = "main"
 optional = false
@@ -961,7 +961,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.7"
-content-hash = "ab82b68fb903e7e6aa69d770ec5867e306103493b067164ae88fd69554fbdbd2"
+content-hash = "beac62152e0b63688c55f3b23462c519ebdf8cef63f67e340a4cb2de246ec9de"
 
 [metadata.files]
 ansicon = [
@@ -1114,8 +1114,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight_core-0.1.11-py3-none-any.whl", hash = "sha256:a37991ff6a01c3288792b9c9c370894a1cd7aa84a4c708b720139a3b38d783ec"},
-    {file = "foursight_core-0.1.11.tar.gz", hash = "sha256:34b15e1114dde3ade362114a3e356cbf9abf4eeb2e90e3dd6708f222893794ec"},
+    {file = "foursight_core-0.2.0-py3-none-any.whl", hash = "sha256:d90a70d53982f9f3198615001f4a0cffc5fbf93a2d16ff2861bb7cd73d6c360f"},
+    {file = "foursight_core-0.2.0.tar.gz", hash = "sha256:f4789a4071b6d7d456e5d476b7085db8e14735857c94d76aac64a89063b96b42"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
@@ -1137,8 +1137,8 @@ google-api-python-client = [
     {file = "google_api_python_client-1.7.4-py3-none-any.whl", hash = "sha256:7cc47cf80b25ecd7f3d917ea247bb6c62587514e40604ae29c47c0e4ebd1174b"},
 ]
 google-auth = [
-    {file = "google-auth-1.33.0.tar.gz", hash = "sha256:9bd25d835c01ca3dd9045ea0b50f036e3fe3868ee2c5a9773a661925bbdf46ca"},
-    {file = "google_auth-1.33.0-py2.py3-none-any.whl", hash = "sha256:a756a33978fac611e4f00b69715b80e35467c30cc6262132d29d33a0e398ac55"},
+    {file = "google-auth-1.33.1.tar.gz", hash = "sha256:7665c04f2df13cc938dc7d9066cddb1f8af62b038bc8b2306848c1b23121865f"},
+    {file = "google_auth-1.33.1-py2.py3-none-any.whl", hash = "sha256:036dd68c1e8baa422b6b61619b8e02793da2e20f55e69514612de6c080468755"},
 ]
 google-auth-httplib2 = [
     {file = "google-auth-httplib2-0.1.0.tar.gz", hash = "sha256:a07c39fd632becacd3f07718dfd6021bf396978f03ad3ce4321d060015cc30ac"},
