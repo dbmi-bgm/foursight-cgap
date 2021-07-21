@@ -189,11 +189,23 @@
             }
         }
     },
+    "spot_failed_metawfrs" : {
+        "title": "Spot-failed Metawfrs",
+        "group": "Pipeline checks",
+        "schedule": {
+            "fifteen_min_checks_2": {
+                "cgap": {
+                    "kwargs": {"primary": true, "queue_action": "prod"},
+                    "dependencies": []
+                }
+            }
+        }
+    },
     "failed_metawfrs" : {
         "title": "Failed Metawfrs",
         "group": "Pipeline checks",
         "schedule": {
-            "fifteen_min_checks_2": {
+            "manual_checks": {
                 "cgap": {
                     "kwargs": {"primary": true},
                     "dependencies": []
