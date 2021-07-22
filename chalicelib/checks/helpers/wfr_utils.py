@@ -749,12 +749,10 @@ def get_attribution(file_json):
     return attributions
 
 
-def extract_file_info(obj_id, arg_name, additional_parameters, auth):
+def extract_file_info(obj_uuid, arg_name, additional_parameters):
     """Takes file id, and creates info dict for tibanna"""
     # start a dictionary
-    template = {"workflow_argument_name": arg_name}
-    metadata = ff_utils.get_metadata(obj_id, key=auth)
-    template['uuid'] = metadata['uuid']
+    template = {"workflow_argument_name": arg_name, "uuid": obj_uuid}
     if additional_parameters:
         template.update(additional_parameters)
     return template
@@ -768,10 +766,11 @@ def run_missing_wfr(input_json, input_files_and_params, run_name, auth, env, sfn
     input_file_parameters = input_files_and_params.get('additional_file_parameters', {})
     for arg, files in input_files.items():
         additional_params = input_file_parameters.get(arg, {})
-        inp = extract_file_info(files, arg, additional_params, auth)
+        inp = extract_file_info(files, arg, additional_params)
         all_inputs.append(inp)
     # tweak to get bg2bw working
     all_inputs = sorted(all_inputs, key=itemgetter('workflow_argument_name'))
+    print("all_inputs=%s" % str(all_inputs))
     # shorten long name_tags
     # they get combined with workflow name, and total should be less then 80
     # (even less since repeats need unique names)
