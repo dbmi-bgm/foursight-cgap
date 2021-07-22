@@ -961,7 +961,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.7"
-content-hash = "80f17d39b757bf80fc57cb5b1561cf8e745f027e64b112de8e3fd5269bfeb2d2"
+content-hash = "beac62152e0b63688c55f3b23462c519ebdf8cef63f67e340a4cb2de246ec9de"
 
 [metadata.files]
 ansicon = [
