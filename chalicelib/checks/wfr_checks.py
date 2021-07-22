@@ -165,7 +165,7 @@ def md5runCGAP_start(connection, **kwargs):
         a_file = ff_utils.get_metadata(a_target, key=my_auth)
         print("getting attribution for target...")
         attributions = wfr_utils.get_attribution(a_file)
-        inp_f = {'input_file': a_file['uuids'],
+        inp_f = {'input_file': a_file['uuid'],
                  'additional_file_parameters': {'input_file': {'mount': True}}}
         print("input template for target: %s" % str(inp_f))
         wfr_setup = step_settings('md5', 'no_organism', attributions)
