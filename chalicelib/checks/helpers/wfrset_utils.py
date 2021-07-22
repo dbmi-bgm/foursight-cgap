@@ -486,8 +486,6 @@ def step_settings(step_name, my_organism, attribution, overwrite=None):
 
     update_config = {
         "spot_instance": True,
-        "log_bucket": "tibanna-output",
-        "key_name": "4dn-encode",
         "public_postrun_json": True,
         "behavior_on_capacity_limit": "wait_and_retry"
         }
