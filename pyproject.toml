@@ -14,7 +14,6 @@ dcicutils = "^1.19.0"  # minimum version
 click = "^7.1.2"
 PyJWT = "1.5.3"
 Jinja2 = "2.10.1"
-MarkupSafe = "1.1.1"
 google-api-python-client = "1.7.4"
 geocoder = "1.38.1"
 elasticsearch = "^6.8.1"

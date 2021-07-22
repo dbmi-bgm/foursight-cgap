@@ -162,7 +162,7 @@ class TestRunResult():
         check.status = 'PASS'
         check.store_result()
         with pytest.raises(Exception):
-            run.delete_results(custom_filter=bad_filter)
+            check.delete_results(custom_filter=bad_filter)
         num_deleted, _ = self.run.delete_results()
         assert num_deleted == 1
 
