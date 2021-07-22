@@ -72,8 +72,8 @@ foursight_cron_by_schedule = {
         'evening_checks': Cron('0', '22', '*', '*', '?', '*'),
         'monday_checks': Cron('30', '9', '?', '*', '2', '*'),
         'monthly_checks': Cron('30', '9', '1', '*', '?', '*'),
-        'friday_autoscaling_checks': effectively_never(),  # do not run autoscaling checks on dev
-        'monday_autoscaling_checks': effectively_never(),  # do not run autoscaling checks on dev
+        'friday_autoscaling_checks': friday_at_8_pm_est(),  # disabled, see schedule below
+        'monday_autoscaling_checks': monday_at_2_am_est(),  # disabled, see schedule below
         'manual_checks': effectively_never(),
         'deployment_checks': end_of_day_on_weekdays()  # disabled, see schedule below
     }
