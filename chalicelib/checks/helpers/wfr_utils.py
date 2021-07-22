@@ -772,6 +772,7 @@ def run_missing_wfr(input_json, input_files_and_params, run_name, auth, env, sfn
         all_inputs.append(inp)
     # tweak to get bg2bw working
     all_inputs = sorted(all_inputs, key=itemgetter('workflow_argument_name'))
+    print("all_inputs=%s" % str(all_inputs))
     # shorten long name_tags
     # they get combined with workflow name, and total should be less then 80
     # (even less since repeats need unique names)

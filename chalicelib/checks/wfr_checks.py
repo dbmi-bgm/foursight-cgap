@@ -161,11 +161,15 @@ def md5runCGAP_start(connection, **kwargs):
         if (now-start).seconds > lambda_limit:
             action.description = 'Did not complete action due to time limitations'
             break
+        print("getting metadata for target...")
         a_file = ff_utils.get_metadata(a_target, key=my_auth)
+        print("getting attribution for target...")
         attributions = wfr_utils.get_attribution(a_file)
         inp_f = {'input_file': a_file['@id'],
                  'additional_file_parameters': {'input_file': {'mount': True}}}
+        print("input template for target: %s" % str(inp_f))
         wfr_setup = step_settings('md5', 'no_organism', attributions)
+        print("wfr_setup for target: %s" % str(wfr_setup))
 
         url = wfr_utils.run_missing_wfr(wfr_setup, inp_f, a_file['accession'], connection.ff_keys, connection.ff_env, sfn)
         # aws run url
