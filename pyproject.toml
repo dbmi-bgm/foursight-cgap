@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "foursight-cgap"
-version = "0.5.13"
+version = "0.5.14"
 description = "Serverless Chalice Application for Monitoring"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -14,13 +14,13 @@ dcicutils = "^1.19.0"  # minimum version
 click = "^7.1.2"
 PyJWT = "1.5.3"
 Jinja2 = "2.10.1"
-MarkupSafe = "1.1.1"
 google-api-python-client = "1.7.4"
 geocoder = "1.38.1"
 elasticsearch = "^6.8.1"
 elasticsearch-dsl = "^6.4.0"
 gitpython = "^3.1.2"
 pytz = "^2020.1"
+MarkupSafe = "1.1.1"
 ## adding foursight-core
 # use below for deployment
 foursight-core = "^0.2.0"

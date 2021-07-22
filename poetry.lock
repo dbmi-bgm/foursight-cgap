@@ -77,20 +77,20 @@ wcwidth = ">=0.1.4"
 
 [[package]]
 name = "boto3"
-version = "1.18.3"
+version = "1.18.4"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.6"
 
 [package.dependencies]
-botocore = ">=1.21.3,<1.22.0"
+botocore = ">=1.21.4,<1.22.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.5.0,<0.6.0"
 
 [[package]]
 name = "botocore"
-version = "1.21.3"
+version = "1.21.4"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -817,7 +817,7 @@ tests = ["coverage", "freezegun (>=0.2.8)", "pretend", "pytest (>=3.3.0)", "simp
 
 [[package]]
 name = "tibanna"
-version = "1.4.0b0"
+version = "1.4.0b2"
 description = "Tibanna runs portable pipelines (in CWL/WDL) on the AWS Cloud."
 category = "main"
 optional = false
@@ -995,12 +995,12 @@ blessed = [
     {file = "blessed-1.17.6.tar.gz", hash = "sha256:a9a774fc6eda05248735b0d86e866d640ca2fef26038878f7e4d23f7749a1e40"},
 ]
 boto3 = [
-    {file = "boto3-1.18.3-py3-none-any.whl", hash = "sha256:3be2f259b279d69495433e3288db3670817fdb1813cfde92abf867bba3ad8148"},
-    {file = "boto3-1.18.3.tar.gz", hash = "sha256:13e60f88d13161df951d6e52bd483cdbe1a36a31f818746289d8ba0879465710"},
+    {file = "boto3-1.18.4-py3-none-any.whl", hash = "sha256:649ed1ca205f5ee0b0328d54580780aebc1a7a05681a24f6ee05253007ca48d8"},
+    {file = "boto3-1.18.4.tar.gz", hash = "sha256:7079b40bd6621c54a0385a8fc11240cff4318a4d487292653e393e18254f5d94"},
 ]
 botocore = [
-    {file = "botocore-1.21.3-py3-none-any.whl", hash = "sha256:285ab9459cdd49d4a9322692c6e13772b97af723a03c0eed519b589446491a5b"},
-    {file = "botocore-1.21.3.tar.gz", hash = "sha256:0b6f378c9efbc72eee61aba1e16cab90bde53a37bd2d861f6435552fd7030adf"},
+    {file = "botocore-1.21.4-py3-none-any.whl", hash = "sha256:dca7f283d4e7a1c9f456f5a23e55725ffc1b7d34abd089eb2c7651359aebd977"},
+    {file = "botocore-1.21.4.tar.gz", hash = "sha256:317d441c8f3f03591761e3478de6ab34b22b333038d819bc24f2e74b64f22201"},
 ]
 cachetools = [
     {file = "cachetools-4.2.2-py3-none-any.whl", hash = "sha256:2cc0b89715337ab6dbba85b5b50effe2b0c74e035d83ee8ed637cf52f12ae001"},
@@ -1407,9 +1407,9 @@ structlog = [
     {file = "structlog-19.2.0.tar.gz", hash = "sha256:4287058cf4ce1a59bc5dea290d6386d37f29a37529c9a51cdf7387e51710152b"},
 ]
 tibanna = [
-    {file = "tibanna-1.4.0b0-py3-none-any.whl", hash = "sha256:8d147f74ceaabf324dff2d1743feabad50b2608f44185514b43aa10c78fb6e00"},
-    {file = "tibanna-1.4.0b0-py3.6.egg", hash = "sha256:b35fe00ce91297975b9804860f8d670340668f51cd4da9f49f5ee60c28661655"},
-    {file = "tibanna-1.4.0b0.tar.gz", hash = "sha256:66c657d26292dd8775b331d49381a45c802f8b87fb477cdf1b15be2d39cf8c5f"},
+    {file = "tibanna-1.4.0b2-py3-none-any.whl", hash = "sha256:0a1d40bb7bf740bd571d69d4e16e0b8792704a380b5e2dd514a2f7f0a2c837de"},
+    {file = "tibanna-1.4.0b2-py3.6.egg", hash = "sha256:5c5941d66123d57cf1f3e46916d5b701daef234b9aa1bbe1f14fa895fd7641b2"},
+    {file = "tibanna-1.4.0b2.tar.gz", hash = "sha256:f48edfc5726dcfeb226c961c980be26ec9e4279c4d5fa876893cf240c3f03e12"},
 ]
 tibanna-ff = [
     {file = "tibanna_ff-0.20.1b1-py3-none-any.whl", hash = "sha256:04a8fa3fbeb40f15072af0bd8d15ab6ae0c65fb49db9adfa2731a5b98a0863ff"},
