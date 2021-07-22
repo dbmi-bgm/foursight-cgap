@@ -487,7 +487,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "magma-suite"
-version = "0.2.5"
+version = "0.2.6"
 description = "Collection of tools to manage meta-workflows automation"
 category = "main"
 optional = false
@@ -961,7 +961,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.7"
-content-hash = "beac62152e0b63688c55f3b23462c519ebdf8cef63f67e340a4cb2de246ec9de"
+content-hash = "7e3abd01f93ef48b7f37811726882dd64c5b4c4b1c52b789db91eae56e26c597"
 
 [metadata.files]
 ansicon = [
@@ -1173,9 +1173,9 @@ jmespath = [
     {file = "jmespath-0.10.0.tar.gz", hash = "sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9"},
 ]
 magma-suite = [
-    {file = "magma-suite-0.2.5.tar.gz", hash = "sha256:ed8e2fe194cc17cb35961d27d177dc908281d482cac5de9f519a6906d98a2790"},
-    {file = "magma_suite-0.2.5-py3-none-any.whl", hash = "sha256:b13f59ead55a117339e374c7e1f3ea415e81e1b5a70885b718900d30632f513b"},
-    {file = "magma_suite-0.2.5-py3.6.egg", hash = "sha256:89d9fd44a46bce6582c6af9ee712a63225bad8926de9c3e99d824fb8c6e2da19"},
+    {file = "magma-suite-0.2.6.tar.gz", hash = "sha256:ef1b033b4367b9b319b46878d87bb39dcdb49388a85b59843ee9f55bcd1e9f5c"},
+    {file = "magma_suite-0.2.6-py3-none-any.whl", hash = "sha256:15296723630491fe9c7345de8d3fefc2760aec8b01f8fd43691e670c7668a335"},
+    {file = "magma_suite-0.2.6-py3.7.egg", hash = "sha256:2c814f1cdd1b95ab064802dd2f1c82c9fa179930ee462d8dd7ecdc88648abb3a"},
 ]
 markupsafe = [
     {file = "MarkupSafe-1.1.1-cp27-cp27m-macosx_10_6_intel.whl", hash = "sha256:09027a7803a62ca78792ad89403b1b7a73a01c8cb65909cd876f7fcebd79b161"},

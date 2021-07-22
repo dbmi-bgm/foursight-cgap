@@ -156,6 +156,7 @@ def md5runCGAP_start(connection, **kwargs):
         targets.extend(md5runCGAP_check_result.get('files_with_run_and_wrong_status', []))
     action_logs['targets'] = targets
     for a_target in targets:
+        print("processing target %s" % a_target)
         now = datetime.utcnow()
         if (now-start).seconds > lambda_limit:
             action.description = 'Did not complete action due to time limitations'
@@ -405,7 +406,104 @@ def checkstatus_metawfrs(connection, **kwargs):
     return action
 
 
-@check_function(reset_all_failed=False)
+
+@check_function()
+def spot_failed_metawfrs(connection, **kwargs):
+    """Find metaworkflowruns that failed and reset
+    if it was obviously caused by spot interruption.
+    """
+    check = CheckResult(connection, 'spot_failed_metawfrs')
+    my_auth = connection.ff_keys
+    check.action = "reset_spot_failed_metawfrs"
+    check.description = "Find metaworkflow runs that has failed workflow runs that may be due to spot interruption."
+    check.brief_output = []
+    check.summary = ""
+    check.full_output = {}
+    check.status = 'PASS'
+
+    # check indexing queue
+    env = connection.ff_env
+    indexing_queue = ff_utils.stuff_in_queues(env, check_secondary=True)
+
+    if indexing_queue:
+        check.status = 'PASS'  # maybe use warn?
+        check.brief_output = ['Waiting for indexing queue to clear']
+        check.summary = 'Waiting for indexing queue to clear'
+        check.full_output = {}
+        return check
+
+    query = '/search/?type=MetaWorkflowRun' + \
+            ''.join(['&final_status=' + st for st in ['failed']])
+    query += ''.join(['&meta_workflow.title=' + mwf for mwf in default_pipelines_to_run])
+    search_res = ff_utils.search_metadata(query, key=my_auth)
+
+    # nothing to run
+    if not search_res:
+        check.summary = 'All Good!'
+        return check
+
+    metawfr_uuids = [r['uuid'] for r in search_res]
+    metawfr_titles = [r['title'] for r in search_res]
+
+    check.allow_action = True
+    check.summary = 'Some metawfrs have failed wfrs.'
+    check.status = 'WARN'
+    msg = str(len(metawfr_uuids)) + ' metawfrs may have failed wfrs'
+    check.brief_output.append(msg)
+    check.full_output['metawfrs_that_failed'] = {'titles': metawfr_titles, 'uuids': metawfr_uuids}
+    if kwargs.get('reset_all_failed'):
+        check.full_output['options'] = ['reset_all_failed']
+
+    return check
+
+
+@action_function()
+def reset_spot_failed_metawfrs(connection, **kwargs):
+    start = datetime.utcnow()
+    action = ActionResult(connection, 'spot_failed_metawfrs')
+    action_logs = {'runs_reset': []}
+    my_auth = connection.ff_keys
+    env = connection.ff_env
+    check_result = action.get_associated_check_result(kwargs).get('full_output', {})
+    action_logs['check_output'] = check_result
+    metawfr_uuids = check_result.get('metawfrs_that_failed', {}).get('uuids', [])
+
+    random.shuffle(metawfr_uuids)  # if always the same order, we may never get to the later ones.
+    for metawfr_uuid in metawfr_uuids:
+        now = datetime.utcnow()
+        if (now-start).seconds > lambda_limit:
+            action.description = 'Did not complete action due to time limitations'
+            break
+        try:
+            metawfr_meta = ff_utils.get_metadata(metawfr_uuid, key=my_auth, add_on='?frame=raw')
+            shards_to_reset = []
+            for wfr in metawfr_meta['workflow_runs']:
+                if wfr['status'] == 'failed':
+                    if wfr.get('workflow_run'):
+                        res = ff_utils.get_metadata(wfr['workflow_run'], key=my_auth)
+                    res = ff_utils.search_metadata('/search/?type=WorkflowRunAwsem&awsem_job_id=%s' % wfr['jobid'], key=my_auth)
+                    if len(res) == 1:
+                        res = res[0]
+                    elif len(res) > 1:
+                        raise Exception("multiple workflow runs for job id %s" % wfr['jobid'])
+                    else:
+                        raise Exception("No workflow run found for job id %s" % wfr['jobid'])
+                    if 'EC2 unintended termination' in res.get('description', '') or \
+                       'EC2 Idle error' in res.get('description', ''):
+                        # reset spot-failed shards
+                        shard_name = wfr['name'] + ':' + str(wfr['shard'])
+                        shards_to_reset.append(shard_name)
+            reset_metawfr.reset_shards(metawfr_uuid, shards_to_reset, my_auth, verbose=True)
+            action_logs['runs_reset'].append({'metawfr': metawfr_uuid, 'shards': shards_to_reset})
+        except Exception as e:
+            action_logs['error'] = str(e)
+            break
+    action.output = action_logs
+    action.status = 'DONE'
+    return action
+
+
+@check_function()
 def failed_metawfrs(connection, **kwargs):
     """Find metaworkflowruns that may need status-checking
     - those with final_status running.
@@ -475,29 +573,8 @@ def reset_failed_metawfrs(connection, **kwargs):
             action.description = 'Did not complete action due to time limitations'
             break
         try:
-            metawfr_meta = ff_utils.get_metadata(metawfr_uuid, key=my_auth, add_on='?frame=raw')
-            shards_to_reset = []
-            for wfr in metawfr_meta['workflow_runs']:
-                if wfr['status'] == 'failed':
-                    if wfr.get('workflow_run'):
-                        res = ff_utils.get_metadata(wfr['workflow_run'], key=my_auth)
-                    res = ff_utils.search_metadata('/search/?type=WorkflowRunAwsem&awsem_job_id=%s' % wfr['jobid'], key=my_auth)
-                    if len(res) == 1:
-                        res = res[0]
-                    elif len(res) > 1:
-                        raise Exception("multiple workflow runs for job id %s" % wfr['jobid'])
-                    else:
-                        raise Exception("No workflow run found for job id %s" % wfr['jobid'])
-                    if reset_all_failed:
-                        shard_name = wfr['name'] + ':' + str(wfr['shard'])
-                        shards_to_reset.append(shard_name)
-                    elif 'EC2 unintended termination' in res.get('description', '') or \
-                       'EC2 Idle error' in res.get('description', ''):
-                        # reset spot-failed shards
-                        shard_name = wfr['name'] + ':' + str(wfr['shard'])
-                        shards_to_reset.append(shard_name)
-            reset_metawfr.reset_shards(metawfr_uuid, shards_to_reset, my_auth, verbose=True)
-            action_logs['runs_reset'].append({'metawfr': metawfr_uuid, 'shards': shards_to_reset})
+            reset_metawfr.reset_failed(metawfr_uuid, my_auth, verbose=True)
+            action_logs['runs_reset'].append({'metawfr': metawfr_uuid})
         except Exception as e:
             action_logs['error'] = str(e)
             break
