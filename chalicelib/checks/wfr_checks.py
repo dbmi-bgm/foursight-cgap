@@ -852,7 +852,7 @@ def ingest_vcf_status(connection, **kwargs):
         return check
 
     # Build the query (skip to be uploaded by workflow)
-    query = ("/search/?file_type=full+annotated+VCF&variant_type!=SV&type=FileProcessed"
+    query = ("/search/?file_type=full+annotated+VCF&type=FileProcessed"
              "&file_ingestion_status=No value&file_ingestion_status=N/A"
              "&status!=uploading&status!=to be uploaded by workflow&status!=upload failed")
     # add date
