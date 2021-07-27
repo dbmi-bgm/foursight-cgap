@@ -410,7 +410,6 @@ def checkstatus_metawfrs(connection, **kwargs):
     return action
 
 
-
 @check_function()
 def spot_failed_metawfrs(connection, **kwargs):
     """Find metaworkflowruns that failed and reset
@@ -755,7 +754,7 @@ def patch_processed_files_to_sample(metawfr_uuid, ff_key):
     case_acc = metawfr_meta['title'].split(' ')[-1]
     case_meta = ff_utils.get_metadata(case_acc, add_on='?frame=raw', key=ff_key)
     sp_uuid = case_meta['sample_processing']
-    sp_meta = ff_utils.get_metadata(sp_uuid, add_on='?frame=object', key=ff_key)
+    sp_meta = ff_utils.get_metadata(sp_uuid, key=ff_key)
 
     # modify this to support trio - need shard matching
     if len(sp_meta['samples']) == 1:
@@ -767,12 +766,13 @@ def patch_processed_files_to_sample(metawfr_uuid, ff_key):
             elif wfr['name'] == 'workflow_gatk-HaplotypeCaller' and wfr['status'] == 'completed':
                 sample_gvcf = wfr['output'][0]['file']['uuid']
         if final_bam and sample_gvcf:
-            ff_utils.patch_metadata({'processed_files': [final_bam, sample_gvcf]}, sp_meta['samples'][0], key=ff_key)
+            ff_utils.patch_metadata({'processed_files': [final_bam, sample_gvcf]}, sp_meta['samples'][0]['uuid'], key=ff_key)
     else:
         # sample name - meta mapping from sample metadata
         sample_mapping = dict()
-        for sample_id in sp_meta['samples']:
-            sample_meta = ff_utils.get_metadata(sample_id, add_on='?frame=raw', key=ff_key)
+        for sample in sp_meta['samples']:
+            sample_uuid = sample['uuid']
+            sample_meta = ff_utils.get_metadata(sample_uuid, add_on='?frame=raw', key=ff_key)
             sample_name = sample_meta.get('bam_sample_id', '')
             sample_mapping.update({sample_name: sample_meta})
 
@@ -936,7 +936,7 @@ def ingest_vcf_status(connection, **kwargs):
         return check
 
     # Build the query (skip to be uploaded by workflow)
-    query = ("/search/?file_type=full+annotated+VCF&variant_type!=SV&type=FileProcessed"
+    query = ("/search/?file_type=full+annotated+VCF&type=FileProcessed"
              "&file_ingestion_status=No value&file_ingestion_status=N/A"
              "&status!=uploading&status!=to be uploaded by workflow&status!=upload failed")
     # add date
