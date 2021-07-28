@@ -667,12 +667,12 @@ def patch_pfs_to_samples(connection, **kwargs):
 
 
 @check_function()
-def metawfrs_to_patch_sample_processing(connection, **kwargs):
+def SNV_metawfrs_to_patch_sample_processing(connection, **kwargs):
     """Find SNV metaworkflowruns that may need sample_processing patched with processed files
     """
-    check = CheckResult(connection, 'metawfrs_to_patch_sample_processing')
+    check = CheckResult(connection, 'SNV_metawfrs_to_patch_sample_processing')
     my_auth = connection.ff_keys
-    check.action = "patch_pfs_to_sample_processing"
+    check.action = "patch_SNV_pfs_to_sample_processing"
     check.description = "Find SNV metaworkflow runs that may need sample processing to be patched."
     check.brief_output = []
     check.summary = ""
@@ -730,9 +730,9 @@ def metawfrs_to_patch_sample_processing(connection, **kwargs):
 
 
 @action_function()
-def patch_pfs_to_sample_processing(connection, **kwargs):
+def patch_SNV_pfs_to_sample_processing(connection, **kwargs):
     start = datetime.utcnow()
-    action = ActionResult(connection, 'patch_pfs_to_sample_processing')
+    action = ActionResult(connection, 'patch_SNV_pfs_to_sample_processing')
     action_logs = {'runs_checked_for_patching': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
@@ -746,7 +746,7 @@ def patch_pfs_to_sample_processing(connection, **kwargs):
             action.description = 'Did not complete action due to time limitations'
             break
         try:
-            patch_processed_files_to_sample_processing(metawfr_uuid, my_auth)
+            patch_SNV_processed_files_to_sample_processing(metawfr_uuid, my_auth)
             action_logs['runs_checked_for_patching'].append(metawfr_uuid)
         except Exception as e:
             action_logs['error'] = str(e)
@@ -900,7 +900,7 @@ def patch_processed_files_to_sample(metawfr_uuid, ff_key):
                 ff_utils.patch_metadata({'processed_files': [final_bam, sample_gvcf]}, sample_uuid, key=ff_key)
 
 
-def patch_processed_files_to_sample_processing(metawfr_uuid, ff_key):
+def patch_SNV_processed_files_to_sample_processing(metawfr_uuid, ff_key):
     """This currently works only for proband-only cases.
     patches samples with final bam and sample gvcf,
     patches sample_processing with vep vcf and final vcf and completed_processes."""
@@ -908,6 +908,8 @@ def patch_processed_files_to_sample_processing(metawfr_uuid, ff_key):
     case_acc = metawfr_meta['title'].split(' ')[-1]
     case_meta = ff_utils.get_metadata(case_acc, add_on='?frame=raw', key=ff_key)
     sp_uuid = case_meta['sample_processing']
+    sp_meta = ff_utils.get_metadata(sp_uuid, key=ff_key)
+    sp_meta_short = ff_utils.get_metadata(sp_uuid, add_on='?frame=raw', key=ff_key)
 
     vep_vcf = ''
     final_vcf = ''
@@ -917,10 +919,31 @@ def patch_processed_files_to_sample_processing(metawfr_uuid, ff_key):
         elif wfr['name'] == 'workflow_hg19lo_hgvsg-check' and wfr['status'] == 'completed':
             final_vcf = wfr['output'][0]['file']['uuid']
     patch_body = dict()
+
+    #here, we aren't checking for type or replacing existing workflows because of how the check is now written
     if vep_vcf and final_vcf:
-        patch_body = {'processed_files': [vep_vcf, final_vcf]}
-    if metawfr_meta['final_status'] == 'completed':
-        patch_body.update({'completed_processes': [metawfr_meta['meta_workflow']['title']]})
+        try:
+            processed_short = sp_meta_short['processed_files'] #if processed files exist (from SV), append these ones
+            processed_short.append(vep_vcf)
+            processed_short.append(final_vcf)
+            patch_body = {'processed_files': processed_short}
+        except:
+            patch_body = {'processed_files': [vep_vcf, final_vcf]} #otherwise, create processed files
+
+    if metawfr_meta['final_status'] == 'completed': #this could be turned into a function (repeated in SV as well)
+        try:
+            sp_meta_short['completed_processes']
+            update = True
+            for process in sp_meta_short['completed_processes']:
+                if metawfr_meta['meta_workflow']['title'] == process:
+                    update = False
+            if update == True:
+                process_list = sp_meta_short['completed_processes']
+                process_list.append(metawfr_meta['meta_workflow']['title'])
+                patch_body.update({'completed_processes': process_list})
+        except:
+            patch_body.update({'completed_processes': [metawfr_meta['meta_workflow']['title']]})
+
     if patch_body:
         ff_utils.patch_metadata(patch_body, sp_uuid, key=ff_key)
 
