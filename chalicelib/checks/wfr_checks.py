@@ -791,7 +791,7 @@ def SV_metawfrs_to_patch_sample_processing(connection, **kwargs):
         return check
 
     # start with cases with a metawfr and no ingested final vcf
-    query = '/search/?type=Case&meta_workflow_run_sv!=No+value&sv_vcf_file.file_ingestion_status!=Ingested'
+    query = '/search/?type=Case&meta_workflow_run_sv!=No+value&sv_vcf_file=No+value'
     search_res = ff_utils.search_metadata(query, key=my_auth)
 
     # filter those whose samples do not have processed_files
