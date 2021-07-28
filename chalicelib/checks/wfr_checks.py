@@ -668,12 +668,12 @@ def patch_pfs_to_samples(connection, **kwargs):
 
 @check_function()
 def metawfrs_to_patch_sample_processing(connection, **kwargs):
-    """Find metaworkflowruns that may need sample_processing patched with processed files
+    """Find SNV metaworkflowruns that may need sample_processing patched with processed files
     """
     check = CheckResult(connection, 'metawfrs_to_patch_sample_processing')
     my_auth = connection.ff_keys
     check.action = "patch_pfs_to_sample_processing"
-    check.description = "Find metaworkflow runs that may need sample processing to be patched."
+    check.description = "Find SNV metaworkflow runs that may need sample processing to be patched."
     check.brief_output = []
     check.summary = ""
     check.full_output = {}
@@ -747,6 +747,96 @@ def patch_pfs_to_sample_processing(connection, **kwargs):
             break
         try:
             patch_processed_files_to_sample_processing(metawfr_uuid, my_auth)
+            action_logs['runs_checked_for_patching'].append(metawfr_uuid)
+        except Exception as e:
+            action_logs['error'] = str(e)
+            break
+    action.output = action_logs
+    action.status = 'DONE'
+    return action
+
+
+@check_function()
+def SV_metawfrs_to_patch_sample_processing(connection, **kwargs):
+    """Find SV metaworkflowruns that may need sample_processing patched with processed files
+    """
+    check = CheckResult(connection, 'SV_metawfrs_to_patch_sample_processing')
+    my_auth = connection.ff_keys
+    check.action = "patch_SV_pfs_to_sample_processing"
+    check.description = "Find SV metaworkflow runs that may need sample processing to be patched."
+    check.brief_output = []
+    check.summary = ""
+    check.full_output = {}
+    check.status = 'PASS'
+
+    # check indexing queue
+    env = connection.ff_env
+    indexing_queue = ff_utils.stuff_in_queues(env, check_secondary=True)
+
+    if indexing_queue:
+        check.status = 'PASS'  # maybe use warn?
+        check.brief_output = ['Waiting for indexing queue to clear']
+        check.summary = 'Waiting for indexing queue to clear'
+        check.full_output = {}
+        return check
+
+    # start with cases with a metawfr and no ingested final vcf
+    query = '/search/?type=Case&meta_workflow_run_sv!=No+value&sv_vcf_file.file_ingestion_status!=Ingested'
+    search_res = ff_utils.search_metadata(query, key=my_auth)
+
+    # filter those whose samples do not have processed_files
+    filtered_res = []
+    SNV_processed = 0
+    SV_processed = 0
+    for r in search_res:
+        result_list = r['sample_processing'].get('processed_files', [])
+        for pf in result_list:
+            try:
+                pf['variant_type']
+                if pf['variant_type'] == "SV":
+                    SV_processed += 1
+                elif pf['variant_type'] == "SNV":
+                    SNV_processed += 1
+            except:
+                SNV_processed += 1
+    if SV_processed < 2:
+        filtered_res.append(r)
+
+    # nothing to run
+    if not filtered_res:
+        check.summary = 'All Good!'
+        return check
+
+    metawfr_uuids = [r['meta_workflow_run_sv']['uuid'] for r in filtered_res]
+    metawfr_titles = [r['meta_workflow_run_sv']['display_title'] for r in filtered_res]
+
+    check.allow_action = True
+    check.summary = 'Some metawfrs may need patching sample processing.'
+    check.status = 'WARN'
+    msg = str(len(metawfr_uuids)) + ' metawfrs may need patching sample processing'
+    check.brief_output.append(msg)
+    check.full_output['metawfrs_to_check'] = {'titles': metawfr_titles, 'uuids': metawfr_uuids}
+    return check
+
+
+@action_function()
+def patch_SV_pfs_to_sample_processing(connection, **kwargs):
+    start = datetime.utcnow()
+    action = ActionResult(connection, 'patch_SV_pfs_to_sample_processing')
+    action_logs = {'runs_checked_for_patching': []}
+    my_auth = connection.ff_keys
+    env = connection.ff_env
+    check_result = action.get_associated_check_result(kwargs).get('full_output', {})
+    action_logs['check_output'] = check_result
+    metawfr_uuids = check_result.get('metawfrs_to_check', {}).get('uuids', [])
+    random.shuffle(metawfr_uuids)  # if always the same order, we may never get to the later ones.
+    for metawfr_uuid in metawfr_uuids:
+        now = datetime.utcnow()
+        if (now-start).seconds > lambda_limit:
+            action.description = 'Did not complete action due to time limitations'
+            break
+        try:
+            patch_processed_SV_files_to_sample_processing(metawfr_uuid, my_auth)
             action_logs['runs_checked_for_patching'].append(metawfr_uuid)
         except Exception as e:
             action_logs['error'] = str(e)
