@@ -697,11 +697,21 @@ def metawfrs_to_patch_sample_processing(connection, **kwargs):
 
     # filter those whose samples do not have processed_files
     filtered_res = []
+    SNV_processed = 0
+    SV_processed = 0
     for r in search_res:
-        if len(r['sample_processing'].get('processed_files', [])) < 2:  # vep vcf and final vcf
-            filtered_res.append(r)
-        elif len(r['sample_processing'].get('completed_processes', [])) < 1:
-            filtered_res.append(r)
+        result_list = r['sample_processing'].get('processed_files', [])
+        for pf in result_list:
+            try:
+                pf['variant_type']
+                if pf['variant_type'] == "SV":
+                    SV_processed += 1
+                elif pf['variant_type'] == "SNV":
+                    SNV_processed += 1
+            except:
+                SNV_processed += 1
+    if SNV_processed < 2:
+        filtered_res.append(r)
 
     # nothing to run
     if not filtered_res:
