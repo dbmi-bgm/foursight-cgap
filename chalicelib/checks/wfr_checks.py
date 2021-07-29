@@ -210,8 +210,8 @@ def metawfrs_to_check_linecount(connection, **kwargs):
         check.full_output = {}
         return check
 
-    query = '/search/?type=MetaWorkflowRun' + \
-            ''.join(['&final_status=' + st for st in ['complete']])
+    query = '/search/?type=MetaWorkflowRun&overall_qcs.name!=linecount_test' + \
+            ''.join(['&final_status=' + st for st in ['completed']])
     search_res = ff_utils.search_metadata(query, key=my_auth)
 
     # nothing to run
@@ -235,7 +235,7 @@ def metawfrs_to_check_linecount(connection, **kwargs):
 def line_count_test(connection, **kwargs):
     start = datetime.utcnow()
     action = ActionResult(connection, 'run_metawfrs')
-    action_logs = {'metawfrs_that_passed_linecount_test': []}
+    action_logs = {'metawfrs_that_passed_linecount_test': [], 'metawfrs_that_failed_linecount_test': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
     check_result = action.get_associated_check_result(kwargs).get('full_output', {})
@@ -247,8 +247,18 @@ def line_count_test(connection, **kwargs):
             action.description = 'Did not complete action due to time limitations'
             break
         try:
-            linecount_result = check_lines(metawfr_uuid, ff_key, steps=steps_dict, fastqs=fastqs_dict)
-            action_logs['metawfrs_that_passed_linecount_test'].append(linecount_result)
+            linecount_result = check_lines(metawfr_uuid, my_auth, steps=steps_dict, fastqs=fastqs_dict)
+            metawfr_meta = ff_utils.get_metadata(metawfr_uuid, add_on='?frame=raw', key=my_auth)
+            overall_qcs_dict = {qc['name']: qc['value'] for qc in metawfr_meta.get('overall_qcs', [])}
+            if overall_qcs_dict and overall_qcs_dict.get('linecount_test', ''):
+                continue
+            overall_qcs_dict['linecount_test'] = 'PASS' if linecount_result else 'FAIL'
+            updated_overall_qcs = [{'name': k, 'value': v} for k, v in overall_qcs_dict.items()]
+            ff_utils.patch_metadata({'overall_qcs': updated_overall_qcs}, metawfr_uuid, key=my_auth)
+            if linecount_result:
+                action_logs['metawfrs_that_passed_linecount_test'].append(metawfr_uuid)
+            else:
+                action_logs['metawfrs_that_failed_linecount_test'].append(metawfr_uuid)
         except Exception as e:
             action_logs['error'] = str(e)
             break
@@ -611,7 +621,7 @@ def metawfrs_to_patch_samples(connection, **kwargs):
         return check
 
     # start with cases with a metawfr and no ingested final vcf
-    query = '/search/?type=Case&meta_workflow_run!=No+value&vcf_file.file_ingestion_status!=Ingested'
+    query = '/search/?type=Case&meta_workflow_run!=No+value&vcf_file=No+value'
     search_res = ff_utils.search_metadata(query, key=my_auth)
 
     # filter those whose samples do not have processed_files
@@ -691,7 +701,7 @@ def SNV_metawfrs_to_patch_sample_processing(connection, **kwargs):
         return check
 
     # start with cases with a metawfr and no ingested final vcf
-    query = '/search/?type=Case&meta_workflow_run!=No+value&vcf_file.file_ingestion_status!=Ingested'
+    query = '/search/?type=Case&meta_workflow_run!=No+value&vcf_file=No+value'
     search_res = ff_utils.search_metadata(query, key=my_auth)
 
     # filter those whose samples do not have processed_files
@@ -781,7 +791,7 @@ def SV_metawfrs_to_patch_sample_processing(connection, **kwargs):
         return check
 
     # start with cases with a metawfr and no ingested final vcf
-    query = '/search/?type=Case&meta_workflow_run_sv!=No+value&sv_vcf_file.file_ingestion_status!=Ingested'
+    query = '/search/?type=Case&meta_workflow_run_sv!=No+value&sv_vcf_file=No+value'
     search_res = ff_utils.search_metadata(query, key=my_auth)
 
     # filter those whose samples do not have processed_files
