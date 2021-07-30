@@ -706,9 +706,9 @@ def SNV_metawfrs_to_patch_sample_processing(connection, **kwargs):
 
     # filter those whose samples do not have processed_files
     filtered_res = []
-    SNV_processed = 0
-    SV_processed = 0
     for r in search_res:
+        SNV_processed = 0
+        SV_processed = 0
         result_list = r['sample_processing'].get('processed_files', [])
         for pf in result_list:
             try:
@@ -719,8 +719,8 @@ def SNV_metawfrs_to_patch_sample_processing(connection, **kwargs):
                     SNV_processed += 1
             except:
                 SNV_processed += 1
-    if SNV_processed < 2:
-        filtered_res.append(r)
+        if SNV_processed < 2:
+            filtered_res.append(r)
 
     # nothing to run
     if not filtered_res:
@@ -796,9 +796,9 @@ def SV_metawfrs_to_patch_sample_processing(connection, **kwargs):
 
     # filter those whose samples do not have processed_files
     filtered_res = []
-    SNV_processed = 0
-    SV_processed = 0
     for r in search_res:
+        SNV_processed = 0
+        SV_processed = 0
         result_list = r['sample_processing'].get('processed_files', [])
         for pf in result_list:
             try:
@@ -809,8 +809,8 @@ def SV_metawfrs_to_patch_sample_processing(connection, **kwargs):
                     SNV_processed += 1
             except:
                 SNV_processed += 1
-    if SV_processed < 2:
-        filtered_res.append(r)
+        if SV_processed < 2:
+            filtered_res.append(r)
 
     # nothing to run
     if not filtered_res:
