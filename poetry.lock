@@ -172,7 +172,7 @@ toml = ["toml"]
 
 [[package]]
 name = "dcicutils"
-version = "1.15.0"
+version = "1.20.0.1b14"
 description = "Utility package for interacting with the 4DN Data Portal and other 4DN resources"
 category = "main"
 optional = false
@@ -260,7 +260,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "0.1.9.1b8"
+version = "0.3.0.1b0"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -268,17 +268,15 @@ python-versions = ">=3.6,<3.7"
 
 [package.dependencies]
 click = ">=7.1.2,<8.0.0"
-dcicutils = ">=1.7.0,<2.0.0"
+dcicutils = "1.20.0.1b14"
 elasticsearch = ">=6.8.1,<7.0.0"
 elasticsearch-dsl = ">=6.4.0,<7.0.0"
-fuzzywuzzy = "0.17.0"
 geocoder = "1.38.1"
 gitpython = ">=3.1.2,<4.0.0"
 google-api-python-client = ">=1.12.5,<2.0.0"
 Jinja2 = "2.10.1"
 MarkupSafe = "1.1.1"
 PyJWT = "1.5.3"
-python-Levenshtein = ">=0.12.2,<0.13.0"
 pytz = ">=2020.1,<2021.0"
 
 [[package]]
@@ -934,7 +932,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.7"
-content-hash = "be3ccbca9e1b257f2f3a5b7f0a62beb86567336069ec297db5cf997e1e969553"
+content-hash = "4d8b45add70ff1cda4715f3535db6c567caa3a76c53cca976e9313937f4d6d37"
 
 [metadata.files]
 ansicon = [
@@ -1049,8 +1047,8 @@ coverage = [
     {file = "coverage-5.5.tar.gz", hash = "sha256:ebe78fe9a0e874362175b02371bdfbee64d8edc42a044253ddf4ee7d3c15212c"},
 ]
 dcicutils = [
-    {file = "dcicutils-1.15.0-py3-none-any.whl", hash = "sha256:1ad2ce8cdae57e42fee5506669af24dc2c181a3188dd07743aba93a87024d04c"},
-    {file = "dcicutils-1.15.0.tar.gz", hash = "sha256:e073cbaee5df83996fafd095620473bad9b31f1be8105a58d7ed39a0077877ee"},
+    {file = "dcicutils-1.20.0.1b14-py3-none-any.whl", hash = "sha256:4ad8fe9ccccb56ecd3087ee462eca44c6379fc678423c1c141c55cb7c044d384"},
+    {file = "dcicutils-1.20.0.1b14.tar.gz", hash = "sha256:1042962828e6a6abedb005d08f4443e88935d421907ebfae6d20eaf0f7b50e61"},
 ]
 decorator = [
     {file = "decorator-5.0.7-py3-none-any.whl", hash = "sha256:945d84890bb20cc4a2f4a31fc4311c0c473af65ea318617f13a7257c9a58bc98"},
@@ -1073,8 +1071,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight_core-0.1.9.1b8-py3-none-any.whl", hash = "sha256:7214c87fa507656a3fb0ae1c42e6129edafbbc715b62406f6fedabde7df07bfe"},
-    {file = "foursight_core-0.1.9.1b8.tar.gz", hash = "sha256:07e8cfa1107b3dcf329c6cf0a79acfddd74f6bde56adb5ccf71125e106f911b9"},
+    {file = "foursight_core-0.3.0.1b0-py3-none-any.whl", hash = "sha256:8fd04cc42b4cefcceaa4579cb6f08cf08b5a3400a32ecc49dc46c29ef1a956f0"},
+    {file = "foursight_core-0.3.0.1b0.tar.gz", hash = "sha256:ac6460406904b5f425ac18d6c829a2fa40b0f1854b7082473a14d5760117542a"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
