@@ -274,17 +274,17 @@ wf_dict = [
     },
     {  # peddy_qc
         'app_name': 'workflow_peddy',
-        'workflow_uuid': '2ba8440c-b157-4394-9e86-c634aa15129d',
+        'workflow_uuid': 'cgap:workflow_peddy_v22',
         'parameters': {},
         "config": {
             "instance_type": "t3.small",
-            "ebs_size": "20x",
+            "ebs_size": "10x",
             "EBS_optimized": True
         }
     },
     {  # SAMPLEGENO
         'app_name': 'workflow_samplegeno',
-        'workflow_uuid': 'cgap:workflow_samplegeno_v20',
+        'workflow_uuid': 'cgap:workflow_samplegeno_v22',
         'parameters': {},
         "config": {
             "instance_type": "t3.small",
@@ -300,11 +300,11 @@ wf_dict = [
     },
     {  # VEP
         'app_name': 'workflow_vep-annot-check',
-        'workflow_uuid': 'cgap:workflow_vep-annot-check_v20',
+        'workflow_uuid': 'cgap:workflow_vep-annot-check_v22',
         'parameters': {"nthreads": 64},
         "config": {
             "instance_type": "c5n.18xlarge",
-            "ebs_size": "0.5x",
+            "ebs_size": "0.25x",
             "EBS_optimized": True
         },
         'custom_pf_fields': {
@@ -320,7 +320,7 @@ wf_dict = [
     # (__)  \_/\_/(__\_) (__)   (__)(__)(__)
     {  # step1a rckTar
         'app_name': 'workflow_granite-rckTar',
-        'workflow_uuid': 'cgap:workflow_granite-rckTar_v20',
+        'workflow_uuid': 'cgap:workflow_granite-rckTar_v22',
         'parameters': {},
         "config": {
             "instance_type": "c5.xlarge",
@@ -336,7 +336,7 @@ wf_dict = [
     },
     {  # Step2 - filtering
         'app_name': 'workflow_granite-filtering-check',
-        'workflow_uuid': 'cgap:workflow_granite-filtering-check_v20',
+        'workflow_uuid': 'cgap:workflow_granite-filtering-check_v22',
         'parameters': {"aftag": "gnomADg_AF", "afthr": 0.01},
         "config": {
             "instance_type": "t3.medium",
@@ -352,7 +352,7 @@ wf_dict = [
     },
     {  # Step3 - novocaller
         'app_name': 'workflow_granite-novoCaller-rck-check',
-        'workflow_uuid': 'cgap:workflow_granite-novoCaller-rck-check_v20',
+        'workflow_uuid': 'cgap:workflow_granite-novoCaller-rck-check_v22',
         'parameters': {},
         "config": {
             "instance_type": "c5.xlarge",
@@ -368,7 +368,7 @@ wf_dict = [
     },
     {  # Step4 - comHet
         'app_name': 'workflow_granite-comHet-check',
-        'workflow_uuid': 'cgap:workflow_granite-comHet-check_v20',
+        'workflow_uuid': 'cgap:workflow_granite-comHet-check_v22',
         'parameters': {
                 # "trio": ["PROBAND_ID", "[PARENT_ID]", "[PARENT_ID]"]
             },
@@ -379,14 +379,44 @@ wf_dict = [
         },
         'custom_pf_fields': {
             'comHet_vcf': {
+                'file_type': 'intermediate file',
+                'description': 'Intermediate VCF file'
+            }
+        }
+    },
+    {  # Step5 - dbSNP_ID_fixer
+        'app_name': 'workflow_dbSNP_ID_fixer-check',
+        'workflow_uuid': 'cgap:workflow_dbSNP_ID_fixer-check_v22',
+        "config": {
+            "instance_type": "t3.micro",
+            "ebs_size": 10,
+            "EBS_optimized": True
+        },
+        'custom_pf_fields': {
+            'vcf': {
+                'file_type': 'intermediate file',
+                'description': 'Intermediate VCF file'
+            }
+        }
+    },
+    {  # Step6 - hg19lo_hgvsg
+        'app_name': 'workflow_hg19lo_hgvsg-check',
+        'workflow_uuid': 'cgap:workflow_hg19lo_hgvsg-check_v22',
+        "config": {
+            "instance_type": "t3.micro",
+            "ebs_size": 10,
+            "EBS_optimized": True
+        },
+        'custom_pf_fields': {
+            'vcf': {
                 'file_type': 'full annotated VCF',
                 'description': 'full annotated VCF file'
             }
         }
     },
-    {  # Step 6 = bamsnap
+    {  # Step 8 = bamsnap
         'app_name': 'bamsnap',
-        'workflow_uuid': 'cgap:bamsnap_v20',
+        'workflow_uuid': 'cgap:bamsnap_v22',
         'parameters': {
                     "nproc": 16
                     # "titles": ["NA12877 (Father)", "NA12878 (Mother)", "NA12879 (Daughter)"]
@@ -400,7 +430,7 @@ wf_dict = [
     },
     {  # VCFQC used in Part III & Part II
         'app_name': 'workflow_granite-qcVCF',
-        'workflow_uuid': '29085493-c13d-4ee6-b5b4-8e1cf36b6209',
+        'workflow_uuid': 'cgap:workflow_granite-qcVCF_v22',
         'parameters': {
                        # "pedigree": "",
                        # "samples": [""],
@@ -409,11 +439,11 @@ wf_dict = [
                        "ti_tv": True},
         "config": {
             "instance_type": "t3.small",
-            "ebs_size": "1.5x",
+            "ebs_size": "1x",
             "EBS_optimized": True
         }
     },
-    {  # temp
+    {  # template
         'app_name': '',
         'workflow_uuid': '',
         'parameters': {},
@@ -455,9 +485,6 @@ def step_settings(step_name, my_organism, attribution, overwrite=None):
             template['custom_pf_fields'][an_output_file]['genome_assembly'] = genome
 
     update_config = {
-        "spot_instance": True,
-        "log_bucket": "tibanna-output",
-        "key_name": "4dn-encode",
         "public_postrun_json": True,
         "behavior_on_capacity_limit": "wait_and_retry"
         }
@@ -473,6 +500,7 @@ def step_settings(step_name, my_organism, attribution, overwrite=None):
         template['parameters'] = {}
 
     template['common_fields'] = attribution
+    template['custom_qc_fields'] = {}
 
     if overwrite:
         for a_key in overwrite:

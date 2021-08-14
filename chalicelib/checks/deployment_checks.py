@@ -34,14 +34,14 @@ def try_to_describe_indexer_env(env):
         raise  # something else happened we should (probably) raise
 
 
-def clone_repo_to_temporary_dir(repo='https://github.com/4dn-dcic/fourfront.git', name='fourfront'):
+def clone_repo_to_temporary_dir(repo='https://github.com/4dn-dcic/fourfront.git', name='fourfront', branch='master'):
     """ Clones the given repo (default fourfront) to a temporary directory whose
         absolute path is returned.
         XXX: This code should be refactored into a contextmanager (probably in dcicutils).
              See PR292 comments.
     """
     tempdir = tempfile.mkdtemp(prefix=name)
-    Repo.clone_from(url=repo, to_path=tempdir)
+    Repo.clone_from(url=repo, to_path=tempdir, branch=branch)
     return tempdir
 
 

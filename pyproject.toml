@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "foursight-cgap"
-version = "0.4.9.2b10"
+version = "0.4.9.2b34"
 description = "Serverless Chalice Application for Monitoring"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -17,17 +17,18 @@ Jinja2 = "2.10.1"
 MarkupSafe = "1.1.1"
 google-api-python-client = "^1.12.5"
 geocoder = "1.38.1"
-fuzzywuzzy = "0.17.0"
 elasticsearch = "^6.8.1"
 elasticsearch-dsl = "^6.4.0"
-python-Levenshtein = "^0.12.2"
 gitpython = "^3.1.2"
 pytz = "^2020.1"
 ## adding foursight-core
 # use below for deployment
-foursight-core = "0.3.0.1b0"  # uses kmp's s3utils
 # use below for tests but not for deployment
 #foursight-core = {git = "ssh://git@github.com/4dn-dcic/foursight-core.git", rev = "branch_name"}
+foursight-core = "0.3.0.1b0"
+magma-suite = "0.2.6"
+tibanna-ff = "0.20.1b1"
+cgap-pipeline-utils = "23.0"
 pytest = "5.1.2"
 
 [tool.poetry.dev-dependencies]
