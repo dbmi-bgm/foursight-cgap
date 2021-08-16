@@ -1213,3 +1213,47 @@ def queue_variants_to_update_genelist(connection, **kwargs):
         action.status = 'DONE'
     action.output = action_logs
     return action
+
+
+@check_function(accessions=[], version='', steps_to_rerun=['all'])
+def get_metadata_for_cases_to_clone(connection, **kwargs):
+    """
+    """
+    check = CheckResult(connection, 'get_metadata_for_cases_to_clone')
+
+    # get metawf_uuid
+    accessions = kwargs.get('accessions')
+    version = kwargs.get('version')
+    steps_to_rerun = kwargs.get('steps_to_rerun')
+    if 'all' not in steps_to_rerun:
+        output = {}
+        check.summary = 'Specifying steps to rerun not yet supported. '
+    meta_workflows = ff_utils.search_metadata(
+        f'search/?type=MetaWorkflow&version={version}&field=title&field=uuid',
+        key=connection.ff_keys
+    )
+    meta_workflow_dict = {mwf['title']: mwf['uuid'] for mwf in meta_workflows}
+    output = {'run': {}, 'ignore': {}}
+    for case in accessions:
+        case_metadata = ff_utils.get_metadata(case, key=connection.ff_keys)
+        mwfr = case_metadata.get('meta_workflow_run', {}).get('display_title')
+        if version.upper() in mwfr:
+            output['ignore'][case] = 'The case has already been run with this pipeline version.'
+            continue
+        updated_mwf = False
+        for k, v in meta_workflow_dict.items():
+            if k in mwfr:
+                output['run'][case] = {'metawf_uuid': v}
+                updated_mwf = True
+                break
+        if not updated_mwf:
+            output['ignore'][case] = f"{version} pipeline not found for this case's meta-workflow."
+            continue
+        # figure steps to rerun?
+        if 'all' not in steps_to_rerun:
+
+
+    check.status = 'PASS'
+    check.summary = ''
+    check.description = check.summary
+    return check
