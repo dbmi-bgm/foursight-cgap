@@ -15,7 +15,7 @@ pairs_mapper = {"GRCh38": "hg38",
 wf_dict = [
     {
         'app_name': 'md5',
-        'workflow_uuid': 'c77a117b-9a58-477e-aaa5-291a109a99f6',
+        'workflow_uuid': '5aa0fdae-e936-4772-b214-9ea0865f7d52',
         "config": {
             "ebs_size": 10,
             "instance_type": 't3.small',
