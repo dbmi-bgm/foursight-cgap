@@ -40,9 +40,9 @@ class CaseToClone:
         self.patch_individual_samples()
         self.new_sp_item = self.clone_sample_processing()
         self.new_cases = self.clone_cases()
-        # self.analysis_type = self.get_analysis_type()
-        # if self.metawf_uuid:
-        #    self.meta_wfr = self.add_metawfr()
+        self.analysis_type = self.get_analysis_type()
+        if self.metawf_uuid and self.analysis_type:
+           self.meta_wfr = self.add_metawfr()
 
     def append_version_to_value(self, value, pretty=False):
         if value is None:
@@ -195,6 +195,8 @@ class CaseToClone:
     def get_analysis_type(self):
         # figure out if analysis will be trio or proband only or proband-only cram
         sp_type = self.sp_metadata.get('analysis_type', '')
+        if not sp_type or not sp_type.startswith('WGS'):
+            return None
         if sp_type.endswith('Trio'):
             return 'trio'
         elif sp_type.endswith('Group'):
@@ -208,15 +210,23 @@ class CaseToClone:
         return 'proband'
 
     def add_metawfr(self):
-        metawfr_json = import_metawfr.import_metawfr(
+        metawfr_json = create_metawfr.create_metawfr_from_case(
             metawf_uuid=self.metawf_uuid,
-            metawfr_uuid=self.case_metadata['meta_workflow_run'],
             case_uuid=self.case_metadata['uuid'],
-            steps_name=self.steps_to_rerun,
-            create_metawfr=create_metawfr.create_metawfr_from_case,
             type=f'WGS {self.analysis_type}',
             ff_key=self.key,
-            post=False,
-            verbose=False
-        )
+            post=True,
+            patch_case=True,
+            verbose=False)
+        # metawfr_json = import_metawfr.import_metawfr(
+        #     metawf_uuid=self.metawf_uuid,
+        #     metawfr_uuid=self.case_metadata['meta_workflow_run'],
+        #     case_uuid=self.case_metadata['uuid'],
+        #     steps_name=self.steps_to_rerun,
+        #     create_metawfr=create_metawfr.create_metawfr_from_case,
+        #     type=f'WGS {self.analysis_type}',
+        #     ff_key=self.key,
+        #     post=False,
+        #     verbose=False
+        # )
         return metawfr_json
