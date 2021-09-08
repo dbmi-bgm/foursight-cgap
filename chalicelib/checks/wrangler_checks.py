@@ -16,6 +16,7 @@ from foursight_core.checks.helpers import wrangler_utils
 # individually - they're now part of class Decorators in foursight-core::decorators
 # that requires initialization with foursight prefix.
 from .helpers.confchecks import *
+from .helpers import clone_utils
 
 
 # use a random number to stagger checks
@@ -1227,6 +1228,7 @@ def get_metadata_for_cases_to_clone(connection, **kwargs):
     accessions = kwargs.get('accessions')
     version = kwargs.get('version')
     steps_to_rerun = kwargs.get('steps_to_rerun')
+    check.action = 'clone_cases'
     if not accessions:
         check.full_output = {}
         check.summary = 'No cases to clone.'
@@ -1260,14 +1262,26 @@ def get_metadata_for_cases_to_clone(connection, **kwargs):
     output = {'run': {}, 'ignore': {}}
     for case in accessions:
         case_metadata = ff_utils.get_metadata(case, key=connection.ff_keys)
+        if case_metadata.get('superseded_by'):
+            output['ignore'][case] = 'This case has already been cloned.'
+            continue
         mwfr = case_metadata.get('meta_workflow_run', {}).get('display_title')
+        if not mwfr:
+            output['ignore'][case] = 'The case has no previous meta-workflow run. Skipping.'
+            continue
         if version.upper() in mwfr:
             output['ignore'][case] = 'The case has already been run with this pipeline version.'
             continue
         updated_mwf = False
         for k, v in meta_workflow_dict.items():
-            if k in mwfr:
-                # value is a dict so that we can add more metadata in future iterations 
+            # TODO: this is a bit hacky right now, should change the mwf metadata to have title separate from version,
+            # and a calcprop that combines title and version
+            if version.upper() in k.upper():
+                mwf_name = k[:k.upper().index(version.upper())]
+            else:
+                mwf_name = k
+            if mwf_name in mwfr:
+                # value is a dict so that we can add more metadata in future iterations
                 output['run'][case] = {'metawf_uuid': v}
                 updated_mwf = True
                 break
@@ -1279,4 +1293,29 @@ def get_metadata_for_cases_to_clone(connection, **kwargs):
     check.status = 'PASS'
     check.summary = f'{len(output["run"].keys())} cases ready to clone, {len(output["ignore"].keys())} cases ignored'
     check.description = check.summary
+    check.allow_action = True
     return check
+
+
+@action_function()
+def clone_cases(connection, **kwargs):
+    """
+    """
+    action = ActionResult(connection, 'clone_cases')
+    check_response = action.get_associated_check_result(kwargs)
+    clone_dict = {}
+    errors = {}
+    for case, data in check_response['full_output']['run'].items():
+        try:
+            new_case = clone_utils.CaseToClone(case, connection.ff_keys, data['metawf_uuid'],
+                                               check_response['kwargs']['version'], [])
+        except Exception as e:
+            errors[case] = str(e)
+        else:
+            clone_dict.update(new_case.new_case_dict)
+    action.output = {'clone success': clone_dict, 'clone fail': errors}
+    if errors:
+        action.status = 'FAIL'
+    else:
+        action.status = 'DONE'
+    return action

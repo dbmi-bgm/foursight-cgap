@@ -1,4 +1,6 @@
-from magma_ff import import_metawfr
+import re
+from dcicutils import ff_utils
+from magma_ff import create_metawfr
 
 # add report?
 # still need to figure if we need to add processed files to sample, sample_processing
@@ -6,6 +8,15 @@ from magma_ff import import_metawfr
 
 pattern_nospace = re.compile(r'-v[0-9]+$')
 pattern_pretty = re.compile(r' \(v[0-9]+\)$')
+
+
+def try_request(func, *args, **kwargs):
+    try:
+        resp = func(*args, **kwargs)
+    except Exception as e:
+        print(e)
+    else:
+        return resp
 
 
 class CaseToClone:
@@ -19,7 +30,7 @@ class CaseToClone:
         self.accession = accession
         self.key = key
         self.metawf_uuid = metawf_uuid
-        self.new_version = new_version  # get version from metawfr uuid instead?
+        self.new_version = 'v' + str(new_version).lstrip('vV')
         self.steps_to_rerun = steps_to_rerun
         self.add_procfiles_to_sample = {
             'bam': add_bam_to_sample,
@@ -39,7 +50,7 @@ class CaseToClone:
         self.sample_info = self.clone_samples()
         self.patch_individual_samples()
         self.new_sp_item = self.clone_sample_processing()
-        self.new_cases = self.clone_cases()
+        self.new_case_dict = self.clone_cases()
         self.analysis_type = self.get_analysis_type()
         if self.metawf_uuid and self.analysis_type:
            self.meta_wfr = self.add_metawfr()
@@ -52,8 +63,8 @@ class CaseToClone:
         pattern = pattern_nospace if not pretty else pattern_pretty
         new_value = re.sub(pattern, '', value)
         if pretty:
-            return new_value + f' (v{self.new_version})'
-        return new_value + '-v' + self.new_version
+            return new_value + f' ({self.new_version})'
+        return new_value + '-' + self.new_version
 
     def try_request(self, func, *args, **kwargs):
         try:
@@ -80,8 +91,6 @@ class CaseToClone:
         return samples_metadata
 
     def clone_samples(self):
-        # need to remove processed_files, completed_processes?
-        # remove_fields_sample = []
         if not self.samples_metadata:
             return
         sample_info = {}
@@ -141,7 +150,7 @@ class CaseToClone:
             if item in self.sp_metadata:
                 new_sp_metadata[item] = self.sp_metadata.get(item)
         new_sp_metadata['samples'] = [item['new_id'] for item in self.sample_info.values()]
-        new_sp_metadata['analysis_version'] = 'v' + str(self.new_version)
+        new_sp_metadata['analysis_version'] = self.new_version
 
         # add back some processed files, etc if pipeline is only being rerun at a particular step
         if self.sp_metadata.get('processed_files'):
@@ -160,12 +169,11 @@ class CaseToClone:
             return resp['@graph'][0]['@id']
 
     def clone_cases(self):
-        # add report?
         keep_fields_case = [
             'family', 'individual', 'description', 'extra_variant_sample_facets', 'active_filterset', 'case_id'
         ]
         cases = self.sp_metadata.get('cases')
-        new_cases = []
+        new_case_dict = {}
         for case in cases:
             old_case_metadata = try_request(ff_utils.get_metadata, case + '?frame=object', key=self.key)
             if not old_case_metadata:
@@ -190,7 +198,14 @@ class CaseToClone:
 
             post_resp = try_request(ff_utils.post_metadata, new_case_metadata, 'case', key=self.key)
             if post_resp:
-                new_cases.append(post_resp['@graph'][0]['@id'])
+                new_accession = post_resp['@graph'][0]['accession']
+                new_case_dict[old_case_metadata['accession']] = {
+                    'new case uuid': post_resp['@graph'][0]['uuid'],
+                    'new case accession': new_accession
+                }
+                patch_resp = try_request(ff_utils.patch_metadata, {'superseded_by': new_accession},
+                                         old_case_metadata['@id'], key=self.key)
+        return new_case_dict
 
     def get_analysis_type(self):
         # figure out if analysis will be trio or proband only or proband-only cram
@@ -212,12 +227,13 @@ class CaseToClone:
     def add_metawfr(self):
         metawfr_json = create_metawfr.create_metawfr_from_case(
             metawf_uuid=self.metawf_uuid,
-            case_uuid=self.case_metadata['uuid'],
+            case_uuid=self.new_case_dict[self.accession]['new case uuid'],
             type=f'WGS {self.analysis_type}',
             ff_key=self.key,
             post=True,
             patch_case=True,
             verbose=False)
+        # keep commented out lines below for future development
         # metawfr_json = import_metawfr.import_metawfr(
         #     metawf_uuid=self.metawf_uuid,
         #     metawfr_uuid=self.case_metadata['meta_workflow_run'],
