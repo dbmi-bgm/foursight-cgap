@@ -2,9 +2,6 @@ import re
 from dcicutils import ff_utils
 from magma_ff import create_metawfr
 
-# add report?
-# still need to figure if we need to add processed files to sample, sample_processing
-# hold off on meta-wfrs for now?
 
 pattern_nospace = re.compile(r'-v[0-9]+$')
 pattern_pretty = re.compile(r' \(v[0-9]+\)$')
