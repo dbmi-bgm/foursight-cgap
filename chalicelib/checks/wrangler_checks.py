@@ -1263,7 +1263,7 @@ def get_metadata_for_cases_to_clone(connection, **kwargs):
     meta_workflow_dict = {mwf['name']: mwf for mwf in meta_workflows}
     output = {'run': {}, 'ignore': {}}
     for case in accessions:
-        case_metadata = ff_utils.get_metadata(case, key=keys['default'])
+        case_metadata = ff_utils.get_metadata(case, key=connection.ff_keys)
         if case_metadata.get('superseded_by'):
             output['ignore'][case] = 'This case has already been cloned.'
             continue
