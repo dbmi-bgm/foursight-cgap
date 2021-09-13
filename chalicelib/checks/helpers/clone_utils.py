@@ -21,14 +21,16 @@ class CaseToClone:
     keep_fields = ['project', 'institution']
     remove_fields = ['uuid', 'submitted_by', 'last_modified', 'schema_version', 'date_created', 'accession']
 
-    def __init__(self, accession, key, metawf_uuid, new_version, steps_to_rerun,
-                 add_bam_to_sample=False, add_gvcf_to_sample=False, add_rck_to_sample=False,
+    def __init__(self, accession, key, metawf_uuid, new_version, steps_to_rerun, create_SNV_mwfr=True,
+                 keep_SV_mwfr=False, add_bam_to_sample=False, add_gvcf_to_sample=False, add_rck_to_sample=False,
                  add_vep_to_sp=False, add_fullvcf_to_sp=False):
         self.accession = accession
         self.key = key
         self.metawf_uuid = metawf_uuid
         self.new_version = 'v' + str(new_version).lstrip('vV')
         self.steps_to_rerun = steps_to_rerun
+        self.create_SNV_mwfr = create_SNV_mwfr
+        self.keep_SV_mwfr = keep_SV_mwfr
         self.add_procfiles_to_sample = {
             'bam': add_bam_to_sample,
             'gvcf': add_gvcf_to_sample,
@@ -49,7 +51,7 @@ class CaseToClone:
         self.new_sp_item = self.clone_sample_processing()
         self.new_case_dict = self.clone_cases()
         self.analysis_type = self.get_analysis_type()
-        if self.metawf_uuid and self.analysis_type:
+        if self.metawf_uuid and self.analysis_type and self.create_SNV_mwfr:
            self.meta_wfr = self.add_metawfr()
 
     def append_version_to_value(self, value, pretty=False):
@@ -169,6 +171,8 @@ class CaseToClone:
         keep_fields_case = [
             'family', 'individual', 'description', 'extra_variant_sample_facets', 'active_filterset', 'case_id'
         ]
+        if self.keep_SV_mwfr:
+            keep_fields_case.append('meta_workflow_run_sv')
         cases = self.sp_metadata.get('cases')
         new_case_dict = {}
         for case in cases:
