@@ -269,6 +269,10 @@
                 "cgap": {
                     "kwargs": {"primary": true},
                     "dependencies": []
+                },
+                "cgapwolf": {
+                    "kwargs": {"primary": true},
+                    "dependencies": []
                 }
             }
         }
