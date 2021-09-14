@@ -189,11 +189,23 @@
             }
         }
     },
+    "spot_failed_metawfrs" : {
+        "title": "Spot-failed Metawfrs",
+        "group": "Pipeline checks",
+        "schedule": {
+            "fifteen_min_checks_2": {
+                "cgap": {
+                    "kwargs": {"primary": true, "queue_action": "prod"},
+                    "dependencies": []
+                }
+            }
+        }
+    },
     "failed_metawfrs" : {
         "title": "Failed Metawfrs",
         "group": "Pipeline checks",
         "schedule": {
-            "fifteen_min_checks_2": {
+            "manual_checks": {
                 "cgap": {
                     "kwargs": {"primary": true},
                     "dependencies": []
@@ -213,8 +225,20 @@
             }
         }
     },
-    "metawfrs_to_patch_sample_processing": {
-        "title": "Metawfrs to patch sample processing with processed files",
+    "SNV_metawfrs_to_patch_sample_processing": {
+        "title": "SNV metawfrs to patch sample processing with processed files",
+        "group": "Pipeline checks",
+        "schedule": {
+            "hourly_checks_2": {
+                "cgap": {
+                    "kwargs": {"primary": true},
+                    "dependencies": []
+                }
+            }
+        }
+    },
+    "SV_metawfrs_to_patch_sample_processing": {
+        "title": "SV metawfrs to patch sample processing with processed files",
         "group": "Pipeline checks",
         "schedule": {
             "hourly_checks_2": {

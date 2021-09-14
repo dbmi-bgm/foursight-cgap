@@ -14,7 +14,7 @@ from .helpers.wfrset_utils import lambda_limit
 from .helpers.confchecks import *
 
 
-default_pipelines_to_run = ['WGS Trio V23', 'WGS Proband-only Cram V24']
+default_pipelines_to_run = ['WGS Trio V23', 'WGS Trio V24', 'WGS Proband-only Cram V24', 'CNV v1']
 
 
 @check_function(file_type='File', start_date=None)
@@ -145,6 +145,8 @@ def md5runCGAP_start(connection, **kwargs):
     action = ActionResult(connection, 'md5runCGAP_start')
     action_logs = {'runs_started': [], "runs_failed": []}
     my_auth = connection.ff_keys
+    env = connection.ff_env
+    sfn = 'tibanna_zebra_' + env.replace('fourfront-', '')
     md5runCGAP_check_result = action.get_associated_check_result(kwargs).get('full_output', {})
     action_logs['check_output'] = md5runCGAP_check_result
     targets = []
@@ -154,17 +156,22 @@ def md5runCGAP_start(connection, **kwargs):
         targets.extend(md5runCGAP_check_result.get('files_with_run_and_wrong_status', []))
     action_logs['targets'] = targets
     for a_target in targets:
+        print("processing target %s" % a_target)
         now = datetime.utcnow()
         if (now-start).seconds > lambda_limit:
             action.description = 'Did not complete action due to time limitations'
             break
+        print("getting metadata for target...")
         a_file = ff_utils.get_metadata(a_target, key=my_auth)
+        print("getting attribution for target...")
         attributions = wfr_utils.get_attribution(a_file)
-        inp_f = {'input_file': a_file['@id'],
+        inp_f = {'input_file': a_file['uuid'],
                  'additional_file_parameters': {'input_file': {'mount': True}}}
+        print("input template for target: %s" % str(inp_f))
         wfr_setup = step_settings('md5', 'no_organism', attributions)
+        print("wfr_setup for target: %s" % str(wfr_setup))
 
-        url = wfr_utils.run_missing_wfr(wfr_setup, inp_f, a_file['accession'], connection.ff_keys, connection.ff_env)
+        url = wfr_utils.run_missing_wfr(wfr_setup, inp_f, a_file['accession'], connection.ff_keys, connection.ff_env, sfn)
         # aws run url
         if url.startswith('http'):
             action_logs['runs_started'].append(url)
@@ -203,8 +210,8 @@ def metawfrs_to_check_linecount(connection, **kwargs):
         check.full_output = {}
         return check
 
-    query = '/search/?type=MetaWorkflowRun' + \
-            ''.join(['&final_status=' + st for st in ['complete']])
+    query = '/search/?type=MetaWorkflowRun&overall_qcs.name!=linecount_test' + \
+            ''.join(['&final_status=' + st for st in ['completed']])
     search_res = ff_utils.search_metadata(query, key=my_auth)
 
     # nothing to run
@@ -228,7 +235,7 @@ def metawfrs_to_check_linecount(connection, **kwargs):
 def line_count_test(connection, **kwargs):
     start = datetime.utcnow()
     action = ActionResult(connection, 'run_metawfrs')
-    action_logs = {'metawfrs_that_passed_linecount_test': []}
+    action_logs = {'metawfrs_that_passed_linecount_test': [], 'metawfrs_that_failed_linecount_test': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
     check_result = action.get_associated_check_result(kwargs).get('full_output', {})
@@ -240,8 +247,18 @@ def line_count_test(connection, **kwargs):
             action.description = 'Did not complete action due to time limitations'
             break
         try:
-            linecount_result = check_lines(metawfr_uuid, ff_key, steps=steps_dict, fastqs=fastqs_dict)
-            action_logs['metawfrs_that_passed_linecount_test'].append(linecount_result)
+            linecount_result = check_lines(metawfr_uuid, my_auth, steps=steps_dict, fastqs=fastqs_dict)
+            metawfr_meta = ff_utils.get_metadata(metawfr_uuid, add_on='?frame=raw', key=my_auth)
+            overall_qcs_dict = {qc['name']: qc['value'] for qc in metawfr_meta.get('overall_qcs', [])}
+            if overall_qcs_dict and overall_qcs_dict.get('linecount_test', ''):
+                continue
+            overall_qcs_dict['linecount_test'] = 'PASS' if linecount_result else 'FAIL'
+            updated_overall_qcs = [{'name': k, 'value': v} for k, v in overall_qcs_dict.items()]
+            ff_utils.patch_metadata({'overall_qcs': updated_overall_qcs}, metawfr_uuid, key=my_auth)
+            if linecount_result:
+                action_logs['metawfrs_that_passed_linecount_test'].append(metawfr_uuid)
+            else:
+                action_logs['metawfrs_that_failed_linecount_test'].append(metawfr_uuid)
         except Exception as e:
             action_logs['error'] = str(e)
             break
@@ -403,7 +420,103 @@ def checkstatus_metawfrs(connection, **kwargs):
     return action
 
 
-@check_function(reset_all_failed=False)
+@check_function()
+def spot_failed_metawfrs(connection, **kwargs):
+    """Find metaworkflowruns that failed and reset
+    if it was obviously caused by spot interruption.
+    """
+    check = CheckResult(connection, 'spot_failed_metawfrs')
+    my_auth = connection.ff_keys
+    check.action = "reset_spot_failed_metawfrs"
+    check.description = "Find metaworkflow runs that has failed workflow runs that may be due to spot interruption."
+    check.brief_output = []
+    check.summary = ""
+    check.full_output = {}
+    check.status = 'PASS'
+
+    # check indexing queue
+    env = connection.ff_env
+    indexing_queue = ff_utils.stuff_in_queues(env, check_secondary=True)
+
+    if indexing_queue:
+        check.status = 'PASS'  # maybe use warn?
+        check.brief_output = ['Waiting for indexing queue to clear']
+        check.summary = 'Waiting for indexing queue to clear'
+        check.full_output = {}
+        return check
+
+    query = '/search/?type=MetaWorkflowRun' + \
+            ''.join(['&final_status=' + st for st in ['failed']])
+    query += ''.join(['&meta_workflow.title=' + mwf for mwf in default_pipelines_to_run])
+    search_res = ff_utils.search_metadata(query, key=my_auth)
+
+    # nothing to run
+    if not search_res:
+        check.summary = 'All Good!'
+        return check
+
+    metawfr_uuids = [r['uuid'] for r in search_res]
+    metawfr_titles = [r['title'] for r in search_res]
+
+    check.allow_action = True
+    check.summary = 'Some metawfrs have failed wfrs.'
+    check.status = 'WARN'
+    msg = str(len(metawfr_uuids)) + ' metawfrs may have failed wfrs'
+    check.brief_output.append(msg)
+    check.full_output['metawfrs_that_failed'] = {'titles': metawfr_titles, 'uuids': metawfr_uuids}
+    if kwargs.get('reset_all_failed'):
+        check.full_output['options'] = ['reset_all_failed']
+
+    return check
+
+
+@action_function()
+def reset_spot_failed_metawfrs(connection, **kwargs):
+    start = datetime.utcnow()
+    action = ActionResult(connection, 'spot_failed_metawfrs')
+    action_logs = {'runs_reset': []}
+    my_auth = connection.ff_keys
+    env = connection.ff_env
+    check_result = action.get_associated_check_result(kwargs).get('full_output', {})
+    action_logs['check_output'] = check_result
+    metawfr_uuids = check_result.get('metawfrs_that_failed', {}).get('uuids', [])
+
+    random.shuffle(metawfr_uuids)  # if always the same order, we may never get to the later ones.
+    for metawfr_uuid in metawfr_uuids:
+        now = datetime.utcnow()
+        if (now-start).seconds > lambda_limit:
+            action.description = 'Did not complete action due to time limitations'
+            break
+        try:
+            metawfr_meta = ff_utils.get_metadata(metawfr_uuid, key=my_auth, add_on='?frame=raw')
+            shards_to_reset = []
+            for wfr in metawfr_meta['workflow_runs']:
+                if wfr['status'] == 'failed':
+                    if wfr.get('workflow_run'):
+                        res = ff_utils.get_metadata(wfr['workflow_run'], key=my_auth)
+                    res = ff_utils.search_metadata('/search/?type=WorkflowRunAwsem&awsem_job_id=%s' % wfr['jobid'], key=my_auth)
+                    if len(res) == 1:
+                        res = res[0]
+                    elif len(res) > 1:
+                        raise Exception("multiple workflow runs for job id %s" % wfr['jobid'])
+                    else:
+                        raise Exception("No workflow run found for job id %s" % wfr['jobid'])
+                    if 'EC2 unintended termination' in res.get('description', '') or \
+                       'EC2 Idle error' in res.get('description', ''):
+                        # reset spot-failed shards
+                        shard_name = wfr['name'] + ':' + str(wfr['shard'])
+                        shards_to_reset.append(shard_name)
+            reset_metawfr.reset_shards(metawfr_uuid, shards_to_reset, my_auth, verbose=True)
+            action_logs['runs_reset'].append({'metawfr': metawfr_uuid, 'shards': shards_to_reset})
+        except Exception as e:
+            action_logs['error'] = str(e)
+            break
+    action.output = action_logs
+    action.status = 'DONE'
+    return action
+
+
+@check_function()
 def failed_metawfrs(connection, **kwargs):
     """Find metaworkflowruns that may need status-checking
     - those with final_status running.
@@ -473,29 +586,8 @@ def reset_failed_metawfrs(connection, **kwargs):
             action.description = 'Did not complete action due to time limitations'
             break
         try:
-            metawfr_meta = ff_utils.get_metadata(metawfr_uuid, key=my_auth, add_on='?frame=raw')
-            shards_to_reset = []
-            for wfr in metawfr_meta['workflow_runs']:
-                if wfr['status'] == 'failed':
-                    if wfr.get('workflow_run'):
-                        res = ff_utils.get_metadata(wfr['workflow_run'], key=my_auth)
-                    res = ff_utils.search_metadata('/search/?type=WorkflowRunAwsem&awsem_job_id=%s' % wfr['jobid'], key=my_auth)
-                    if len(res) == 1:
-                        res = res[0]
-                    elif len(res) > 1:
-                        raise Exception("multiple workflow runs for job id %s" % wfr['jobid'])
-                    else:
-                        raise Exception("No workflow run found for job id %s" % wfr['jobid'])
-                    if reset_all_failed:
-                        shard_name = wfr['name'] + ':' + str(wfr['shard'])
-                        shards_to_reset.append(shard_name)
-                    elif 'EC2 unintended termination' in res.get('description', '') or \
-                       'EC2 Idle error' in res.get('description', ''):
-                        # reset spot-failed shards
-                        shard_name = wfr['name'] + ':' + str(wfr['shard'])
-                        shards_to_reset.append(shard_name)
-            reset_metawfr.reset_shards(metawfr_uuid, shards_to_reset, my_auth, verbose=True)
-            action_logs['runs_reset'].append({'metawfr': metawfr_uuid, 'shards': shards_to_reset})
+            reset_metawfr.reset_failed(metawfr_uuid, my_auth, verbose=True)
+            action_logs['runs_reset'].append({'metawfr': metawfr_uuid})
         except Exception as e:
             action_logs['error'] = str(e)
             break
@@ -529,7 +621,7 @@ def metawfrs_to_patch_samples(connection, **kwargs):
         return check
 
     # start with cases with a metawfr and no ingested final vcf
-    query = '/search/?type=Case&meta_workflow_run!=No+value&vcf_file.file_ingestion_status!=Ingested'
+    query = '/search/?type=Case&meta_workflow_run!=No+value&vcf_file=No+value'
     search_res = ff_utils.search_metadata(query, key=my_auth)
 
     # filter those whose samples do not have processed_files
@@ -585,13 +677,13 @@ def patch_pfs_to_samples(connection, **kwargs):
 
 
 @check_function()
-def metawfrs_to_patch_sample_processing(connection, **kwargs):
-    """Find metaworkflowruns that may need sample_processing patched with processed files
+def SNV_metawfrs_to_patch_sample_processing(connection, **kwargs):
+    """Find SNV metaworkflowruns that may need sample_processing patched with processed files
     """
-    check = CheckResult(connection, 'metawfrs_to_patch_sample_processing')
+    check = CheckResult(connection, 'SNV_metawfrs_to_patch_sample_processing')
     my_auth = connection.ff_keys
-    check.action = "patch_pfs_to_sample_processing"
-    check.description = "Find metaworkflow runs that may need sample processing to be patched."
+    check.action = "patch_SNV_pfs_to_sample_processing"
+    check.description = "Find SNV metaworkflow runs that may need sample processing to be patched."
     check.brief_output = []
     check.summary = ""
     check.full_output = {}
@@ -609,15 +701,25 @@ def metawfrs_to_patch_sample_processing(connection, **kwargs):
         return check
 
     # start with cases with a metawfr and no ingested final vcf
-    query = '/search/?type=Case&meta_workflow_run!=No+value&vcf_file.file_ingestion_status!=Ingested'
+    query = '/search/?type=Case&meta_workflow_run!=No+value&vcf_file=No+value'
     search_res = ff_utils.search_metadata(query, key=my_auth)
 
     # filter those whose samples do not have processed_files
     filtered_res = []
     for r in search_res:
-        if len(r['sample_processing'].get('processed_files', [])) < 2:  # vep vcf and final vcf
-            filtered_res.append(r)
-        elif len(r['sample_processing'].get('completed_processes', [])) < 1:
+        SNV_processed = 0
+        SV_processed = 0
+        result_list = r['sample_processing'].get('processed_files', [])
+        for pf in result_list:
+            try:
+                pf['variant_type']
+                if pf['variant_type'] == "SV":
+                    SV_processed += 1
+                elif pf['variant_type'] == "SNV":
+                    SNV_processed += 1
+            except:
+                SNV_processed += 1
+        if SNV_processed < 2:
             filtered_res.append(r)
 
     # nothing to run
@@ -638,9 +740,9 @@ def metawfrs_to_patch_sample_processing(connection, **kwargs):
 
 
 @action_function()
-def patch_pfs_to_sample_processing(connection, **kwargs):
+def patch_SNV_pfs_to_sample_processing(connection, **kwargs):
     start = datetime.utcnow()
-    action = ActionResult(connection, 'patch_pfs_to_sample_processing')
+    action = ActionResult(connection, 'patch_SNV_pfs_to_sample_processing')
     action_logs = {'runs_checked_for_patching': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
@@ -654,7 +756,97 @@ def patch_pfs_to_sample_processing(connection, **kwargs):
             action.description = 'Did not complete action due to time limitations'
             break
         try:
-            patch_processed_files_to_sample_processing(metawfr_uuid, my_auth)
+            patch_SNV_processed_files_to_sample_processing(metawfr_uuid, my_auth)
+            action_logs['runs_checked_for_patching'].append(metawfr_uuid)
+        except Exception as e:
+            action_logs['error'] = str(e)
+            break
+    action.output = action_logs
+    action.status = 'DONE'
+    return action
+
+
+@check_function()
+def SV_metawfrs_to_patch_sample_processing(connection, **kwargs):
+    """Find SV metaworkflowruns that may need sample_processing patched with processed files
+    """
+    check = CheckResult(connection, 'SV_metawfrs_to_patch_sample_processing')
+    my_auth = connection.ff_keys
+    check.action = "patch_SV_pfs_to_sample_processing"
+    check.description = "Find SV metaworkflow runs that may need sample processing to be patched."
+    check.brief_output = []
+    check.summary = ""
+    check.full_output = {}
+    check.status = 'PASS'
+
+    # check indexing queue
+    env = connection.ff_env
+    indexing_queue = ff_utils.stuff_in_queues(env, check_secondary=True)
+
+    if indexing_queue:
+        check.status = 'PASS'  # maybe use warn?
+        check.brief_output = ['Waiting for indexing queue to clear']
+        check.summary = 'Waiting for indexing queue to clear'
+        check.full_output = {}
+        return check
+
+    # start with cases with a metawfr and no ingested final vcf
+    query = '/search/?type=Case&meta_workflow_run_sv!=No+value&sv_vcf_file=No+value'
+    search_res = ff_utils.search_metadata(query, key=my_auth)
+
+    # filter those whose samples do not have processed_files
+    filtered_res = []
+    for r in search_res:
+        SNV_processed = 0
+        SV_processed = 0
+        result_list = r['sample_processing'].get('processed_files', [])
+        for pf in result_list:
+            try:
+                pf['variant_type']
+                if pf['variant_type'] == "SV":
+                    SV_processed += 1
+                elif pf['variant_type'] == "SNV":
+                    SNV_processed += 1
+            except:
+                SNV_processed += 1
+        if SV_processed < 2:
+            filtered_res.append(r)
+
+    # nothing to run
+    if not filtered_res:
+        check.summary = 'All Good!'
+        return check
+
+    metawfr_uuids = [r['meta_workflow_run_sv']['uuid'] for r in filtered_res]
+    metawfr_titles = [r['meta_workflow_run_sv']['display_title'] for r in filtered_res]
+
+    check.allow_action = True
+    check.summary = 'Some metawfrs may need patching sample processing.'
+    check.status = 'WARN'
+    msg = str(len(metawfr_uuids)) + ' metawfrs may need patching sample processing'
+    check.brief_output.append(msg)
+    check.full_output['metawfrs_to_check'] = {'titles': metawfr_titles, 'uuids': metawfr_uuids}
+    return check
+
+
+@action_function()
+def patch_SV_pfs_to_sample_processing(connection, **kwargs):
+    start = datetime.utcnow()
+    action = ActionResult(connection, 'patch_SV_pfs_to_sample_processing')
+    action_logs = {'runs_checked_for_patching': []}
+    my_auth = connection.ff_keys
+    env = connection.ff_env
+    check_result = action.get_associated_check_result(kwargs).get('full_output', {})
+    action_logs['check_output'] = check_result
+    metawfr_uuids = check_result.get('metawfrs_to_check', {}).get('uuids', [])
+    random.shuffle(metawfr_uuids)  # if always the same order, we may never get to the later ones.
+    for metawfr_uuid in metawfr_uuids:
+        now = datetime.utcnow()
+        if (now-start).seconds > lambda_limit:
+            action.description = 'Did not complete action due to time limitations'
+            break
+        try:
+            patch_processed_SV_files_to_sample_processing(metawfr_uuid, my_auth)
             action_logs['runs_checked_for_patching'].append(metawfr_uuid)
         except Exception as e:
             action_logs['error'] = str(e)
@@ -672,24 +864,53 @@ def patch_processed_files_to_sample(metawfr_uuid, ff_key):
     case_acc = metawfr_meta['title'].split(' ')[-1]
     case_meta = ff_utils.get_metadata(case_acc, add_on='?frame=raw', key=ff_key)
     sp_uuid = case_meta['sample_processing']
-    sp_meta = ff_utils.get_metadata(sp_uuid, add_on='?frame=object', key=ff_key)
+    sp_meta = ff_utils.get_metadata(sp_uuid, key=ff_key)
 
     # modify this to support trio - need shard matching
-    if len(sp_meta['samples']) > 1:
-        raise Exception("currently applicable only to proband-only")
+    if len(sp_meta['samples']) == 1:
+        final_bam = ''
+        sample_gvcf = ''
+        for wfr in metawfr_meta['workflow_runs']:
+            if wfr['name'] == 'workflow_gatk-ApplyBQSR-check' and wfr['status'] == 'completed':
+                final_bam = wfr['output'][0]['file']['uuid']
+            elif wfr['name'] == 'workflow_gatk-HaplotypeCaller' and wfr['status'] == 'completed':
+                sample_gvcf = wfr['output'][0]['file']['uuid']
+        if final_bam and sample_gvcf:
+            ff_utils.patch_metadata({'processed_files': [final_bam, sample_gvcf]}, sp_meta['samples'][0]['uuid'], key=ff_key)
+    else:
+        # sample name - meta mapping from sample metadata
+        sample_mapping = dict()
+        for sample in sp_meta['samples']:
+            sample_uuid = sample['uuid']
+            sample_meta = ff_utils.get_metadata(sample_uuid, add_on='?frame=raw', key=ff_key)
+            sample_name = sample_meta.get('bam_sample_id', '')
+            sample_mapping.update({sample_name: sample_meta})
 
-    final_bam = ''
-    sample_gvcf = ''
-    for wfr in metawfr_meta['workflow_runs']:
-        if wfr['name'] == 'workflow_gatk-ApplyBQSR-check' and wfr['status'] == 'completed':
-            final_bam = wfr['output'][0]['file']['uuid']
-        elif wfr['name'] == 'workflow_gatk-HaplotypeCaller' and wfr['status'] == 'completed':
-            sample_gvcf = wfr['output'][0]['file']['uuid']
-    if final_bam and sample_gvcf:
-        ff_utils.patch_metadata({'processed_files': [final_bam, sample_gvcf]}, sp_meta['samples'][0], key=ff_key)
+        sample_names_arg = [inp for inp in metawfr_meta['input'] if inp['argument_name'] == 'sample_names_proband_first']
+        if sample_names_arg:
+            sample_names = json.loads(sample_names_arg[0]['value'])
+        else:
+            raise Exception("sample_names_proband_first not found in the input of metawfr %s" % metawfr_uuid)
+        for i, sample_name in enumerate(sample_names):
+            final_bam = ''
+            sample_gvcf = ''
+            for wfr in metawfr_meta['workflow_runs']:
+                if wfr['name'] == 'workflow_gatk-ApplyBQSR-check' and wfr['status'] == 'completed' and wfr['shard'] == str(i):
+                    final_bam = wfr['output'][0]['file']['uuid']
+                elif wfr['name'] == 'workflow_gatk-HaplotypeCaller' and wfr['status'] == 'completed' and wfr['shard'] == str(i):
+                    sample_gvcf = wfr['output'][0]['file']['uuid']
+            if final_bam and sample_gvcf:
+                pfs = sample_mapping[sample_name].get('processed_files', [])
+                sample_uuid = sample_mapping[sample_name]['uuid']
+                if pfs:
+                    if final_bam not in pfs and sample_gvcf not in pfs:
+                        raise Exception("conflicting processed files - please clean up existing processed files for sample %s" % sample_uuid)
+                    elif final_bam in pfs and sample_gvcf in pfs:
+                        continue  # already patched, do nothing.
+                ff_utils.patch_metadata({'processed_files': [final_bam, sample_gvcf]}, sample_uuid, key=ff_key)
 
 
-def patch_processed_files_to_sample_processing(metawfr_uuid, ff_key):
+def patch_SNV_processed_files_to_sample_processing(metawfr_uuid, ff_key):
     """This currently works only for proband-only cases.
     patches samples with final bam and sample gvcf,
     patches sample_processing with vep vcf and final vcf and completed_processes."""
@@ -697,6 +918,8 @@ def patch_processed_files_to_sample_processing(metawfr_uuid, ff_key):
     case_acc = metawfr_meta['title'].split(' ')[-1]
     case_meta = ff_utils.get_metadata(case_acc, add_on='?frame=raw', key=ff_key)
     sp_uuid = case_meta['sample_processing']
+    sp_meta = ff_utils.get_metadata(sp_uuid, key=ff_key)
+    sp_meta_short = ff_utils.get_metadata(sp_uuid, add_on='?frame=raw', key=ff_key)
 
     vep_vcf = ''
     final_vcf = ''
@@ -706,10 +929,115 @@ def patch_processed_files_to_sample_processing(metawfr_uuid, ff_key):
         elif wfr['name'] == 'workflow_hg19lo_hgvsg-check' and wfr['status'] == 'completed':
             final_vcf = wfr['output'][0]['file']['uuid']
     patch_body = dict()
+
+    #here, we aren't checking for type or replacing existing workflows because of how the check is now written
     if vep_vcf and final_vcf:
-        patch_body = {'processed_files': [vep_vcf, final_vcf]}
+        try:
+            processed_short = sp_meta_short['processed_files'] #if processed files exist (from SV), append these ones
+            processed_short.append(vep_vcf)
+            processed_short.append(final_vcf)
+            patch_body = {'processed_files': processed_short}
+        except:
+            patch_body = {'processed_files': [vep_vcf, final_vcf]} #otherwise, create processed files
+
+    if metawfr_meta['final_status'] == 'completed': #this could be turned into a function (repeated in SV as well)
+        try:
+            sp_meta_short['completed_processes']
+            update = True
+            for process in sp_meta_short['completed_processes']:
+                if metawfr_meta['meta_workflow']['title'] == process:
+                    update = False
+            if update == True:
+                process_list = sp_meta_short['completed_processes']
+                process_list.append(metawfr_meta['meta_workflow']['title'])
+                patch_body.update({'completed_processes': process_list})
+        except:
+            patch_body.update({'completed_processes': [metawfr_meta['meta_workflow']['title']]})
+
+    if patch_body:
+        ff_utils.patch_metadata(patch_body, sp_uuid, key=ff_key)
+
+
+def patch_processed_SV_files_to_sample_processing(metawfr_uuid, ff_key):
+    """patches sample_processing with SV full annotated vcf and higlass vcf, and completed_processes."""
+    metawfr_meta = ff_utils.get_metadata(metawfr_uuid, key=ff_key)
+    case_acc = metawfr_meta['title'].split(' ')[-1]
+    case_meta = ff_utils.get_metadata(case_acc, add_on='?frame=raw', key=ff_key)
+    sp_uuid = case_meta['sample_processing']
+
+    final_vcf = ''
+    higlass_vcf = ''
+
+    for wfr in metawfr_meta['workflow_runs']:
+        if wfr['name'] == 'workflow_SV_length_filter_vcf-check' and wfr['status'] == 'completed':
+            final_vcf = wfr['output'][0]['file']['uuid']
+        elif wfr['name'] == 'workflow_SV_annotation_cleaner_vcf-check' and wfr['status'] == 'completed':
+            higlass_vcf = wfr['output'][0]['file']['uuid']
+
+    patch_body = dict()
+    sp_meta = ff_utils.get_metadata(sp_uuid, key=ff_key)
+    sp_meta_short = ff_utils.get_metadata(sp_uuid, add_on='?frame=raw', key=ff_key)
+    # if we have a final_vcf and higlass_vcf
+    # we want to check if processed_files already exists
+    # we need to create it with final_vcf and higlass_vcf if it doesn't
+    # and if it already does:
+    # we want to append if no SV type files exist
+    # we want to do nothing if SV type files with same UUIDs exist
+    # we want to replace if SV type files with different UUIDs exist
+
+    if final_vcf and higlass_vcf:
+        try:
+            processed = sp_meta['processed_files']
+            SV_type = False
+            SV_uuids = []
+            for file in processed:
+                try:
+                    if file['variant_type'] == "SV":
+                        SV_type = True
+                        SV_uuids.append(file['uuid'])
+                except:
+                    pass
+
+            if SV_type and SV_uuids:
+                update = True
+                for uuid_SV in SV_uuids:
+                    if uuid_SV == final_vcf:
+                        update = False
+                    if uuid_SV == higlass_vcf:
+                        update = False
+                if update == True:
+                    processed_short = sp_meta_short['processed_files']
+                    for uuid_SV in SV_uuids:
+                        processed_short.remove(uuid_SV)
+                    processed_short.append(final_vcf)
+                    processed_short.append(higlass_vcf)
+                    patch_body = {'processed_files': processed_short}
+
+            else:
+                processed_short = sp_meta_short['processed_files']
+                processed_short.append(final_vcf)
+                processed_short.append(higlass_vcf)
+                patch_body = {'processed_files': processed_short}
+        except:
+            patch_body = {'processed_files': [final_vcf, higlass_vcf]}
+
+    # also want to patch completed_processes
+    # if it already exists, append to the list (but only if this process is not already in the list)
+    # if it doesn't exist, create it with this process
     if metawfr_meta['final_status'] == 'completed':
-        patch_body.update({'completed_processes': [metawfr_meta['meta_workflow']['title']]})
+        try:
+            sp_meta_short['completed_processes']
+            update = True
+            for process in sp_meta_short['completed_processes']:
+                if metawfr_meta['meta_workflow']['title'] == process:
+                    update = False
+            if update == True:
+                process_list = sp_meta_short['completed_processes']
+                process_list.append(metawfr_meta['meta_workflow']['title'])
+                patch_body.update({'completed_processes': process_list})
+        except:
+            patch_body.update({'completed_processes': [metawfr_meta['meta_workflow']['title']]})
+
     if patch_body:
         ff_utils.patch_metadata(patch_body, sp_uuid, key=ff_key)
 
@@ -1011,168 +1339,4 @@ def problematic_wfrs_start(connection, **kwargs):
         msg += ', {} wfrs were skipped due to protected item status.'.format(str(status_protected))
     action.output = msg
     action.status = 'DONE'
-    return action
-
-
-@check_function()
-def replace_me_status(connection, **kwargs):
-    """
-    Keyword arguments:
-    """
-    start = datetime.utcnow()
-    check = CheckResult(connection, 'replace_me_status')
-    my_auth = connection.ff_keys
-    check.action = "replace_me_start"
-    check.description = "add description"
-    check.brief_output = []
-    check.summary = ""
-    check.full_output = {'skipped': [], 'running_runs': [], 'needs_runs': [],
-                         'completed_runs': [], 'problematic_runs': []}
-    check.status = 'PASS'
-
-    # check indexing queue
-    env = connection.ff_env
-    indexing_queue = ff_utils.stuff_in_queues(env, check_secondary=True)
-
-    if indexing_queue:
-        check.status = 'PASS'  # maybe use warn?
-        check.brief_output = ['Waiting for indexing queue to clear']
-        check.summary = 'Waiting for indexing queue to clear'
-        check.full_output = {}
-        return check
-
-    query_base = '/search/?type=...'
-    q = query_base
-    # print(q)
-    res = ff_utils.search_metadata(q, my_auth)
-    # check if anything in scope
-    if not res:
-        check.summary = 'All Good!'
-        return check
-    cnt = 0
-    for a_res in res:
-        # do something
-
-        # use first alias if available, uuid if not
-        if a_res.get('aliases'):
-            print_id = a_res['aliases'][0]
-        else:
-            print_id = a_res['uuid']
-
-        cnt += 1
-        all_items, all_uuids = ff_utils.expand_es_metadata([a_res['uuid']], my_auth,
-                                                           store_frame='embedded',
-                                                           add_pc_wfr=True,
-                                                           ignore_field=['previous_version'])
-        now = datetime.utcnow()
-        print('\n', print_id, (now-start).seconds, len(all_uuids))
-        if (now-start).seconds > lambda_limit:
-            check.summary = 'Timout - only {} sample_processings were processed'.format(str(cnt))
-            break
-
-        all_wfrs = all_items.get('workflow_run_awsem', []) + all_items.get('workflow_run_sbg', [])
-        file_items = [typ for typ in all_items if typ.startswith('file_') and typ != 'file_format']
-        all_files = [i for typ in all_items for i in all_items[typ] if typ in file_items]
-        all_qcs = [i for typ in all_items for i in all_items[typ] if typ.startswith('quality_metric')]
-        library = {'wfrs': all_wfrs, 'files': all_files, 'qcs': all_qcs}
-        keep = {'missing_run': [], 'running': [], 'problematic_run': []}
-
-        # add steps ...
-
-        # step 1
-
-        # step2
-        if step1_status != 'complete':
-            step2_status = ""
-        else:
-            # Run step
-            s2_input_files = {"input_file": 'input file',
-                              # "bigfile": "20004873-b672-4d84-a7c1-7fd5c0407519",
-                              'additional_file_parameters': {'input_file': {"unzip": "gz"}}
-                              }
-            s2_tag = print_id + '_new_step'
-            keep, step2_status, step2_output = wfr_utils.stepper(library, keep,
-                                                                  s2_tag, 'input file',
-                                                                  s2_input_files,  'name of the app name', 'output argument')
-
-        # finalize steps
-        final_status = print_id
-        completed = []
-        pipeline_tag = cgap_partIIII_version[-1]
-        previous_tags = a_res.get('completed_processes', [])
-        previous_files = [i['@id'] for i in a_res['processed_files']]
-
-        # unpack results
-        missing_run = keep['missing_run']
-        running = keep['running']
-        problematic_run = keep['problematic_run']
-
-        if step2_status == 'complete':
-            final_status += ' completed'
-            # existing_pf = [i['@id'] for i in a_res['processed_files']]
-            completed = [
-                a_res['@id'],
-                {'processed_files': previous_files + [step2_output, ],
-                 'completed_processes': previous_tags + [pipeline_tag, ]}]
-            print('COMPLETED', step2_output)
-        else:
-            if missing_run:
-                final_status += ' |Missing: ' + " ".join([i[0] for i in missing_run])
-            if running:
-                final_status += ' |Running: ' + " ".join([i[0] for i in running])
-            if problematic_run:
-                final_status += ' |Problem: ' + " ".join([i[0] for i in problematic_run])
-
-        # add dictionaries to main ones
-        set_acc = a_res['@id']
-        check.brief_output.append(final_status)
-        if running:
-            check.full_output['running_runs'].append({set_acc: running})
-        if missing_run:
-            check.full_output['needs_runs'].append({set_acc: missing_run})
-        if problematic_run:
-            check.full_output['problematic_runs'].append({set_acc: problematic_run})
-        # if made it till the end
-        if completed:
-            assert not running
-            assert not problematic_run
-            assert not missing_run
-            check.full_output['completed_runs'].append(completed)
-
-    # complete check values
-    check.summary = ""
-    if check.full_output['running_runs']:
-        check.summary = str(len(check.full_output['running_runs'])) + ' running|'
-    if check.full_output['skipped']:
-        check.summary += str(len(check.full_output['skipped'])) + ' skipped|'
-        check.status = 'WARN'
-    if check.full_output['needs_runs']:
-        check.summary += str(len(check.full_output['needs_runs'])) + ' missing|'
-        check.status = 'WARN'
-        check.allow_action = True
-    if check.full_output['completed_runs']:
-        check.summary += str(len(check.full_output['completed_runs'])) + ' completed|'
-        check.status = 'WARN'
-        check.allow_action = True
-    if check.full_output['problematic_runs']:
-        check.summary += str(len(check.full_output['problematic_runs'])) + ' problem|'
-        check.status = 'WARN'
-    return check
-
-
-@action_function(start_runs=True, patch_completed=True)
-def replace_me_start(connection, **kwargs):
-    """Start runs by sending compiled input_json to run_workflow endpoint"""
-    start = datetime.utcnow()
-    action = ActionResult(connection, 'replace_me_start')
-    my_auth = connection.ff_keys
-    my_env = connection.ff_env
-    replace_me_check_result = action.get_associated_check_result(kwargs).get('full_output', {})
-    missing_runs = []
-    patch_meta = []
-    if kwargs.get('start_runs'):
-        missing_runs = replace_me_check_result.get('needs_runs')
-    if kwargs.get('patch_completed'):
-        patch_meta = replace_me_check_result.get('completed_runs')
-    action = wfr_utils.start_tasks(missing_runs, patch_meta, action, my_auth, my_env, start)
     return action

@@ -77,24 +77,24 @@ wcwidth = ">=0.1.4"
 
 [[package]]
 name = "boto3"
-version = "1.17.107"
+version = "1.18.4"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
-python-versions = ">= 2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
+python-versions = ">= 3.6"
 
 [package.dependencies]
-botocore = ">=1.20.107,<1.21.0"
+botocore = ">=1.21.4,<1.22.0"
 jmespath = ">=0.7.1,<1.0.0"
-s3transfer = ">=0.4.0,<0.5.0"
+s3transfer = ">=0.5.0,<0.6.0"
 
 [[package]]
 name = "botocore"
-version = "1.20.107"
+version = "1.21.4"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
-python-versions = ">= 2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
+python-versions = ">= 3.6"
 
 [package.dependencies]
 jmespath = ">=0.7.1,<1.0.0"
@@ -134,7 +134,7 @@ magma-suite = ">=0.2.1"
 
 [[package]]
 name = "chalice"
-version = "1.23.0"
+version = "1.24.0"
 description = "Microframework"
 category = "dev"
 optional = false
@@ -156,12 +156,15 @@ cdk = ["aws-cdk.aws-iam (>=1.85.0,<2.0)", "aws-cdk.aws-s3-assets (>=1.85.0,<2.0)
 event-file-poller = ["watchdog (==0.9.0)"]
 
 [[package]]
-name = "chardet"
-version = "4.0.0"
-description = "Universal encoding detector for Python 2 and 3"
+name = "charset-normalizer"
+version = "2.0.3"
+description = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
 category = "main"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+python-versions = ">=3.5.0"
+
+[package.extras]
+unicode_backport = ["unicodedata2"]
 
 [[package]]
 name = "click"
@@ -288,7 +291,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "0.1.11"
+version = "0.2.0"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -370,7 +373,7 @@ uritemplate = ">=3.0.0,<4dev"
 
 [[package]]
 name = "google-auth"
-version = "1.32.1"
+version = "1.33.1"
 description = "Google Authentication Library"
 category = "main"
 optional = false
@@ -413,11 +416,11 @@ pyparsing = ">=2.4.2,<3"
 
 [[package]]
 name = "idna"
-version = "2.10"
+version = "3.2"
 description = "Internationalized Domain Names in Applications (IDNA)"
 category = "main"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+python-versions = ">=3.5"
 
 [[package]]
 name = "importlib-metadata"
@@ -484,7 +487,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "magma-suite"
-version = "0.2.3"
+version = "0.2.6"
 description = "Collection of tools to manage meta-workflows automation"
 category = "main"
 optional = false
@@ -644,7 +647,7 @@ testing = ["fields", "hunter", "process-tests (==2.0.2)", "six", "virtualenv"]
 
 [[package]]
 name = "python-dateutil"
-version = "2.8.1"
+version = "2.8.2"
 description = "Extensions to the standard Python datetime module"
 category = "main"
 optional = false
@@ -719,21 +722,21 @@ python-versions = "*"
 
 [[package]]
 name = "requests"
-version = "2.25.1"
+version = "2.26.0"
 description = "Python HTTP for Humans."
 category = "main"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
 
 [package.dependencies]
 certifi = ">=2017.4.17"
-chardet = ">=3.0.2,<5"
-idna = ">=2.5,<3"
+charset-normalizer = {version = ">=2.0.0,<2.1.0", markers = "python_version >= \"3\""}
+idna = {version = ">=2.5,<4", markers = "python_version >= \"3\""}
 urllib3 = ">=1.21.1,<1.27"
 
 [package.extras]
-security = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)"]
 socks = ["PySocks (>=1.5.6,!=1.5.7)", "win-inet-pton"]
+use_chardet_on_py3 = ["chardet (>=3.0.2,<5)"]
 
 [[package]]
 name = "rfc3986"
@@ -759,11 +762,11 @@ pyasn1 = ">=0.1.3"
 
 [[package]]
 name = "s3transfer"
-version = "0.4.2"
+version = "0.5.0"
 description = "An Amazon S3 Transfer Manager"
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">= 3.6"
 
 [package.dependencies]
 botocore = ">=1.12.36,<2.0a.0"
@@ -814,7 +817,7 @@ tests = ["coverage", "freezegun (>=0.2.8)", "pretend", "pytest (>=3.3.0)", "simp
 
 [[package]]
 name = "tibanna"
-version = "1.4.0b0"
+version = "1.4.0b2"
 description = "Tibanna runs portable pipelines (in CWL/WDL) on the AWS Cloud."
 category = "main"
 optional = false
@@ -830,7 +833,7 @@ urllib3 = ">=1.24"
 
 [[package]]
 name = "tibanna-ff"
-version = "0.20.0"
+version = "0.20.1b1"
 description = "Tibanna runs portable pipelines (in CWL/WDL) on the AWS Cloud."
 category = "main"
 optional = false
@@ -838,7 +841,7 @@ python-versions = "*"
 
 [package.dependencies]
 dcicutils = ">=1.19.0"
-tibanna = ">=1.4.0b"
+tibanna = ">=1.4.0b0"
 
 [[package]]
 name = "toml"
@@ -958,7 +961,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6,<3.7"
-content-hash = "958a942f2eb33c80f346a18f298b911e7f8689b9b076ba1c38a6640952b8bf2f"
+content-hash = "7e3abd01f93ef48b7f37811726882dd64c5b4c4b1c52b789db91eae56e26c597"
 
 [metadata.files]
 ansicon = [
@@ -992,12 +995,12 @@ blessed = [
     {file = "blessed-1.17.6.tar.gz", hash = "sha256:a9a774fc6eda05248735b0d86e866d640ca2fef26038878f7e4d23f7749a1e40"},
 ]
 boto3 = [
-    {file = "boto3-1.17.107-py2.py3-none-any.whl", hash = "sha256:ca911509477d499b62029aaef01ba042ec0fd214f372773a4d8566a7cd422d91"},
-    {file = "boto3-1.17.107.tar.gz", hash = "sha256:4a6febc5ab709b2c53a72ebb420e4be29e84a01a0f84604e8b5dc43e8d1bfab0"},
+    {file = "boto3-1.18.4-py3-none-any.whl", hash = "sha256:649ed1ca205f5ee0b0328d54580780aebc1a7a05681a24f6ee05253007ca48d8"},
+    {file = "boto3-1.18.4.tar.gz", hash = "sha256:7079b40bd6621c54a0385a8fc11240cff4318a4d487292653e393e18254f5d94"},
 ]
 botocore = [
-    {file = "botocore-1.20.107-py2.py3-none-any.whl", hash = "sha256:bfd08ae511ed27095ce4cb9c3bba953909a02d62114e7560cb4bdfa045747e54"},
-    {file = "botocore-1.20.107.tar.gz", hash = "sha256:59539432640d1b0324c375b906f1e3a37935b4e589c133cd7f50490be7ab7986"},
+    {file = "botocore-1.21.4-py3-none-any.whl", hash = "sha256:dca7f283d4e7a1c9f456f5a23e55725ffc1b7d34abd089eb2c7651359aebd977"},
+    {file = "botocore-1.21.4.tar.gz", hash = "sha256:317d441c8f3f03591761e3478de6ab34b22b333038d819bc24f2e74b64f22201"},
 ]
 cachetools = [
     {file = "cachetools-4.2.2-py3-none-any.whl", hash = "sha256:2cc0b89715337ab6dbba85b5b50effe2b0c74e035d83ee8ed637cf52f12ae001"},
@@ -1013,12 +1016,12 @@ cgap-pipeline-utils = [
     {file = "cgap_pipeline_utils-23.0-py3.6.egg", hash = "sha256:cf7ac0a5e8bafa9357ced5bbae087ff178070a5a505a6585bb8c40782c292265"},
 ]
 chalice = [
-    {file = "chalice-1.23.0-py2.py3-none-any.whl", hash = "sha256:3b000fcab2e2067f23cb27cec7572a83593cefc0cf3fa4718852bcbd2e6bd5c3"},
-    {file = "chalice-1.23.0.tar.gz", hash = "sha256:8e3b26f8ec15197d8c04cd1edb0d692a490cb5ec179560183a403de63f21c1d7"},
+    {file = "chalice-1.24.0-py3-none-any.whl", hash = "sha256:0fea830b90eb2ca269133b226abcf58be534e2e6e15dd79d28ea1985200e78af"},
+    {file = "chalice-1.24.0.tar.gz", hash = "sha256:c7021b4c096ee9a28b64de6f1d9ceae1e3ad4a308b5df01e8b025f10fe5449d9"},
 ]
-chardet = [
-    {file = "chardet-4.0.0-py2.py3-none-any.whl", hash = "sha256:f864054d66fd9118f2e67044ac8981a54775ec5b67aed0441892edb553d21da5"},
-    {file = "chardet-4.0.0.tar.gz", hash = "sha256:0d6f53a15db4120f2b08c94f11e7d93d2c911ee118b6b30a04ec3ee8310179fa"},
+charset-normalizer = [
+    {file = "charset-normalizer-2.0.3.tar.gz", hash = "sha256:c46c3ace2d744cfbdebceaa3c19ae691f53ae621b39fd7570f59d14fb7f2fd12"},
+    {file = "charset_normalizer-2.0.3-py3-none-any.whl", hash = "sha256:88fce3fa5b1a84fdcb3f603d889f723d1dd89b26059d0123ca435570e848d5e1"},
 ]
 click = [
     {file = "click-7.1.2-py2.py3-none-any.whl", hash = "sha256:dacca89f4bfadd5de3d7489b7c8a566eee0d3676333fbb50030263894c38c0dc"},
@@ -1111,8 +1114,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight_core-0.1.11-py3-none-any.whl", hash = "sha256:a37991ff6a01c3288792b9c9c370894a1cd7aa84a4c708b720139a3b38d783ec"},
-    {file = "foursight_core-0.1.11.tar.gz", hash = "sha256:34b15e1114dde3ade362114a3e356cbf9abf4eeb2e90e3dd6708f222893794ec"},
+    {file = "foursight_core-0.2.0-py3-none-any.whl", hash = "sha256:d90a70d53982f9f3198615001f4a0cffc5fbf93a2d16ff2861bb7cd73d6c360f"},
+    {file = "foursight_core-0.2.0.tar.gz", hash = "sha256:f4789a4071b6d7d456e5d476b7085db8e14735857c94d76aac64a89063b96b42"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
@@ -1134,8 +1137,8 @@ google-api-python-client = [
     {file = "google_api_python_client-1.7.4-py3-none-any.whl", hash = "sha256:7cc47cf80b25ecd7f3d917ea247bb6c62587514e40604ae29c47c0e4ebd1174b"},
 ]
 google-auth = [
-    {file = "google-auth-1.32.1.tar.gz", hash = "sha256:c7c215c74348ef24faef2f7b62f6d8e6b38824fe08b1e7b7b09a02d397eda7b3"},
-    {file = "google_auth-1.32.1-py2.py3-none-any.whl", hash = "sha256:9266252e11393943410354cf14a77bcca24dd2ccd9c4e1aef23034fe0fbae630"},
+    {file = "google-auth-1.33.1.tar.gz", hash = "sha256:7665c04f2df13cc938dc7d9066cddb1f8af62b038bc8b2306848c1b23121865f"},
+    {file = "google_auth-1.33.1-py2.py3-none-any.whl", hash = "sha256:036dd68c1e8baa422b6b61619b8e02793da2e20f55e69514612de6c080468755"},
 ]
 google-auth-httplib2 = [
     {file = "google-auth-httplib2-0.1.0.tar.gz", hash = "sha256:a07c39fd632becacd3f07718dfd6021bf396978f03ad3ce4321d060015cc30ac"},
@@ -1146,8 +1149,8 @@ httplib2 = [
     {file = "httplib2-0.19.1.tar.gz", hash = "sha256:0b12617eeca7433d4c396a100eaecfa4b08ee99aa881e6df6e257a7aad5d533d"},
 ]
 idna = [
-    {file = "idna-2.10-py2.py3-none-any.whl", hash = "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"},
-    {file = "idna-2.10.tar.gz", hash = "sha256:b307872f855b18632ce0c21c5e45be78c0ea7ae4c15c828c20788b26921eb3f6"},
+    {file = "idna-3.2-py3-none-any.whl", hash = "sha256:14475042e284991034cb48e06f6851428fb14c4dc953acd9be9a5e95c7b6dd7a"},
+    {file = "idna-3.2.tar.gz", hash = "sha256:467fbad99067910785144ce333826c71fb0e63a425657295239737f7ecd125f3"},
 ]
 importlib-metadata = [
     {file = "importlib_metadata-4.6.1-py3-none-any.whl", hash = "sha256:9f55f560e116f8643ecf2922d9cd3e1c7e8d52e683178fecd9d08f6aa357e11e"},
@@ -1170,9 +1173,9 @@ jmespath = [
     {file = "jmespath-0.10.0.tar.gz", hash = "sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9"},
 ]
 magma-suite = [
-    {file = "magma-suite-0.2.3.tar.gz", hash = "sha256:00c9087a9b5fc397c76c84f587aea41efc4467640884380cb6a03082093cfb4f"},
-    {file = "magma_suite-0.2.3-py3-none-any.whl", hash = "sha256:420faf92f75d9d608d34fc68dac96771fa213b1f7009fc1fd6ebcf2cbbb469d7"},
-    {file = "magma_suite-0.2.3-py3.6.egg", hash = "sha256:af8f49c77e1dd122ccdc5a7ac5a42996150da2b62224b0832582eb2a95bdfb01"},
+    {file = "magma-suite-0.2.6.tar.gz", hash = "sha256:ef1b033b4367b9b319b46878d87bb39dcdb49388a85b59843ee9f55bcd1e9f5c"},
+    {file = "magma_suite-0.2.6-py3-none-any.whl", hash = "sha256:15296723630491fe9c7345de8d3fefc2760aec8b01f8fd43691e670c7668a335"},
+    {file = "magma_suite-0.2.6-py3.7.egg", hash = "sha256:2c814f1cdd1b95ab064802dd2f1c82c9fa179930ee462d8dd7ecdc88648abb3a"},
 ]
 markupsafe = [
     {file = "MarkupSafe-1.1.1-cp27-cp27m-macosx_10_6_intel.whl", hash = "sha256:09027a7803a62ca78792ad89403b1b7a73a01c8cb65909cd876f7fcebd79b161"},
@@ -1299,8 +1302,8 @@ pytest-cov = [
     {file = "pytest_cov-2.7.1-py2.py3-none-any.whl", hash = "sha256:2b097cde81a302e1047331b48cadacf23577e431b61e9c6f49a1170bbe3d3da6"},
 ]
 python-dateutil = [
-    {file = "python-dateutil-2.8.1.tar.gz", hash = "sha256:73ebfe9dbf22e832286dafa60473e4cd239f8592f699aa5adaf10050e6e1823c"},
-    {file = "python_dateutil-2.8.1-py2.py3-none-any.whl", hash = "sha256:75bb3f31ea686f1197762692a9ee6a7550b59fc6ca3a1f4b5d7e32fb98e2da2a"},
+    {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
+    {file = "python_dateutil-2.8.2-py2.py3-none-any.whl", hash = "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"},
 ]
 python-editor = [
     {file = "python-editor-1.0.4.tar.gz", hash = "sha256:51fda6bcc5ddbbb7063b2af7509e43bd84bfc32a4ff71349ec7847713882327b"},
@@ -1372,8 +1375,8 @@ readchar = [
     {file = "readchar-2.0.1-py3-none-any.whl", hash = "sha256:3ac34aab28563bc895f73233d5c08b28f951ca190d5850b8d4bec973132a8dca"},
 ]
 requests = [
-    {file = "requests-2.25.1-py2.py3-none-any.whl", hash = "sha256:c210084e36a42ae6b9219e00e48287def368a26d03a048ddad7bfee44f75871e"},
-    {file = "requests-2.25.1.tar.gz", hash = "sha256:27973dd4a904a4f13b263a19c866c13b92a39ed1c964655f025f3f8d3d75b804"},
+    {file = "requests-2.26.0-py2.py3-none-any.whl", hash = "sha256:6c1246513ecd5ecd4528a0906f910e8f0f9c6b8ec72030dc9fd154dc1a6efd24"},
+    {file = "requests-2.26.0.tar.gz", hash = "sha256:b8aa58f8cf793ffd8782d3d8cb19e66ef36f7aba4353eec859e74678b01b07a7"},
 ]
 rfc3986 = [
     {file = "rfc3986-1.5.0-py2.py3-none-any.whl", hash = "sha256:a86d6e1f5b1dc238b218b012df0aa79409667bb209e58da56d0b94704e712a97"},
@@ -1384,8 +1387,8 @@ rsa = [
     {file = "rsa-4.7.2.tar.gz", hash = "sha256:9d689e6ca1b3038bc82bf8d23e944b6b6037bc02301a574935b2dd946e0353b9"},
 ]
 s3transfer = [
-    {file = "s3transfer-0.4.2-py2.py3-none-any.whl", hash = "sha256:9b3752887a2880690ce628bc263d6d13a3864083aeacff4890c1c9839a5eb0bc"},
-    {file = "s3transfer-0.4.2.tar.gz", hash = "sha256:cb022f4b16551edebbb31a377d3f09600dbada7363d8c5db7976e7f47732e1b2"},
+    {file = "s3transfer-0.5.0-py3-none-any.whl", hash = "sha256:9c1dc369814391a6bda20ebbf4b70a0f34630592c9aa520856bf384916af2803"},
+    {file = "s3transfer-0.5.0.tar.gz", hash = "sha256:50ed823e1dc5868ad40c8dc92072f757aa0e653a192845c94a3b676f4a62da4c"},
 ]
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
@@ -1404,14 +1407,14 @@ structlog = [
     {file = "structlog-19.2.0.tar.gz", hash = "sha256:4287058cf4ce1a59bc5dea290d6386d37f29a37529c9a51cdf7387e51710152b"},
 ]
 tibanna = [
-    {file = "tibanna-1.4.0b0-py3-none-any.whl", hash = "sha256:8d147f74ceaabf324dff2d1743feabad50b2608f44185514b43aa10c78fb6e00"},
-    {file = "tibanna-1.4.0b0-py3.6.egg", hash = "sha256:b35fe00ce91297975b9804860f8d670340668f51cd4da9f49f5ee60c28661655"},
-    {file = "tibanna-1.4.0b0.tar.gz", hash = "sha256:66c657d26292dd8775b331d49381a45c802f8b87fb477cdf1b15be2d39cf8c5f"},
+    {file = "tibanna-1.4.0b2-py3-none-any.whl", hash = "sha256:0a1d40bb7bf740bd571d69d4e16e0b8792704a380b5e2dd514a2f7f0a2c837de"},
+    {file = "tibanna-1.4.0b2-py3.6.egg", hash = "sha256:5c5941d66123d57cf1f3e46916d5b701daef234b9aa1bbe1f14fa895fd7641b2"},
+    {file = "tibanna-1.4.0b2.tar.gz", hash = "sha256:f48edfc5726dcfeb226c961c980be26ec9e4279c4d5fa876893cf240c3f03e12"},
 ]
 tibanna-ff = [
-    {file = "tibanna_ff-0.20.0-py3-none-any.whl", hash = "sha256:4fdea982ca02e9a79eab598ef0e1b3f140694c1e773726db8b48be7738b5a7f4"},
-    {file = "tibanna_ff-0.20.0-py3.6.egg", hash = "sha256:ad38c87018f103ddc8294de10dca49be476cb44f409ccb849475fcbfc12efd65"},
-    {file = "tibanna_ff-0.20.0.tar.gz", hash = "sha256:466d10bbc514d3c135751ef3953cc65c6d555f64091ca6c72be23d1cc7a86a11"},
+    {file = "tibanna_ff-0.20.1b1-py3-none-any.whl", hash = "sha256:04a8fa3fbeb40f15072af0bd8d15ab6ae0c65fb49db9adfa2731a5b98a0863ff"},
+    {file = "tibanna_ff-0.20.1b1-py3.6.egg", hash = "sha256:7195c59e327b3a8604b993c830a578e6c6952fd64520d5615a7cb55b1e96eca3"},
+    {file = "tibanna_ff-0.20.1b1.tar.gz", hash = "sha256:b63f532fbf90397caa880932544842177d508c9a86a620f9db65ab8ea14e5b15"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},

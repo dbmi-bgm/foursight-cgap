@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 from operator import itemgetter
 from dcicutils import ff_utils, s3Utils
+from tibanna_cgap.core import API
 from .wfrset_utils import (
     # use wf_dict in workflow version check to make sure latest version and workflow uuid matches
     wf_dict,
@@ -748,90 +749,16 @@ def get_attribution(file_json):
     return attributions
 
 
-def extract_file_info(obj_id, arg_name, additional_parameters, auth, env, rename=[]):
+def extract_file_info(obj_uuid, arg_name, additional_parameters):
     """Takes file id, and creates info dict for tibanna"""
-    my_s3_util = s3Utils(env=env)
-    raw_bucket = my_s3_util.raw_file_bucket
-    out_bucket = my_s3_util.outfile_bucket
-    """Creates the formatted dictionary for files.
-    """
     # start a dictionary
-    template = {"workflow_argument_name": arg_name}
-    if rename:
-        change_from = rename[0]
-        change_to = rename[1]
-    # if it is list of items, change the structure
-    if isinstance(obj_id, list):
-        object_key = []
-        uuid = []
-        buckets = []
-        for obj in obj_id:
-            metadata = ff_utils.get_metadata(obj, key=auth)
-            object_key.append(metadata['display_title'])
-            uuid.append(metadata['uuid'])
-            # get the bucket
-            if 'FileProcessed' in metadata['@type']:
-                my_bucket = out_bucket
-            else:  # covers cases of FileFastq, FileReference, FileMicroscopy
-                my_bucket = raw_bucket
-            buckets.append(my_bucket)
-        # check bucket consistency
-        assert len(list(set(buckets))) == 1
-        template['object_key'] = object_key
-        template['uuid'] = uuid
-        template['bucket_name'] = buckets[0]
-        if rename:
-            template['rename'] = [i.replace(change_from, change_to) for i in template['object_key']]
-        if additional_parameters:
-            template.update(additional_parameters)
-
-    # if obj_id is a string
-    else:
-        metadata = ff_utils.get_metadata(obj_id, key=auth)
-        template['object_key'] = metadata['display_title']
-        template['uuid'] = metadata['uuid']
-        # get the bucket
-        if 'FileProcessed' in metadata['@type']:
-            my_bucket = out_bucket
-        else:  # covers cases of FileFastq, FileReference, FileMicroscopy
-            my_bucket = raw_bucket
-        template['bucket_name'] = my_bucket
-        if rename:
-            template['rename'] = template['object_key'].replace(change_from, change_to)
-        if additional_parameters:
-            template.update(additional_parameters)
+    template = {"workflow_argument_name": arg_name, "uuid": obj_uuid}
+    if additional_parameters:
+        template.update(additional_parameters)
     return template
 
 
-def start_missing_run(run_info, auth, env):
-    # arguments for finding the file with the attribution (as opposed to reference files)
-    attr_keys = ['fastq1', 'fastq', 'input_pairs', 'input_bams',
-                 'fastq_R1', 'input_bam', 'input_gvcf', 'cram',
-                 'input_gvcfs', 'input_rcks', 'input_vcf',
-                 '']
-    run_settings = run_info[1]
-    inputs = run_info[2]
-    name_tag = run_info[3]
-    # find file to use for attribution
-    attr_file = ''
-    for attr_key in attr_keys:
-        if attr_key in inputs:
-            attr_file = inputs[attr_key]
-            if isinstance(attr_file, list):
-                attr_file = attr_file[0]
-            break
-    if not attr_file:
-        possible_keys = [i for i in inputs.keys() if i != 'additional_file_parameters']
-        error_message = ('one of these argument names {} which carry the input file -not the references-'
-                         ' should be added to att_keys dictionary on foursight wfr_utils.py function start_missing_run').format(possible_keys)
-        raise ValueError(error_message)
-    attributions = get_attribution(ff_utils.get_metadata(attr_file, auth))
-    settings = step_settings(run_settings[0], run_settings[1], attributions, run_settings[2])
-    url = run_missing_wfr(settings, inputs, name_tag, auth, env)
-    return url
-
-
-def run_missing_wfr(input_json, input_files_and_params, run_name, auth, env):
+def run_missing_wfr(input_json, input_files_and_params, run_name, auth, env, sfn):
     all_inputs = []
     # input_files container
     input_files = {k: v for k, v in input_files_and_params.items() if k != 'additional_file_parameters'}
@@ -839,116 +766,33 @@ def run_missing_wfr(input_json, input_files_and_params, run_name, auth, env):
     input_file_parameters = input_files_and_params.get('additional_file_parameters', {})
     for arg, files in input_files.items():
         additional_params = input_file_parameters.get(arg, {})
-        inp = extract_file_info(files, arg, additional_params, auth, env)
+        inp = extract_file_info(files, arg, additional_params)
         all_inputs.append(inp)
     # tweak to get bg2bw working
     all_inputs = sorted(all_inputs, key=itemgetter('workflow_argument_name'))
-    my_s3_util = s3Utils(env=env)
-    out_bucket = my_s3_util.outfile_bucket
+    print("all_inputs=%s" % str(all_inputs))
     # shorten long name_tags
     # they get combined with workflow name, and total should be less then 80
     # (even less since repeats need unique names)
     if len(run_name) > 30:
         run_name = run_name[:30] + '...'
-    """Creates the trigger json that is used by foufront endpoint.
-    """
+    """Creates the trigger json that is used by tibanna."""
     input_json['input_files'] = all_inputs
-    input_json['output_bucket'] = out_bucket
     input_json["_tibanna"] = {
         "env": env,
         "run_type": input_json['app_name'],
-        "run_id": run_name}
-    # input_json['env_name'] = CGAP_ENV_WEBPROD  # e.g., 'fourfront-cgap'
-    input_json['step_function_name'] = 'tibanna_zebra'
+        "run_id": run_name
+    }
     input_json['public_postrun_json'] = True
+    print("input_json=" + str(input_json))
     try:
-        e = ff_utils.post_metadata(input_json, 'WorkflowRun/run', key=auth)
-        url = json.loads(e['input'])['_tibanna']['url']
+        #e = ff_utils.post_metadata(input_json, 'WorkflowRun/run', key=auth)
+        res = API().run_workflow(input_json, sfn=sfn, verbose=False)
+        print("run_workflow res=" + str(res))
+        url = res['_tibanna']['url']
         return url
     except Exception as e:
         return str(e)
-
-
-def find_fastq_info(my_sample, fastq_files, organism='human'):
-    """Find fastq files from sample
-    expects my_rep_set to be set response in frame object (search result)
-    will check if files are paired or not, and if paired will give list of lists for sample
-    if not paired, with just give list of files for sample.
-
-    result is 2 lists
-    - file [file1, file2, file3, file4]  # unpaired
-      file [ [file1, file2], [file3, file4]] # paired
-    - refs keys  {pairing, organism, bwa_ref, f_size}
-    """
-    # # TODO: re word for samples
-    files = []
-    refs = {}
-    # check pairing for the first file, and assume all same
-    paired = ""
-    # check if files are FileFastq or FileProcessed
-    f_type = ""
-    total_f_size = 0
-    sample_files = my_sample['files']
-    # Assumption: Fastq files are either all FileFastq or File processed
-    # File Processed ones don't have paired end information
-    # Assumption: File Processed fastq files are paired end in the order they are in sample files
-    types = [i['@id'].split('/')[1] for i in fastq_files]
-    f_type = list(set(types))
-    msg = '{} has mixed fastq files types {}'.format(my_sample['accession'], f_type)
-    assert len(f_type) == 1, msg
-    f_type = f_type[0]
-
-    if f_type == 'files-processed':
-        for fastq_file in sample_files:
-            file_resp = [i for i in fastq_files if i['uuid'] == fastq_file['uuid']][0]
-            if file_resp.get('file_size'):
-                total_f_size += file_resp['file_size']
-        # we are assuming that this files are processed
-        # # TODO: make sure that this is encoded in the metadata
-        paired = 'Yes'
-        file_ids = [i['@id'] for i in sample_files]
-        files = [file_ids[i:i+2] for i in range(0, len(file_ids), 2)]
-
-    elif f_type == 'files-fastq':
-        for fastq_file in sample_files:
-            file_resp = [i for i in fastq_files if i['uuid'] == fastq_file['uuid']][0]
-            if file_resp.get('file_size'):
-                total_f_size += file_resp['file_size']
-            # skip pair no 2
-            if file_resp.get('paired_end') == '2':
-                continue
-            # check that file has a pair
-            f1 = file_resp['@id']
-            f2 = ""
-            # assign pairing info by the first file
-            if not paired:
-                try:
-                    relations = file_resp['related_files']
-                    paired_files = [relation['file']['@id'] for relation in relations
-                                    if relation['relationship_type'] == 'paired with']
-                    assert len(paired_files) == 1
-                    paired = "Yes"
-                except:
-                    paired = "No"
-
-            if paired == 'No':
-                files.append(f1)
-            elif paired == 'Yes':
-                relations = file_resp['related_files']
-                paired_files = [relation['file']['@id'] for relation in relations
-                                if relation['relationship_type'] == 'paired with']
-                assert len(paired_files) == 1
-                f2 = paired_files[0]
-                files.append((f1, f2))
-    bwa = bwa_index.get(organism)
-    # chrsize = chr_size.get(organism)
-
-    f_size = int(total_f_size / (1024 * 1024 * 1024))
-    refs = {'pairing': paired,
-            'organism': organism,
-            'bwa_ref': bwa,
-            'f_size': str(f_size)+'GB'}
-    return files, refs
 
 
 def check_runs_without_output(res, check, run_name, my_auth, start):
@@ -1005,52 +849,6 @@ def check_runs_without_output(res, check, run_name, my_auth, start):
     if not check.brief_output:
         check.brief_output = ['All Good!']
     return check
-
-
-def start_tasks(missing_runs, patch_meta, action, my_auth, my_env, start, move_to_pc=False, runtype='hic'):
-    started_runs = 0
-    patched_md = 0
-    action.description = ""
-    action_log = {'started_runs': [], 'failed_runs': [], 'patched_meta': [], 'failed_meta': []}
-    if missing_runs:
-        for a_case in missing_runs:
-            now = datetime.utcnow()
-            acc = list(a_case.keys())[0]
-            print((now-start).seconds, acc)
-            if (now-start).seconds > lambda_limit:
-                action.description = 'Did not complete action due to time limitations.'
-                break
-
-            for a_run in a_case[acc]:
-                started_runs += 1
-                url = start_missing_run(a_run, my_auth, my_env)
-                log_message = acc + ' started running ' + a_run[0] + ' with ' + a_run[3]
-                if url.startswith('http'):
-                    action_log['started_runs'].append([log_message, url])
-                else:
-                    action_log['failed_runs'].append([log_message, url])
-    if patch_meta:
-        action_log['patched_meta'] = []
-        for a_completed_info in patch_meta:
-            exp_acc = a_completed_info[0]
-            patch_body = a_completed_info[1]
-            now = datetime.utcnow()
-            if (now-start).seconds > lambda_limit:
-                action.description = 'Did not complete action due to time limitations.'
-                break
-            patched_md += 1
-            ff_utils.patch_metadata(patch_body, exp_acc, my_auth)
-            action_log['patched_meta'].append(exp_acc)
-
-    # did we complete without running into time limit
-    for k in action_log:
-        if action_log[k]:
-            add_desc = "| {}: {} ".format(k, str(len(action_log[k])))
-            action.description += add_desc
-
-    action.output = action_log
-    action.status = 'DONE'
-    return action
 
 
 def is_there_my_qc_metric(file_meta, qc_metric_name, my_auth):
