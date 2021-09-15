@@ -17,6 +17,23 @@ def try_request(func, *args, **kwargs):
 
 
 class CaseToClone:
+    """
+    Clones a case, with most of the same metadata, so that analyses can be rerun
+    without the old files and variants being overwritten (especially if interpretation
+    has already been performed). Cases, Samples, and SampleProcessing items get cloned;
+    Family, Individual, Fastq, and Cram items remain and get linked appropriately. If the
+    Case is a trio or group analysis, the other individual's cases will also get cloned.
+
+    In the first version, a SNV meta-workflow run can get created from scratch and the input
+    case's SV meta-workflow run can be attached if desired. The steps_to_rerun arg should be set to [].
+    In a future version, we will want the ability to create an SNV meta-workflow run that only
+    restarts at a particular step. If this step is one of the last steps in the meta-workflow,
+    we may also want the ability to create a new SV meta-workflow run as well; or keep the SNV
+    meta-workflow run and create a new SV meta-workflow run.
+
+    Example call:
+    new_case = CaseToClone('GAPCAXXXXXX', access_key, 'd20ab9c2-932b-411e-95fd-792bd1001d77', 'v25', [])
+    """
 
     keep_fields = ['project', 'institution']
     remove_fields = ['uuid', 'submitted_by', 'last_modified', 'schema_version', 'date_created', 'accession']
@@ -64,14 +81,6 @@ class CaseToClone:
         if pretty:
             return new_value + f' ({self.new_version})'
         return new_value + '-' + self.new_version
-
-    def try_request(self, func, *args, **kwargs):
-        try:
-            resp = func(*args, **kwargs)
-        except Exception as e:
-            self.errors.append(e)
-        else:
-            return resp
 
     def get_case_metadata(self):
         return ff_utils.get_metadata(self.accession + '?frame=raw', key=self.key)
@@ -143,6 +152,7 @@ class CaseToClone:
                 resp = try_request(ff_utils.patch_metadata, sample_patch, v['individual'], key=self.key)
 
     def clone_sample_processing(self):
+        # TODO: attach SV VCFs if keep_SV_mwfr ?
         keep_fields_sp = ['analysis_type', 'families']
         new_sp_metadata = {}
         for item in self.keep_fields + keep_fields_sp:
@@ -152,6 +162,7 @@ class CaseToClone:
         new_sp_metadata['analysis_version'] = self.new_version
 
         # add back some processed files, etc if pipeline is only being rerun at a particular step
+        # will be used in future version but not currently part of check/action
         if self.sp_metadata.get('processed_files'):
             if self.add_procfiles_to_sp['vep'] or self.add_procfiles_to_sp['full']:
                 new_sp_metadata['processed_files'] = []
@@ -210,6 +221,8 @@ class CaseToClone:
 
     def get_analysis_type(self):
         # figure out if analysis will be trio or proband only or proband-only cram
+        # magma currently doesn't support creation of WES meta-workflow runs but this will
+        # need to be changed in the future.
         sp_type = self.sp_metadata.get('analysis_type', '')
         if not sp_type or not sp_type.startswith('WGS'):
             return None

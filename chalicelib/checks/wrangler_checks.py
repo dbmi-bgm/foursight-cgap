@@ -1216,9 +1216,23 @@ def queue_variants_to_update_genelist(connection, **kwargs):
     return action
 
 
-@check_function(accessions=[], version='', keep_SV_mwfr=False, create_SNV_mwfr=True, steps_to_rerun=['all'])
+@check_function(accessions=[], version='', keep_SV_mwfr=False,
+                create_SNV_mwfr=True, steps_to_rerun=['all'])
 def get_metadata_for_cases_to_clone(connection, **kwargs):
     """
+    Gathers metadata for cases to be cloned. By default will create a new SNV
+    meta-workflow run from scratch, of the type already on the case. Also by default
+    the SV meta-workflow run won't be attached to the cloned case. Case accessions need
+    to be specified in the kwarg, as well as the updated pipeline version (as formatted in the
+    meta-workflow metadata - e.g. 'v25'). The check will look up the cases. In the output
+    cases will be listed as ignored in the following circumstances:
+    - no SNV meta-workflows are present on the case already
+    - no SNV meta-workflows of the type present on the case are found with the specified version
+    - the case has an SNV meta-workflow run already of the specified version
+    - the case has already been cloned
+    Cases listed as 'run' will contain the uuid of the meta-workflow that should be created, as
+    well as the kwargs for whether to create a new SNV meta-workflow run and whether to attach the
+    old SV meta-workflow run.
     """
     # TODO: implement steps_to_rerun, moving processed files
 
@@ -1277,8 +1291,6 @@ def get_metadata_for_cases_to_clone(connection, **kwargs):
             continue
         updated_mwf = False
         for k, v in meta_workflow_dict.items():
-            # TODO: this is a bit hacky right now, should change the mwf metadata to have title separate from version,
-            # and a calcprop that combines title and version
             if k == mwfr.get('meta_workflow', {}).get('name'):
                 # value is a dict so that we can add more metadata in future iterations
                 output['run'][case] = {
@@ -1294,7 +1306,8 @@ def get_metadata_for_cases_to_clone(connection, **kwargs):
 
     check.full_output = output
     check.status = 'PASS'
-    check.summary = f'{len(output["run"].keys())} cases ready to clone, {len(output["ignore"].keys())} cases ignored'
+    check.summary = (f'{len(output["run"].keys())} cases ready to clone, '
+                     f'{len(output["ignore"].keys())} cases ignored')
     check.description = check.summary
     check.allow_action = True
     return check
