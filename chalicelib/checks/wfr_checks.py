@@ -477,6 +477,9 @@ def reset_spot_failed_metawfrs(connection, **kwargs):
     action_logs = {'runs_reset': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
+    my_s3_util = s3Utils(env=env)
+    log_bucket = my_s3_util.tibanna_output_bucket
+
     check_result = action.get_associated_check_result(kwargs).get('full_output', {})
     action_logs['check_output'] = check_result
     metawfr_uuids = check_result.get('metawfrs_that_failed', {}).get('uuids', [])
@@ -501,7 +504,11 @@ def reset_spot_failed_metawfrs(connection, **kwargs):
                         raise Exception("multiple workflow runs for job id %s" % wfr['jobid'])
                     else:
                         raise Exception("No workflow run found for job id %s" % wfr['jobid'])
-                    if 'EC2 unintended termination' in res.get('description', '') or \
+                    # If Tibanna received a spot termination notice, it will create the file JOBID.spot_failure in the
+                    # Tibanna log bucket. If it failed otherwise it will throw an EC2UnintendedTerminationException
+                    # which will create a corresponding entry in the workflow description
+                    if my_s3_util.does_key_exist(key=wfr['jobid']+".spot_failure", bucket=log_bucket, print_error=False) or \
+                       'EC2 unintended termination' in res.get('description', '') or \
                        'EC2 Idle error' in res.get('description', ''):
                         # reset spot-failed shards
                         shard_name = wfr['name'] + ':' + str(wfr['shard'])
