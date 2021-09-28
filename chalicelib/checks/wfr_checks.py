@@ -242,6 +242,7 @@ def line_count_test(connection, **kwargs):
     env = connection.ff_env
     check_result = action.get_associated_check_result(kwargs).get('full_output', {})
     action_logs['check_output'] = check_result
+    action_logs['error'] = []
     metawfr_uuids = check_result.get('metawfrs_to_run', {}).get('uuids', [])
     for metawfr_uuid in metawfr_uuids:
         now = datetime.utcnow()
@@ -263,8 +264,8 @@ def line_count_test(connection, **kwargs):
             # if this is run on something other than those expected MWFRs, we want an error.
             else:
                 e = 'Unexpected MWF Title: '+metawfr_meta['title']
-                action_logs['error'] = str(e)
-
+                action_logs['error'].append(str(e))
+                continue
             # this calls check_lines from cgap-pipeline pipeline_utils check_lines.py (might get moved to generic repo in the future)
             # will return TRUE or FALSE if all pipeline steps are fine, or if there are any that do not match linecount with their partners, respectively
             linecount_result = check_lines(metawfr_uuid, my_auth, steps=steps_dict, fastqs=fastqs_dict)
@@ -273,13 +274,17 @@ def line_count_test(connection, **kwargs):
             overall_qcs_dict['linecount_test'] = 'PASS' if linecount_result else 'FAIL'
             # turn the dictionary back into a list of dictionaries that is properly structured (e.g., overall_qcs: [{"name": "linecount_test", "value": "PASS"}, {...}, {...}])
             updated_overall_qcs = [{'name': k, 'value': v} for k, v in overall_qcs_dict.items()]
-            ff_utils.patch_metadata({'overall_qcs': updated_overall_qcs}, metawfr_uuid, key=my_auth)
-            if linecount_result:
-                action_logs['metawfrs_that_passed_linecount_test'].append(metawfr_uuid)
-            else:
-                action_logs['metawfrs_that_failed_linecount_test'].append(metawfr_uuid)
+            try:
+                ff_utils.patch_metadata({'overall_qcs': updated_overall_qcs}, metawfr_uuid, key=my_auth)
+                if linecount_result:
+                    action_logs['metawfrs_that_passed_linecount_test'].append(metawfr_uuid)
+                else:
+                    action_logs['metawfrs_that_failed_linecount_test'].append(metawfr_uuid)
+            except Exception as e:
+                action_logs['error'].append(str(e))
+                break
         except Exception as e:
-            action_logs['error'] = str(e)
+            action_logs['error'].append(str(e))
             break
     action.output = action_logs
     action.status = 'DONE'
