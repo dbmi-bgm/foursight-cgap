@@ -12,7 +12,7 @@ from .helpers.wfrset_utils import lambda_limit
 # individually - they're now part of class Decorators in foursight-core::decorators
 # that requires initialization with foursight prefix.
 from .helpers.confchecks import *
-
+from .helpers.linecount_dicts import *
 
 default_pipelines_to_run = ['WGS Trio v25', 'WGS Proband-only Cram v25', 'CNV v2']
 
@@ -184,11 +184,9 @@ def md5runCGAP_start(connection, **kwargs):
 
 @check_function()
 def metawfrs_to_check_linecount(connection, **kwargs):
-    """Find metaworkflowruns that may need kicking
-    - those with final_status pending, inactive and running.
-    pending means no workflow run has started.
-    inactive means some workflow runs are complete but others are pending.
-    running means some workflow runs are actively running.
+    """
+    Find metaworkflowruns that may have completed steps for
+    a linecount VCF QC line count
     """
     check = CheckResult(connection, 'metawfrs_to_check_linecount')
     my_auth = connection.ff_keys
@@ -210,8 +208,12 @@ def metawfrs_to_check_linecount(connection, **kwargs):
         check.full_output = {}
         return check
 
-    query = '/search/?type=MetaWorkflowRun&overall_qcs.name!=linecount_test' + \
-            ''.join(['&final_status=' + st for st in ['completed']])
+    # need to build two queries and put them together
+    # first, we want those completed MWFRs without any overall_qcs
+    search_no_overall_qcs = '/search/?type=MetaWorkflowRun&overall_qcs=No+value&final_status=completed'
+    # second, we want those completed MWFRs with overall_qcs, but without linecount_test
+    search_no_linecount_test = 'search/?type=MetaWorkflowRun&overall_qcs.name!=linecount_test&final_status=completed'
+    query = search_no_overall_qcs + search_no_linecount_test
     search_res = ff_utils.search_metadata(query, key=my_auth)
 
     # nothing to run
@@ -247,12 +249,30 @@ def line_count_test(connection, **kwargs):
             action.description = 'Did not complete action due to time limitations'
             break
         try:
-            linecount_result = check_lines(metawfr_uuid, my_auth, steps=steps_dict, fastqs=fastqs_dict)
             metawfr_meta = ff_utils.get_metadata(metawfr_uuid, add_on='?frame=raw', key=my_auth)
+            # we have a few different dictionaries of steps to check output from in linecount_dicts.py
+            # the proband-only and family workflows have the same steps, so we assign the proband_SNV_dict
+            if 'Proband-only' in metawfr_meta['title'] or 'Family' in metawfr_meta['title']:
+                steps_dict = proband_SNV_dict
+            # trio has novoCaller, so it has a separate dictionary of steps
+            elif 'Trio' in metawfr_meta['title']:
+                steps_dict = trio_SNV_dict
+            # cnv/sv is a completely different pipeline, so has a many different steps
+            elif 'CNV' in metawfr_meta['title']:
+                steps_dict = CNV_dict
+            # if this is run on something other than those expected MWFRs, we want an error.
+            else:
+                e = 'Unexpected MWF Title: '+metawfr_meta['title']
+                action_logs['error'] = str(e)
+                raise Exception(str(e))
+
+            # this calls check_lines from cgap-pipeline pipeline_utils check_lines.py (might get moved to generic repo in the future)
+            # will return TRUE or FALSE if all pipeline steps are fine, or if there are any that do not match linecount with their partners, respectively
+            linecount_result = check_lines(metawfr_uuid, my_auth, steps=steps_dict, fastqs=fastqs_dict)
+            #want an empty dictionary if no overall_qcs, or a dictionary of tests and results if there are items in the overall_qcs list
             overall_qcs_dict = {qc['name']: qc['value'] for qc in metawfr_meta.get('overall_qcs', [])}
-            if overall_qcs_dict and overall_qcs_dict.get('linecount_test', ''):
-                continue
             overall_qcs_dict['linecount_test'] = 'PASS' if linecount_result else 'FAIL'
+            # turn the dictionary back into a list of dictionaries that is properly structured (e.g., overall_qcs: [{"name": "linecount_test", "value": "PASS"}, {...}, {...}])
             updated_overall_qcs = [{'name': k, 'value': v} for k, v in overall_qcs_dict.items()]
             ff_utils.patch_metadata({'overall_qcs': updated_overall_qcs}, metawfr_uuid, key=my_auth)
             if linecount_result:
