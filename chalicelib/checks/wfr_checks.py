@@ -264,7 +264,6 @@ def line_count_test(connection, **kwargs):
             else:
                 e = 'Unexpected MWF Title: '+metawfr_meta['title']
                 action_logs['error'] = str(e)
-                raise Exception(str(e))
 
             # this calls check_lines from cgap-pipeline pipeline_utils check_lines.py (might get moved to generic repo in the future)
             # will return TRUE or FALSE if all pipeline steps are fine, or if there are any that do not match linecount with their partners, respectively
