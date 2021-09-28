@@ -282,12 +282,16 @@ def line_count_test(connection, **kwargs):
                     action_logs['metawfrs_that_failed_linecount_test'].append(metawfr_uuid)
             except Exception as e:
                 action_logs['error'].append(str(e))
-                break
+                continue
         except Exception as e:
             action_logs['error'].append(str(e))
-            break
+            continue
     action.output = action_logs
-    action.status = 'DONE'
+    # we want to display an error if there are any errors in the run, even if many patches are successful
+    if action_logs['error'] == []:
+        action.status = 'DONE'
+    else:
+        action.status = 'ERROR'
     return action
 
 
