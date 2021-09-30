@@ -208,13 +208,15 @@ def metawfrs_to_check_linecount(connection, **kwargs):
         check.full_output = {}
         return check
 
-    # need to build two queries and put them together
+    # need to build two sets of results and put them together
     # first, we want those completed MWFRs without any overall_qcs
     search_no_overall_qcs = '/search/?type=MetaWorkflowRun&overall_qcs=No+value&final_status=completed'
+    result_no_overall_qcs = ff_utils.search_metadata(search_no_overall_qcs, key=my_auth)
     # second, we want those completed MWFRs with overall_qcs, but without linecount_test
     search_no_linecount_test = 'search/?type=MetaWorkflowRun&overall_qcs.name!=linecount_test&final_status=completed'
-    query = search_no_overall_qcs + search_no_linecount_test
-    search_res = ff_utils.search_metadata(query, key=my_auth)
+    result_no_linecount_test = ff_utils.search_metadata(search_no_linecount_test, key=my_auth)
+    # add the two resulting lists together
+    search_res = result_no_overall_qcs + result_no_linecount_test
 
     # nothing to run
     if not search_res:
