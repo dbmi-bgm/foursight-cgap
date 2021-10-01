@@ -18,6 +18,9 @@ class TestActionResult():
         unstored_res = action.store_result() # will not update latest result
         assert ('do_not_store' in unstored_res['kwargs'])
         res2 = action.get_latest_result()
+        # remove id_alias's which will differ
+        del res['id_alias']
+        del res2['id_alias']
         assert (res == res2)
         # bad status
         action.kwargs = {'abc': 123}

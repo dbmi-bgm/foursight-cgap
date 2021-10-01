@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "foursight-cgap"
-version = "0.4.9.2b45"
+version = "0.4.9.2b46"
 description = "Serverless Chalice Application for Monitoring"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -10,11 +10,10 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.6,<3.7"
-dcicutils = "^2.0.0"
+dcicutils = "^2.3.0"
 click = "^7.1.2"
 PyJWT = "1.5.3"
 Jinja2 = "2.10.1"
-MarkupSafe = "1.1.1"
 google-api-python-client = "^1.12.5"
 geocoder = "1.38.1"
 elasticsearch = "^6.8.1"

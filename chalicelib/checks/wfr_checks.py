@@ -12,7 +12,7 @@ from .helpers.wfrset_utils import lambda_limit
 # individually - they're now part of class Decorators in foursight-core::decorators
 # that requires initialization with foursight prefix.
 from .helpers.confchecks import *
-
+from .helpers.linecount_dicts import *
 
 default_pipelines_to_run = ['WGS Trio v25', 'WGS Proband-only Cram v25', 'CNV v2', 'WES Proband-only v25']
 
@@ -184,11 +184,9 @@ def md5runCGAP_start(connection, **kwargs):
 
 @check_function()
 def metawfrs_to_check_linecount(connection, **kwargs):
-    """Find metaworkflowruns that may need kicking
-    - those with final_status pending, inactive and running.
-    pending means no workflow run has started.
-    inactive means some workflow runs are complete but others are pending.
-    running means some workflow runs are actively running.
+    """
+    Find metaworkflowruns that may have completed steps for
+    a linecount VCF QC line count
     """
     check = CheckResult(connection, 'metawfrs_to_check_linecount')
     my_auth = connection.ff_keys
@@ -210,9 +208,15 @@ def metawfrs_to_check_linecount(connection, **kwargs):
         check.full_output = {}
         return check
 
-    query = '/search/?type=MetaWorkflowRun&overall_qcs.name!=linecount_test' + \
-            ''.join(['&final_status=' + st for st in ['completed']])
-    search_res = ff_utils.search_metadata(query, key=my_auth)
+    # need to build two sets of results and put them together
+    # first, we want those completed MWFRs without any overall_qcs
+    search_no_overall_qcs = '/search/?type=MetaWorkflowRun&overall_qcs=No+value&final_status=completed'
+    result_no_overall_qcs = ff_utils.search_metadata(search_no_overall_qcs, key=my_auth)
+    # second, we want those completed MWFRs with overall_qcs, but without linecount_test
+    search_no_linecount_test = 'search/?type=MetaWorkflowRun&overall_qcs.name!=linecount_test&final_status=completed'
+    result_no_linecount_test = ff_utils.search_metadata(search_no_linecount_test, key=my_auth)
+    # add the two resulting lists together
+    search_res = result_no_overall_qcs + result_no_linecount_test
 
     # nothing to run
     if not search_res:
@@ -240,6 +244,7 @@ def line_count_test(connection, **kwargs):
     env = connection.ff_env
     check_result = action.get_associated_check_result(kwargs).get('full_output', {})
     action_logs['check_output'] = check_result
+    action_logs['error'] = []
     metawfr_uuids = check_result.get('metawfrs_to_run', {}).get('uuids', [])
     for metawfr_uuid in metawfr_uuids:
         now = datetime.utcnow()
@@ -247,23 +252,48 @@ def line_count_test(connection, **kwargs):
             action.description = 'Did not complete action due to time limitations'
             break
         try:
-            linecount_result = check_lines(metawfr_uuid, my_auth, steps=steps_dict, fastqs=fastqs_dict)
             metawfr_meta = ff_utils.get_metadata(metawfr_uuid, add_on='?frame=raw', key=my_auth)
-            overall_qcs_dict = {qc['name']: qc['value'] for qc in metawfr_meta.get('overall_qcs', [])}
-            if overall_qcs_dict and overall_qcs_dict.get('linecount_test', ''):
-                continue
-            overall_qcs_dict['linecount_test'] = 'PASS' if linecount_result else 'FAIL'
-            updated_overall_qcs = [{'name': k, 'value': v} for k, v in overall_qcs_dict.items()]
-            ff_utils.patch_metadata({'overall_qcs': updated_overall_qcs}, metawfr_uuid, key=my_auth)
-            if linecount_result:
-                action_logs['metawfrs_that_passed_linecount_test'].append(metawfr_uuid)
+            # we have a few different dictionaries of steps to check output from in linecount_dicts.py
+            # the proband-only and family workflows have the same steps, so we assign the proband_SNV_dict
+            if 'Proband-only' in metawfr_meta['title'] or 'Family' in metawfr_meta['title']:
+                steps_dict = proband_SNV_dict
+            # trio has novoCaller, so it has a separate dictionary of steps
+            elif 'Trio' in metawfr_meta['title']:
+                steps_dict = trio_SNV_dict
+            # cnv/sv is a completely different pipeline, so has a many different steps
+            elif 'CNV' in metawfr_meta['title']:
+                steps_dict = CNV_dict
+            # if this is run on something other than those expected MWFRs, we want an error.
             else:
-                action_logs['metawfrs_that_failed_linecount_test'].append(metawfr_uuid)
+                e = 'Unexpected MWF Title: '+metawfr_meta['title']
+                action_logs['error'].append(str(e))
+                continue
+            # this calls check_lines from cgap-pipeline pipeline_utils check_lines.py (might get moved to generic repo in the future)
+            # will return TRUE or FALSE if all pipeline steps are fine, or if there are any that do not match linecount with their partners, respectively
+            linecount_result = check_lines(metawfr_uuid, my_auth, steps=steps_dict, fastqs=fastqs_dict)
+            #want an empty dictionary if no overall_qcs, or a dictionary of tests and results if there are items in the overall_qcs list
+            overall_qcs_dict = {qc['name']: qc['value'] for qc in metawfr_meta.get('overall_qcs', [])}
+            overall_qcs_dict['linecount_test'] = 'PASS' if linecount_result else 'FAIL'
+            # turn the dictionary back into a list of dictionaries that is properly structured (e.g., overall_qcs: [{"name": "linecount_test", "value": "PASS"}, {...}, {...}])
+            updated_overall_qcs = [{'name': k, 'value': v} for k, v in overall_qcs_dict.items()]
+            try:
+                ff_utils.patch_metadata({'overall_qcs': updated_overall_qcs}, metawfr_uuid, key=my_auth)
+                if linecount_result:
+                    action_logs['metawfrs_that_passed_linecount_test'].append(metawfr_uuid)
+                else:
+                    action_logs['metawfrs_that_failed_linecount_test'].append(metawfr_uuid)
+            except Exception as e:
+                action_logs['error'].append(str(e))
+                continue
         except Exception as e:
-            action_logs['error'] = str(e)
-            break
+            action_logs['error'].append(str(e))
+            continue
     action.output = action_logs
-    action.status = 'DONE'
+    # we want to display an error if there are any errors in the run, even if many patches are successful
+    if action_logs['error'] == []:
+        action.status = 'DONE'
+    else:
+        action.status = 'ERROR'
     return action
 
 
@@ -477,6 +507,9 @@ def reset_spot_failed_metawfrs(connection, **kwargs):
     action_logs = {'runs_reset': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
+    my_s3_util = s3Utils(env=env)
+    log_bucket = my_s3_util.tibanna_output_bucket
+
     check_result = action.get_associated_check_result(kwargs).get('full_output', {})
     action_logs['check_output'] = check_result
     metawfr_uuids = check_result.get('metawfrs_that_failed', {}).get('uuids', [])
@@ -501,7 +534,11 @@ def reset_spot_failed_metawfrs(connection, **kwargs):
                         raise Exception("multiple workflow runs for job id %s" % wfr['jobid'])
                     else:
                         raise Exception("No workflow run found for job id %s" % wfr['jobid'])
-                    if 'EC2 unintended termination' in res.get('description', '') or \
+                    # If Tibanna received a spot termination notice, it will create the file JOBID.spot_failure in the
+                    # Tibanna log bucket. If it failed otherwise it will throw an EC2UnintendedTerminationException
+                    # which will create a corresponding entry in the workflow description
+                    if my_s3_util.does_key_exist(key=wfr['jobid']+".spot_failure", bucket=log_bucket, print_error=False) or \
+                       'EC2 unintended termination' in res.get('description', '') or \
                        'EC2 Idle error' in res.get('description', ''):
                         # reset spot-failed shards
                         shard_name = wfr['name'] + ':' + str(wfr['shard'])
