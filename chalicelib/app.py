@@ -1,9 +1,11 @@
 from chalice import Chalice, Cron, Rate, Response
 import json
 import os
-import datetime
 from chalicelib.app_utils import AppUtils
+from chalicelib.deploy import Deploy
 
+
+# Chalice metadata
 app = Chalice(app_name='foursight-cgap')
 app.debug = True
 STAGE = os.environ.get('chalice_stage', 'dev')
@@ -303,7 +305,6 @@ def check_runner(event, context):
 
 
 def set_stage(stage):
-    from deploy import Deploy
     if stage != 'test' and stage not in Deploy.CONFIG_BASE['stages']:
         print('ERROR! Input stage is not valid. Must be one of: %s' % str(list(Deploy.CONFIG_BASE['stages'].keys()).extend('test')))
     os.environ['chalice_stage'] = stage
