@@ -4,15 +4,10 @@ import shutil
 import datetime
 import tempfile
 from git import Repo
-from dcicutils.ff_utils import get_metadata
+from dcicutils.beanstalk_utils import compute_cgap_prd_env, compute_ff_prd_env, beanstalk_info
 from dcicutils.deployment_utils import EBDeployer
-from dcicutils.beanstalk_utils import compute_ff_stg_env
-from dcicutils.env_utils import (
-    FF_ENV_INDEXER, CGAP_ENV_INDEXER, is_fourfront_env, is_cgap_env,
-)
-from dcicutils.beanstalk_utils import (
-    compute_cgap_prd_env, compute_ff_prd_env, beanstalk_info, is_indexing_finished
-)
+from dcicutils.env_utils import is_fourfront_env, is_cgap_env, indexer_env_for_env
+from dcicutils.ff_utils import get_metadata
 from ..vars import FOURSIGHT_PREFIX, DEV_ENV
 
 # Use confchecks to import decorators object and its methods for each check module
@@ -72,7 +67,7 @@ def indexer_server_status(connection, **kwargs):
     check = CheckResult(connection, 'indexer_server_status')
     check.action = 'terminate_indexer_server'
     env = kwargs.get('env')
-    indexer_env = FF_ENV_INDEXER if is_fourfront_env(env) else CGAP_ENV_INDEXER
+    indexer_env = indexer_env_for_env(env)
     description = try_to_describe_indexer_env(indexer_env)  # verify an indexer is online
     if description is None:
         check.status = 'PASS'  # could have been terminated
@@ -147,10 +142,7 @@ def provision_indexer_environment(connection, **kwargs):
         return check
 
     def _deploy_indexer(e, version):
-        if is_fourfront_env(e):
-            description = try_to_describe_indexer_env(FF_ENV_INDEXER)
-        else:
-            description = try_to_describe_indexer_env(CGAP_ENV_INDEXER)
+        description = try_to_describe_indexer_env(indexer_env_for_env(e))
         if description is not None:
             check.status = 'ERROR'
             check.summary = 'Tried to spin up indexer env for %s when one already exists for this portal' % e
