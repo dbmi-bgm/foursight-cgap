@@ -15,6 +15,7 @@ coverage.xml
 requirements.txt
 
 # Virtual environments
+.python-version
 *env/
 
 # Emacs
