@@ -19,6 +19,8 @@ from .helpers.linecount_dicts import *
 #-----------------------------------------------------------
 default_pipelines_to_run = ['WGS Trio v25', 'WGS Proband-only Cram v25', 'CNV v2']
 
+
+
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
 #           !!! FUNCTIONS USED BY CHECKS !!!
@@ -82,8 +84,167 @@ def _eval_qcs(metawfr_meta):
     return True
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#               Check specific functions
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+############################################################
+# patch_processed_files_to_sample (upstream processed files)
+############################################################
+def patch_processed_files_to_sample(metawfr_uuid, ff_key):
+    """
+    Patch sample_processing with final_bam and sample_gvcf,
+    does not patch completed_processes
+    """
+    ### Getting metadata
+    metawfr_meta, sp_meta, _ = _metadata_for_patch(metawfr_uuid, ff_key)
+    ### Checking QCs are PASS and final_status completed
+    if not _eval_qcs(metawfr_meta): # if check fails, return
+        return
+
+    if len(sp_meta['samples']) == 1: # proband only
+        final_bam, sample_gvcf = '', ''
+        for wfr in metawfr_meta['workflow_runs']:
+            if wfr['name'] == 'workflow_gatk-ApplyBQSR-check':
+                final_bam = wfr['output'][0]['file']['uuid']
+            elif wfr['name'] == 'workflow_gatk-HaplotypeCaller':
+                sample_gvcf = wfr['output'][0]['file']['uuid']
+        if final_bam and sample_gvcf:
+            ff_utils.patch_metadata({'processed_files': [final_bam, sample_gvcf]}, sp_meta['samples'][0]['uuid'], key=ff_key)
+    else: # trio
+        # sample name - meta mapping from sample metadata
+        sample_mapping = dict()
+        for sample in sp_meta['samples']:
+            sample_uuid = sample['uuid']
+            sample_meta = ff_utils.get_metadata(sample_uuid, add_on='?frame=raw', key=ff_key)
+            sample_name = sample_meta.get('bam_sample_id', '')
+            sample_mapping.update({sample_name: sample_meta})
+
+        sample_names_arg = [inp for inp in metawfr_meta['input'] if inp['argument_name'] == 'sample_names_proband_first']
+        if sample_names_arg:
+            sample_names = json.loads(sample_names_arg[0]['value'])
+        else:
+            raise Exception("sample_names_proband_first not found in the input of metawfr %s" % metawfr_uuid)
+        for i, sample_name in enumerate(sample_names):
+            final_bam, sample_gvcf = '', ''
+            for wfr in metawfr_meta['workflow_runs']:
+                if wfr['name'] == 'workflow_gatk-ApplyBQSR-check' and wfr['shard'] == str(i):
+                    final_bam = wfr['output'][0]['file']['uuid']
+                elif wfr['name'] == 'workflow_gatk-HaplotypeCaller' and wfr['shard'] == str(i):
+                    sample_gvcf = wfr['output'][0]['file']['uuid']
+            if final_bam and sample_gvcf:
+                pfs = sample_mapping[sample_name].get('processed_files', [])
+                sample_uuid = sample_mapping[sample_name]['uuid']
+                if pfs:
+                    if final_bam not in pfs and sample_gvcf not in pfs:
+                        raise Exception("conflicting processed files - please clean up existing processed files for sample %s" % sample_uuid)
+                    elif final_bam in pfs and sample_gvcf in pfs:
+                        continue  # already patched, do nothing.
+                ff_utils.patch_metadata({'processed_files': [final_bam, sample_gvcf]}, sample_uuid, key=ff_key)
+
+############################################################
+# patch_SNV_processed_files_to_sample_processing
+############################################################
+def patch_SNV_processed_files_to_sample_processing(metawfr_uuid, ff_key):
+    """
+    Patch sample_processing with SNV vep_vcf (full annotated vcf) and final_vcf,
+    patch completed_processes
+    """
+    ### Getting metadata
+    metawfr_meta, sp_meta, sp_meta_short = _metadata_for_patch(metawfr_uuid, ff_key)
+    ### Checking QCs are PASS and final_status completed
+    if not _eval_qcs(metawfr_meta): # if check fails, return
+        return
+
+    ### Getting uuid for files to patch and create patch body
+    patch_body = dict()
+    vep_vcf, final_vcf = '', ''
+    # get uuids for processed files
+    for wfr in metawfr_meta['workflow_runs']:
+        if wfr['name'] == 'workflow_vep-annot-check':
+            vep_vcf = wfr['output'][0]['file']['uuid']
+        elif wfr['name'] == 'workflow_hg19lo_hgvsg-check':
+            final_vcf = wfr['output'][0]['file']['uuid']
+
+    # update patch_body processed_files
+    if vep_vcf and final_vcf:
+        # this is not checking processed_files makes sense
+        #   that should be done at the check
+        try: # if processed files exist, append
+            processed_files = sp_meta_short['processed_files']
+            processed_files.append(vep_vcf)
+            processed_files.append(final_vcf)
+            patch_body = {'processed_files': processed_files}
+        except Exception: # create processed files
+            patch_body = {'processed_files': [vep_vcf, final_vcf]}
+
+    # update patch_body completed_process
+    try:
+        completed_processes = sp_meta_short['completed_processes']
+        meta_workflow_title = metawfr_meta['meta_workflow']['title']
+        if meta_workflow_title not in completed_processes:
+            completed_processes.append(meta_workflow_title)
+            patch_body.update({'completed_processes': completed_processes})
+    except Exception:
+        patch_body.update({'completed_processes': [metawfr_meta['meta_workflow']['title']]})
+
+    ### Patching metadata
+    if patch_body:
+        ff_utils.patch_metadata(patch_body, sp_uuid, key=ff_key)
+
+############################################################
+# patch_SV_processed_files_to_sample_processing
+############################################################
+def patch_SV_processed_files_to_sample_processing(metawfr_uuid, ff_key):
+    """
+    Patch sample_processing with SV final_vcf and higlass_vcf,
+    patch completed_processes
+    """
+    ### Getting metadata
+    metawfr_meta, sp_meta, sp_meta_short = _metadata_for_patch(metawfr_uuid, ff_key)
+    ### Checking QCs are PASS and final_status completed
+    if not _eval_qcs(metawfr_meta): # if check fails, return
+        return
+
+    ### Getting uuid for files to patch and create patch body
+    patch_body = dict()
+    final_vcf, higlass_vcf = '', ''
+    # get uuids for processed files
+    for wfr in metawfr_meta['workflow_runs']:
+        if wfr['name'] == 'workflow_SV_length_filter_vcf-check':
+            final_vcf = wfr['output'][0]['file']['uuid']
+        elif wfr['name'] == 'workflow_SV_annotation_cleaner_vcf-check':
+            higlass_vcf = wfr['output'][0]['file']['uuid']
+
+    # update patch_body processed_files
+    if final_vcf and higlass_vcf:
+        # this is not checking processed_files makes sense
+        #   that should be done at the check
+        try:
+            processed_files = sp_meta_short['processed_files']
+            processed_files.append(final_vcf)
+            processed_files.append(higlass_vcf)
+            patch_body = {'processed_files': processed_files}
+        except Exception:
+            patch_body = {'processed_files': [final_vcf, higlass_vcf]}
+
+    # update patch_body completed_process
+    try:
+        completed_processes = sp_meta_short['completed_processes']
+        meta_workflow_title = metawfr_meta['meta_workflow']['title']
+        if meta_workflow_title not in completed_processes:
+            completed_processes.append(meta_workflow_title)
+            patch_body.update({'completed_processes': completed_processes})
+    except Exception:
+        patch_body.update({'completed_processes': [metawfr_meta['meta_workflow']['title']]})
+
+    ### Patching metadata
+    if patch_body:
+        ff_utils.patch_metadata(patch_body, sp_uuid, key=ff_key)
+
+
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
-#                   !!! CHECKS !!!
+#                !!! CHECKS & ACTIONS !!!
 #
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ############################################################
@@ -1073,161 +1234,6 @@ def patch_SV_pfs_to_sample_processing(connection, **kwargs):
     action.status = 'DONE'
 
     return action
-
-
-############################################################
-# patch_processed_files_to_sample (upstream processed files)
-############################################################
-def patch_processed_files_to_sample(metawfr_uuid, ff_key):
-    """
-    Patch sample_processing with final_bam and sample_gvcf,
-    does not patch completed_processes
-    """
-    ### Getting metadata
-    metawfr_meta, sp_meta, _ = _metadata_for_patch(metawfr_uuid, ff_key)
-    ### Checking QCs are PASS and final_status completed
-    if not _eval_qcs(metawfr_meta): # if check fails, return
-        return
-
-    if len(sp_meta['samples']) == 1: # proband only
-        final_bam, sample_gvcf = '', ''
-        for wfr in metawfr_meta['workflow_runs']:
-            if wfr['name'] == 'workflow_gatk-ApplyBQSR-check':
-                final_bam = wfr['output'][0]['file']['uuid']
-            elif wfr['name'] == 'workflow_gatk-HaplotypeCaller':
-                sample_gvcf = wfr['output'][0]['file']['uuid']
-        if final_bam and sample_gvcf:
-            ff_utils.patch_metadata({'processed_files': [final_bam, sample_gvcf]}, sp_meta['samples'][0]['uuid'], key=ff_key)
-    else: # trio
-        # sample name - meta mapping from sample metadata
-        sample_mapping = dict()
-        for sample in sp_meta['samples']:
-            sample_uuid = sample['uuid']
-            sample_meta = ff_utils.get_metadata(sample_uuid, add_on='?frame=raw', key=ff_key)
-            sample_name = sample_meta.get('bam_sample_id', '')
-            sample_mapping.update({sample_name: sample_meta})
-
-        sample_names_arg = [inp for inp in metawfr_meta['input'] if inp['argument_name'] == 'sample_names_proband_first']
-        if sample_names_arg:
-            sample_names = json.loads(sample_names_arg[0]['value'])
-        else:
-            raise Exception("sample_names_proband_first not found in the input of metawfr %s" % metawfr_uuid)
-        for i, sample_name in enumerate(sample_names):
-            final_bam, sample_gvcf = '', ''
-            for wfr in metawfr_meta['workflow_runs']:
-                if wfr['name'] == 'workflow_gatk-ApplyBQSR-check' and wfr['shard'] == str(i):
-                    final_bam = wfr['output'][0]['file']['uuid']
-                elif wfr['name'] == 'workflow_gatk-HaplotypeCaller' and wfr['shard'] == str(i):
-                    sample_gvcf = wfr['output'][0]['file']['uuid']
-            if final_bam and sample_gvcf:
-                pfs = sample_mapping[sample_name].get('processed_files', [])
-                sample_uuid = sample_mapping[sample_name]['uuid']
-                if pfs:
-                    if final_bam not in pfs and sample_gvcf not in pfs:
-                        raise Exception("conflicting processed files - please clean up existing processed files for sample %s" % sample_uuid)
-                    elif final_bam in pfs and sample_gvcf in pfs:
-                        continue  # already patched, do nothing.
-                ff_utils.patch_metadata({'processed_files': [final_bam, sample_gvcf]}, sample_uuid, key=ff_key)
-
-############################################################
-# patch_SNV_processed_files_to_sample_processing
-############################################################
-def patch_SNV_processed_files_to_sample_processing(metawfr_uuid, ff_key):
-    """
-    Patch sample_processing with SNV vep_vcf (full annotated vcf) and final_vcf,
-    patch completed_processes
-    """
-    ### Getting metadata
-    metawfr_meta, sp_meta, sp_meta_short = _metadata_for_patch(metawfr_uuid, ff_key)
-    ### Checking QCs are PASS and final_status completed
-    if not _eval_qcs(metawfr_meta): # if check fails, return
-        return
-
-    ### Getting uuid for files to patch and create patch body
-    patch_body = dict()
-    vep_vcf, final_vcf = '', ''
-    # get uuids for processed files
-    for wfr in metawfr_meta['workflow_runs']:
-        if wfr['name'] == 'workflow_vep-annot-check':
-            vep_vcf = wfr['output'][0]['file']['uuid']
-        elif wfr['name'] == 'workflow_hg19lo_hgvsg-check':
-            final_vcf = wfr['output'][0]['file']['uuid']
-
-    # update patch_body processed_files
-    if vep_vcf and final_vcf:
-        # this is not checking processed_files makes sense
-        #   that should be done at the check
-        try: # if processed files exist, append
-            processed_files = sp_meta_short['processed_files']
-            processed_files.append(vep_vcf)
-            processed_files.append(final_vcf)
-            patch_body = {'processed_files': processed_files}
-        except Exception: # create processed files
-            patch_body = {'processed_files': [vep_vcf, final_vcf]}
-
-    # update patch_body completed_process
-    try:
-        completed_processes = sp_meta_short['completed_processes']
-        meta_workflow_title = metawfr_meta['meta_workflow']['title']
-        if meta_workflow_title not in completed_processes:
-            completed_processes.append(meta_workflow_title)
-            patch_body.update({'completed_processes': completed_processes})
-    except Exception:
-        patch_body.update({'completed_processes': [metawfr_meta['meta_workflow']['title']]})
-
-    ### Patching metadata
-    if patch_body:
-        ff_utils.patch_metadata(patch_body, sp_uuid, key=ff_key)
-
-############################################################
-# patch_SV_processed_files_to_sample_processing
-############################################################
-def patch_SV_processed_files_to_sample_processing(metawfr_uuid, ff_key):
-    """
-    Patch sample_processing with SV final_vcf and higlass_vcf,
-    patch completed_processes
-    """
-    ### Getting metadata
-    metawfr_meta, sp_meta, sp_meta_short = _metadata_for_patch(metawfr_uuid, ff_key)
-    ### Checking QCs are PASS and final_status completed
-    if not _eval_qcs(metawfr_meta): # if check fails, return
-        return
-
-    ### Getting uuid for files to patch and create patch body
-    patch_body = dict()
-    final_vcf, higlass_vcf = '', ''
-    # get uuids for processed files
-    for wfr in metawfr_meta['workflow_runs']:
-        if wfr['name'] == 'workflow_SV_length_filter_vcf-check':
-            final_vcf = wfr['output'][0]['file']['uuid']
-        elif wfr['name'] == 'workflow_SV_annotation_cleaner_vcf-check':
-            higlass_vcf = wfr['output'][0]['file']['uuid']
-
-    # update patch_body processed_files
-    if final_vcf and higlass_vcf:
-        # this is not checking processed_files makes sense
-        #   that should be done at the check
-        try:
-            processed_files = sp_meta_short['processed_files']
-            processed_files.append(final_vcf)
-            processed_files.append(higlass_vcf)
-            patch_body = {'processed_files': processed_files}
-        except Exception:
-            patch_body = {'processed_files': [final_vcf, higlass_vcf]}
-
-    # update patch_body completed_process
-    try:
-        completed_processes = sp_meta_short['completed_processes']
-        meta_workflow_title = metawfr_meta['meta_workflow']['title']
-        if meta_workflow_title not in completed_processes:
-            completed_processes.append(meta_workflow_title)
-            patch_body.update({'completed_processes': completed_processes})
-    except Exception:
-        patch_body.update({'completed_processes': [metawfr_meta['meta_workflow']['title']]})
-
-    ### Patching metadata
-    if patch_body:
-        ff_utils.patch_metadata(patch_body, sp_uuid, key=ff_key)
 
 
 ############################################################
