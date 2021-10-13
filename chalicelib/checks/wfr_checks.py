@@ -14,7 +14,8 @@ from .helpers.wfrset_utils import lambda_limit
 from .helpers.confchecks import *
 from .helpers.linecount_dicts import *
 
-default_pipelines_to_run = ['WGS Trio v25', 'WGS Proband-only Cram v25', 'CNV v2', 'WES Proband-only v25']
+default_pipelines_to_run = ['WGS Trio v25', 'WGS Proband-only Cram v25', 'CNV v2', 'WES Proband-only v25',
+                            'WES Family v25']
 
 
 @check_function(file_type='File', start_date=None)
