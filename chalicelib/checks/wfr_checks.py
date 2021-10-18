@@ -41,11 +41,11 @@ def _metadata_for_patch(metawfr_uuid, ff_key):
     metawfr_meta = ff_utils.get_metadata(metawfr_uuid, key=ff_key)
     ### Getting the case that will be patched
     case_acc = metawfr_meta['title'].split(' ')[-1]
-    case_meta = ff_utils.get_metadata(case_acc, add_on='?frame=raw', key=ff_key)
+    case_meta = ff_utils.get_metadata(case_acc, add_on='frame=raw', key=ff_key)
     ### Getting the sample_processing that will be modified and used for patching
     sp_uuid = case_meta['sample_processing']
     sp_meta = ff_utils.get_metadata(sp_uuid, key=ff_key)
-    sp_meta_short = ff_utils.get_metadata(sp_uuid, add_on='?frame=raw', key=ff_key)
+    sp_meta_short = ff_utils.get_metadata(sp_uuid, add_on='frame=raw', key=ff_key)
 
     return (metawfr_meta, sp_meta, sp_meta_short)
 
@@ -69,11 +69,11 @@ def _eval_qcs(metawfr_meta):
 
     # check expected qcs are in overall_qcs
     expected_qcs = {'linecount_test'}
-    availabl_qcs = set()
+    available_qcs = set()
     for qc in overall_qcs:
-        availabl_qcs.add(qc['name'])
+        available_qcs.add(qc['name'])
 
-    if expected_qcs.difference(availabl_qcs):
+    if expected_qcs.difference(available_qcs):
         return False
 
     # check all expected qcs are pass
@@ -114,7 +114,7 @@ def patch_processed_files_to_sample(metawfr_uuid, ff_key):
         sample_mapping = dict()
         for sample in sp_meta['samples']:
             sample_uuid = sample['uuid']
-            sample_meta = ff_utils.get_metadata(sample_uuid, add_on='?frame=raw', key=ff_key)
+            sample_meta = ff_utils.get_metadata(sample_uuid, add_on='frame=raw', key=ff_key)
             sample_name = sample_meta.get('bam_sample_id', '')
             sample_mapping.update({sample_name: sample_meta})
 
@@ -168,23 +168,17 @@ def patch_SNV_processed_files_to_sample_processing(metawfr_uuid, ff_key):
     if vep_vcf and final_vcf:
         # this is not checking processed_files makes sense
         #   that should be done at the check
-        try: # if processed files exist, append
-            processed_files = sp_meta_short['processed_files']
-            processed_files.append(vep_vcf)
-            processed_files.append(final_vcf)
-            patch_body = {'processed_files': processed_files}
-        except Exception: # create processed files
-            patch_body = {'processed_files': [vep_vcf, final_vcf]}
+        processed_files = sp_meta_short.get('processed_files', [])
+        processed_files.append(vep_vcf)
+        processed_files.append(final_vcf)
+        patch_body = {'processed_files': processed_files}
 
     # update patch_body completed_process
-    try:
-        completed_processes = sp_meta_short['completed_processes']
-        meta_workflow_title = metawfr_meta['meta_workflow']['title']
-        if meta_workflow_title not in completed_processes:
-            completed_processes.append(meta_workflow_title)
-            patch_body.update({'completed_processes': completed_processes})
-    except Exception:
-        patch_body.update({'completed_processes': [metawfr_meta['meta_workflow']['title']]})
+    completed_processes = sp_meta_short.get('completed_processes', [])
+    meta_workflow_title = metawfr_meta['meta_workflow']['title']
+    if meta_workflow_title not in completed_processes:
+        completed_processes.append(meta_workflow_title)
+        patch_body.update({'completed_processes': completed_processes})
 
     ### Patching metadata
     if patch_body:
@@ -218,23 +212,17 @@ def patch_SV_processed_files_to_sample_processing(metawfr_uuid, ff_key):
     if final_vcf and higlass_vcf:
         # this is not checking processed_files makes sense
         #   that should be done at the check
-        try:
-            processed_files = sp_meta_short['processed_files']
-            processed_files.append(final_vcf)
-            processed_files.append(higlass_vcf)
-            patch_body = {'processed_files': processed_files}
-        except Exception:
-            patch_body = {'processed_files': [final_vcf, higlass_vcf]}
+        processed_files = sp_meta_short.get('processed_files', [])
+        processed_files.append(final_vcf)
+        processed_files.append(higlass_vcf)
+        patch_body = {'processed_files': processed_files}
 
     # update patch_body completed_process
-    try:
-        completed_processes = sp_meta_short['completed_processes']
-        meta_workflow_title = metawfr_meta['meta_workflow']['title']
-        if meta_workflow_title not in completed_processes:
-            completed_processes.append(meta_workflow_title)
-            patch_body.update({'completed_processes': completed_processes})
-    except Exception:
-        patch_body.update({'completed_processes': [metawfr_meta['meta_workflow']['title']]})
+    completed_processes = sp_meta_short.get('completed_processes', [])
+    meta_workflow_title = metawfr_meta['meta_workflow']['title']
+    if meta_workflow_title not in completed_processes:
+        completed_processes.append(meta_workflow_title)
+        patch_body.update({'completed_processes': completed_processes})
 
     ### Patching metadata
     if patch_body:
@@ -502,7 +490,7 @@ def line_count_test(connection, **kwargs):
             action.description = 'Did not complete action due to time limitations'
             break
         try:
-            metawfr_meta = ff_utils.get_metadata(metawfr_uuid, add_on='?frame=raw', key=my_auth)
+            metawfr_meta = ff_utils.get_metadata(metawfr_uuid, add_on='frame=raw', key=my_auth)
             # we have a few different dictionaries of steps to check output from in linecount_dicts.py
             # the proband-only and family workflows have the same steps, so we assign the proband_SNV_dict
             if 'Proband-only' in metawfr_meta['title'] or 'Family' in metawfr_meta['title']:
@@ -806,7 +794,7 @@ def reset_spot_failed_metawfrs(connection, **kwargs):
             action.description = 'Did not complete action due to time limitations'
             break
         try:
-            metawfr_meta = ff_utils.get_metadata(metawfr_uuid, key=my_auth, add_on='?frame=raw')
+            metawfr_meta = ff_utils.get_metadata(metawfr_uuid, key=my_auth, add_on='frame=raw')
             shards_to_reset = []
             for wfr in metawfr_meta['workflow_runs']:
                 if wfr['status'] == 'failed':
