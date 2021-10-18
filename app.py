@@ -11,4 +11,4 @@
 # library while maintaining application (functional) isolation
 # and respective differences in environments, check scheduling and
 # the check code itself. -- Will Oct 18 2021
-from chalicelib.app import *
+from chalicelib.app import *  # noQA
