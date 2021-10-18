@@ -16,6 +16,7 @@ from foursight_core.checks.helpers import wrangler_utils
 # individually - they're now part of class Decorators in foursight-core::decorators
 # that requires initialization with foursight prefix.
 from .helpers.confchecks import *
+from .helpers import clone_utils
 
 
 # use a random number to stagger checks
@@ -1215,4 +1216,112 @@ def queue_variants_to_update_genelist(connection, **kwargs):
     else:
         action.status = 'DONE'
     action.output = action_logs
+    return action
+
+
+@check_function(accessions=[], version='', keep_SV_mwfr=False, create_SNV_mwfr=True, steps_to_rerun=['all'])
+def get_metadata_for_cases_to_clone(connection, **kwargs):
+    """
+    """
+    # TODO: implement steps_to_rerun, moving processed files
+
+    check = CheckResult(connection, 'get_metadata_for_cases_to_clone')
+
+    # get metawf_uuid
+    accessions = kwargs.get('accessions')
+    version = kwargs.get('version')
+    steps_to_rerun = kwargs.get('steps_to_rerun')
+    keep_SV_mwfr = kwargs.get('keep_SV_mwfr')
+    create_SNV_mwfr = kwargs.get('create_SNV_mwfr')
+    check.action = 'clone_cases'
+    if not accessions:
+        check.full_output = {}
+        check.summary = 'No cases to clone.'
+        check.description = check.summary
+        check.status = 'PASS'
+        return check
+    if not version:
+        check.full_output = {}
+        check.summary = 'No pipeline version specified.'
+        check.description = check.summary
+        check.status = 'ERROR'
+        return check
+    if 'all' not in steps_to_rerun:
+        check.full_output = {}
+        check.summary = 'Specifying steps to rerun not yet supported. '
+        check.description = ('Specifying steps to rerun not yet supported. Please rerun with '
+                             'steps_to_rerun="all" and create meta-workflow run manually.')
+        check.status = 'ERROR'
+        return check
+    meta_workflows = ff_utils.search_metadata(
+        f'search/?type=MetaWorkflow&version={version}&field=version&field=name&field=uuid',
+        key=connection.ff_keys
+    )
+    if not meta_workflows:
+        check.full_output = {}
+        check.summary = 'No meta-workflows found with the specified version.'
+        check.description = check.summary
+        check.status = 'ERROR'
+        return check
+    meta_workflow_dict = {mwf['name']: mwf for mwf in meta_workflows}
+    output = {'run': {}, 'ignore': {}}
+    for case in accessions:
+        case_metadata = ff_utils.get_metadata(case, key=connection.ff_keys)
+        if case_metadata.get('superseded_by'):
+            output['ignore'][case] = 'This case has already been cloned.'
+            continue
+        mwfr = case_metadata.get('meta_workflow_run', {})
+        if not mwfr:
+            output['ignore'][case] = 'The case has no previous meta-workflow run. Skipping.'
+            continue
+        current_mwfr_version = mwfr.get('meta_workflow', {}).get('version')
+        if current_mwfr_version and current_mwfr_version.upper() == version.upper():
+            output['ignore'][case] = 'The case has already been run with this pipeline version.'
+            continue
+        updated_mwf = False
+        for k, v in meta_workflow_dict.items():
+            # TODO: this is a bit hacky right now, should change the mwf metadata to have title separate from version,
+            # and a calcprop that combines title and version
+            if k == mwfr.get('meta_workflow', {}).get('name'):
+                # value is a dict so that we can add more metadata in future iterations
+                output['run'][case] = {
+                    'metawf_uuid': v['uuid'],
+                    'create_SNV_mwfr': create_SNV_mwfr,
+                    'keep_SV_mwfr': keep_SV_mwfr
+                }
+                updated_mwf = True
+                break
+        if not updated_mwf:
+            output['ignore'][case] = f"{version} pipeline not found for this case's meta-workflow."
+            continue
+
+    check.full_output = output
+    check.status = 'PASS'
+    check.summary = f'{len(output["run"].keys())} cases ready to clone, {len(output["ignore"].keys())} cases ignored'
+    check.description = check.summary
+    check.allow_action = True
+    return check
+
+
+@action_function()
+def clone_cases(connection, **kwargs):
+    """
+    """
+    action = ActionResult(connection, 'clone_cases')
+    check_response = action.get_associated_check_result(kwargs)
+    clone_dict = {}
+    errors = {}
+    for case, data in check_response['full_output']['run'].items():
+        try:
+            new_case = clone_utils.CaseToClone(case, connection.ff_keys, data['metawf_uuid'],
+                                               check_response['kwargs']['version'], [])
+        except Exception as e:
+            errors[case] = str(e)
+        else:
+            clone_dict.update(new_case.new_case_dict)
+    action.output = {'clone success': clone_dict, 'clone fail': errors}
+    if errors:
+        action.status = 'FAIL'
+    else:
+        action.status = 'DONE'
     return action
