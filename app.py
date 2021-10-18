@@ -1,1 +1,1 @@
-from chalicelib.app import app
+from chalicelib.app import *
