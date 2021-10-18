@@ -34,8 +34,8 @@ default_pipelines_to_run = ['WGS Trio v25', 'WGS Proband-only Cram v25', 'CNV v2
 ############################################################
 def _metadata_for_patch(metawfr_uuid, ff_key):
     """
-    Fetch meta data for metawfr, sample_processing,
-    sample_processing short (frame=raw)
+    Fetch meta data for metaworkflowrun (metawfr_meta)
+    and sample_processing (sp_meta)
     """
     ### Getting metawfr metadata
     metawfr_meta = ff_utils.get_metadata(metawfr_uuid, key=ff_key)
@@ -45,16 +45,29 @@ def _metadata_for_patch(metawfr_uuid, ff_key):
     ### Getting the sample_processing that will be modified and used for patching
     sp_uuid = case_meta['sample_processing']
     sp_meta = ff_utils.get_metadata(sp_uuid, key=ff_key)
-    sp_meta_short = ff_utils.get_metadata(sp_uuid, add_on='frame=raw', key=ff_key)
 
-    return (metawfr_meta, sp_meta, sp_meta_short)
+    return metawfr_meta, sp_meta
+
+############################################################
+# _sp_meta_processed_files
+############################################################
+def _sp_meta_processed_files(sp_meta):
+    """
+    List uuids for processed_files in sample_processing if any
+    else return an empty list
+    """
+    processed_files = []
+    for pf_dict in sp_meta.get('processed_files', []):
+        processed_files.append(pf_dict['uuid'])
+
+    return processed_files
 
 ############################################################
 # _eval_qcs
 ############################################################
 def _eval_qcs(metawfr_meta):
     """
-    Check final_status for metawfr is completed
+    Check final_status for metawfr_meta is completed
     Check expected QCs in overall_qcs are PASS
     """
     ### Check final_status
@@ -89,28 +102,29 @@ def _eval_qcs(metawfr_meta):
 ############################################################
 # patch_processed_files_to_sample (upstream processed files)
 ############################################################
-def patch_processed_files_to_sample(metawfr_uuid, ff_key):
+def patch_processed_files_to_sample(metawfr_uuid, final_steps, ff_key):
     """
-    Patch sample_processing with final_bam and sample_gvcf,
+    Patch samples with bam and gvcf,
     does not patch completed_processes
     """
     ### Getting metadata
-    metawfr_meta, sp_meta, _ = _metadata_for_patch(metawfr_uuid, ff_key)
+    metawfr_meta, sp_meta = _metadata_for_patch(metawfr_uuid, ff_key)
     ### Checking QCs are PASS and final_status completed
     if not _eval_qcs(metawfr_meta): # if check fails, return
-        return
+        return 'failed final_status or QCs validation'
 
+    ### Getting uuid for output files and patch
     if len(sp_meta['samples']) == 1: # proband only
-        final_bam, sample_gvcf = '', ''
+        final_files = []
+        # get uuids for output files
         for wfr in metawfr_meta['workflow_runs']:
-            if wfr['name'] == 'workflow_gatk-ApplyBQSR-check':
-                final_bam = wfr['output'][0]['file']['uuid']
-            elif wfr['name'] == 'workflow_gatk-HaplotypeCaller':
-                sample_gvcf = wfr['output'][0]['file']['uuid']
-        if final_bam and sample_gvcf:
-            ff_utils.patch_metadata({'processed_files': [final_bam, sample_gvcf]}, sp_meta['samples'][0]['uuid'], key=ff_key)
+            if wfr['name'] in final_steps:
+                final_files.append(wfr['output'][0]['file']['uuid'])
+        # patch sample
+        ff_utils.patch_metadata({'processed_files': final_files}, sp_meta['samples'][0]['uuid'], key=ff_key)
     else: # trio
-        # sample name - meta mapping from sample metadata
+        # sample name
+        #   meta mapping from sample metadata
         sample_mapping = dict()
         for sample in sp_meta['samples']:
             sample_uuid = sample['uuid']
@@ -119,62 +133,70 @@ def patch_processed_files_to_sample(metawfr_uuid, ff_key):
             sample_mapping.update({sample_name: sample_meta})
 
         sample_names_arg = [inp for inp in metawfr_meta['input'] if inp['argument_name'] == 'sample_names_proband_first']
+        # sample_names_proband_first is an argument from the metaworkflowrun, probably there is a better way to run
+        #   this patching but for now we can keep this as it is working
         if sample_names_arg:
             sample_names = json.loads(sample_names_arg[0]['value'])
         else:
             raise Exception("sample_names_proband_first not found in the input of metawfr %s" % metawfr_uuid)
         for i, sample_name in enumerate(sample_names):
-            final_bam, sample_gvcf = '', ''
+            final_files = []
+            # get uuids for output files
             for wfr in metawfr_meta['workflow_runs']:
-                if wfr['name'] == 'workflow_gatk-ApplyBQSR-check' and wfr['shard'] == str(i):
-                    final_bam = wfr['output'][0]['file']['uuid']
-                elif wfr['name'] == 'workflow_gatk-HaplotypeCaller' and wfr['shard'] == str(i):
-                    sample_gvcf = wfr['output'][0]['file']['uuid']
-            if final_bam and sample_gvcf:
-                pfs = sample_mapping[sample_name].get('processed_files', [])
-                sample_uuid = sample_mapping[sample_name]['uuid']
-                if pfs:
-                    if final_bam not in pfs and sample_gvcf not in pfs:
-                        raise Exception("conflicting processed files - please clean up existing processed files for sample %s" % sample_uuid)
-                    elif final_bam in pfs and sample_gvcf in pfs:
-                        continue  # already patched, do nothing.
-                ff_utils.patch_metadata({'processed_files': [final_bam, sample_gvcf]}, sample_uuid, key=ff_key)
+                if wfr['name'] in final_steps and wfr['shard'] == str(i):
+                    final_files.append(wfr['output'][0]['file']['uuid'])
+            # get sample uuid
+            sample_uuid = sample_mapping[sample_name]['uuid']
+            ## !!!
+            #  the check is not robust enough for now and we may have a situation
+            #    where for a case with multiple samples only some of the sample are patched.
+            #    The samples not patched will trigger this action that will work on all samples
+            #    no matter what, we want to skip here samples that are already patched
+            # #
+            pfs = sample_mapping[sample_name].get('processed_files', [])
+            if pfs:
+                if final_files != pfs:
+                    raise Exception("conflicting processed files - please clean up existing processed files for sample %s" % sample_uuid)
+                else:
+                    continue  # already patched, do nothing.
+            # patch sample
+            ff_utils.patch_metadata({'processed_files': final_files}, sample_uuid, key=ff_key)
+
+    return 'patched succesfully'
 
 ############################################################
-# patch_SNV_processed_files_to_sample_processing
+# patch_processed_files_to_sample_processing
 ############################################################
-def patch_SNV_processed_files_to_sample_processing(metawfr_uuid, ff_key):
+def patch_processed_files_to_sample_processing(metawfr_uuid, final_steps, ff_key):
     """
-    Patch sample_processing with SNV vep_vcf (full annotated vcf) and final_vcf,
-    patch completed_processes
+    Patch sample_processing processed_files,
+        patch the output file from each step in final_steps
+
+    Patch sample_processing completed_processes,
+        patch the metaworkflow title
     """
     ### Getting metadata
-    metawfr_meta, sp_meta, sp_meta_short = _metadata_for_patch(metawfr_uuid, ff_key)
+    metawfr_meta, sp_meta = _metadata_for_patch(metawfr_uuid, ff_key)
     ### Checking QCs are PASS and final_status completed
     if not _eval_qcs(metawfr_meta): # if check fails, return
-        return
+        return 'failed final_status or QCs validation'
 
     ### Getting uuid for files to patch and create patch body
-    patch_body = dict()
-    vep_vcf, final_vcf = '', ''
-    # get uuids for processed files
+    patch_body, final_files = dict(), []
+    # get uuids for output files
     for wfr in metawfr_meta['workflow_runs']:
-        if wfr['name'] == 'workflow_vep-annot-check':
-            vep_vcf = wfr['output'][0]['file']['uuid']
-        elif wfr['name'] == 'workflow_hg19lo_hgvsg-check':
-            final_vcf = wfr['output'][0]['file']['uuid']
+        if wfr['name'] in final_steps:
+            final_files.append(wfr['output'][0]['file']['uuid'])
 
     # update patch_body processed_files
-    if vep_vcf and final_vcf:
-        # this is not checking processed_files makes sense
-        #   that should be done at the check
-        processed_files = sp_meta_short.get('processed_files', [])
-        processed_files.append(vep_vcf)
-        processed_files.append(final_vcf)
-        patch_body = {'processed_files': processed_files}
+    # this is not checking processed_files makes sense
+    #   that should be done at the check
+    processed_files = _sp_meta_processed_files(sp_meta)
+    processed_files += final_files
+    patch_body = {'processed_files': processed_files}
 
     # update patch_body completed_process
-    completed_processes = sp_meta_short.get('completed_processes', [])
+    completed_processes = sp_meta.get('completed_processes', [])
     meta_workflow_title = metawfr_meta['meta_workflow']['title']
     if meta_workflow_title not in completed_processes:
         completed_processes.append(meta_workflow_title)
@@ -182,51 +204,9 @@ def patch_SNV_processed_files_to_sample_processing(metawfr_uuid, ff_key):
 
     ### Patching metadata
     if patch_body:
-        ff_utils.patch_metadata(patch_body, sp_uuid, key=ff_key)
+        ff_utils.patch_metadata(patch_body, sp_meta['uuid'], key=ff_key)
 
-############################################################
-# patch_SV_processed_files_to_sample_processing
-############################################################
-def patch_SV_processed_files_to_sample_processing(metawfr_uuid, ff_key):
-    """
-    Patch sample_processing with SV final_vcf and higlass_vcf,
-    patch completed_processes
-    """
-    ### Getting metadata
-    metawfr_meta, sp_meta, sp_meta_short = _metadata_for_patch(metawfr_uuid, ff_key)
-    ### Checking QCs are PASS and final_status completed
-    if not _eval_qcs(metawfr_meta): # if check fails, return
-        return
-
-    ### Getting uuid for files to patch and create patch body
-    patch_body = dict()
-    final_vcf, higlass_vcf = '', ''
-    # get uuids for processed files
-    for wfr in metawfr_meta['workflow_runs']:
-        if wfr['name'] == 'workflow_SV_length_filter_vcf-check':
-            final_vcf = wfr['output'][0]['file']['uuid']
-        elif wfr['name'] == 'workflow_SV_annotation_cleaner_vcf-check':
-            higlass_vcf = wfr['output'][0]['file']['uuid']
-
-    # update patch_body processed_files
-    if final_vcf and higlass_vcf:
-        # this is not checking processed_files makes sense
-        #   that should be done at the check
-        processed_files = sp_meta_short.get('processed_files', [])
-        processed_files.append(final_vcf)
-        processed_files.append(higlass_vcf)
-        patch_body = {'processed_files': processed_files}
-
-    # update patch_body completed_process
-    completed_processes = sp_meta_short.get('completed_processes', [])
-    meta_workflow_title = metawfr_meta['meta_workflow']['title']
-    if meta_workflow_title not in completed_processes:
-        completed_processes.append(meta_workflow_title)
-        patch_body.update({'completed_processes': completed_processes})
-
-    ### Patching metadata
-    if patch_body:
-        ff_utils.patch_metadata(patch_body, sp_uuid, key=ff_key)
+    return 'patched succesfully'
 
 
 
@@ -985,11 +965,12 @@ def patch_pfs_to_samples(connection, **kwargs):
     ### General action attributes
     start = datetime.utcnow()
     action = ActionResult(connection, 'patch_pfs_to_samples')
-    action_logs = {'runs_checked_for_patching': []}
+    action_logs = {'runs_checked_for_patching': [], 'runs_checked_for_patching_log': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
     check_result = action.get_associated_check_result(kwargs).get('full_output', {})
     action_logs['check_output'] = check_result
+    action_logs['error'] = []
     metawfr_uuids = check_result.get('metawfrs_to_check', {}).get('uuids', [])
     random.shuffle(metawfr_uuids)  # if always the same order, we may never get to the later ones.
 
@@ -1001,13 +982,20 @@ def patch_pfs_to_samples(connection, **kwargs):
             break
         try:
             # action function call
-            patch_processed_files_to_sample(metawfr_uuid, my_auth)
+            res = patch_processed_files_to_sample(metawfr_uuid,
+                ['workflow_gatk-ApplyBQSR-check', 'workflow_gatk-HaplotypeCaller'],
+                my_auth)
             action_logs['runs_checked_for_patching'].append(metawfr_uuid)
+            action_logs['runs_checked_for_patching_log'].append(metawfr_uuid + ' ' + res)
         except Exception as e:
-            action_logs['error'] = str(e)
-            break
+            action_logs['error'].append(str(e))
+            continue
     action.output = action_logs
-    action.status = 'DONE'
+    # we want to display an error if there are any errors in the run, even if many patches are successful
+    if action_logs['error'] == []:
+        action.status = 'DONE'
+    else:
+        action.status = 'ERROR'
 
     return action
 
@@ -1091,11 +1079,12 @@ def patch_SNV_pfs_to_sample_processing(connection, **kwargs):
     ### General action attributes
     start = datetime.utcnow()
     action = ActionResult(connection, 'patch_SNV_pfs_to_sample_processing')
-    action_logs = {'runs_checked_for_patching': []}
+    action_logs = {'runs_checked_for_patching': [], 'runs_checked_for_patching_log': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
     check_result = action.get_associated_check_result(kwargs).get('full_output', {})
     action_logs['check_output'] = check_result
+    action_logs['error'] = []
     metawfr_uuids = check_result.get('metawfrs_to_check', {}).get('uuids', [])
     random.shuffle(metawfr_uuids)  # if always the same order, we may never get to the later ones.
 
@@ -1107,13 +1096,20 @@ def patch_SNV_pfs_to_sample_processing(connection, **kwargs):
             break
         try:
             # action function call
-            patch_SNV_processed_files_to_sample_processing(metawfr_uuid, my_auth)
+            res = patch_processed_files_to_sample_processing(metawfr_uuid,
+                ['workflow_vep-annot-check', 'workflow_hg19lo_hgvsg-check'],
+                my_auth)
             action_logs['runs_checked_for_patching'].append(metawfr_uuid)
+            action_logs['runs_checked_for_patching_log'].append(metawfr_uuid + ' ' + res)
         except Exception as e:
-            action_logs['error'] = str(e)
-            break
+            action_logs['error'].append(str(e))
+            continue
     action.output = action_logs
-    action.status = 'DONE'
+    # we want to display an error if there are any errors in the run, even if many patches are successful
+    if action_logs['error'] == []:
+        action.status = 'DONE'
+    else:
+        action.status = 'ERROR'
 
     return action
 
@@ -1197,11 +1193,12 @@ def patch_SV_pfs_to_sample_processing(connection, **kwargs):
     ### General action attributes
     start = datetime.utcnow()
     action = ActionResult(connection, 'patch_SV_pfs_to_sample_processing')
-    action_logs = {'runs_checked_for_patching': []}
+    action_logs = {'runs_checked_for_patching': [], 'runs_checked_for_patching_log': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
     check_result = action.get_associated_check_result(kwargs).get('full_output', {})
     action_logs['check_output'] = check_result
+    action_logs['error'] = []
     metawfr_uuids = check_result.get('metawfrs_to_check', {}).get('uuids', [])
     random.shuffle(metawfr_uuids)  # if always the same order, we may never get to the later ones.
 
@@ -1213,13 +1210,20 @@ def patch_SV_pfs_to_sample_processing(connection, **kwargs):
             break
         try:
             # action function call
-            patch_SV_processed_files_to_sample_processing(metawfr_uuid, my_auth)
+            res = patch_processed_files_to_sample_processing(metawfr_uuid,
+                ['workflow_SV_length_filter_vcf-check', 'workflow_SV_annotation_cleaner_vcf-check'],
+                my_auth)
             action_logs['runs_checked_for_patching'].append(metawfr_uuid)
+            action_logs['runs_checked_for_patching_log'].append(metawfr_uuid + ' ' + res)
         except Exception as e:
-            action_logs['error'] = str(e)
-            break
+            action_logs['error'].append(str(e))
+            continue
     action.output = action_logs
-    action.status = 'DONE'
+    # we want to display an error if there are any errors in the run, even if many patches are successful
+    if action_logs['error'] == []:
+        action.status = 'DONE'
+    else:
+        action.status = 'ERROR'
 
     return action
 
