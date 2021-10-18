@@ -104,7 +104,8 @@ def _eval_qcs(metawfr_meta):
 ############################################################
 def patch_processed_files_to_sample(metawfr_uuid, final_steps, ff_key):
     """
-    Patch samples with bam and gvcf,
+    Patch sample processed_files,
+        patch the output file from each step in final_steps
     does not patch completed_processes
     """
     ### Getting metadata
