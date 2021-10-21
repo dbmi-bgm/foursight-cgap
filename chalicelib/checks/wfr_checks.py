@@ -1152,6 +1152,68 @@ def ingest_vcf_start(connection, **kwargs):
     return action
 
 
+@check_function(file_accessions=[])
+def check_vcf_ingestion_errors(connection, **kwargs):
+    """
+    Check for finding full annotated VCFs that have failed ingestion, so that they
+    can be reset and the ingestion rerun if needed.
+    """
+    check = CheckResult(connection, 'check_vcf_ingestion_errors')
+    accessions = [accession.strip() for accession in kwargs.get('file_accessions', '').split(',') if accession]
+    ingestion_error_search = 'search/?file_type=full+annotated+VCF&type=FileProcessed&file_ingestion_status=Error'
+    if accessions:
+        ingestion_error_search += '&accession='
+        ingestion_error_search += '&accession='.join(accessions)
+    ingestion_error_search += '&field=@id&field=file_ingestion_error'
+    results = ff_utils.search_metadata(ingestion_error_search, key=connection.ff_keys)
+    output = {}
+    for result in results:
+        if len(result.get('file_ingestion_error')) > 0:
+            # usually there are 100 errors, so just report first error, user can view item to see others
+            output[result['@id']] = result['file_ingestion_error'][0].get('body')
+    check.full_output = output
+    check.brief_output = list(output.keys())
+    if output:
+        check.status = 'WARN'
+        check.summary = f'{len(check.brief_output)} VCFs failed ingestion'
+        check.description = check.summary
+        check.allow_action = True
+        check.action = ''
+    else:
+        check.status = 'PASS'
+        check.summary = 'No VCFs found with ingestion errors'
+        check.description = check.summary
+    return check
+
+
+@action_function()
+def reset_vcf_ingestion_errors(connection, **kwargs):
+    """
+    Takes VCFs with ingestion errors, patches file_ingestion_status to 'N/A', and
+    removes file_ingestion_error property. This will allow ingestion to be retried.
+    """
+    action = ActionResult(connection, 'reset_vcf_ingestion_errors')
+    check_result_vcfs = action.get_associated_check_result(kwargs).get('brief_output', [])
+    action_logs = {'success': [], 'fail': {}}
+    for vcf in check_result_vcfs:
+        patch = {'file_ingestion_status': 'N/A'}
+        try:
+            resp = ff_utils.patch_metadata(patch, vcf + '?delete_fields=file_ingestion_error', key=connection.ff_keys)
+        except Exception as e:
+            action_logs['fail'][vcf] = str(e)
+        else:
+            if resp['status'] == 'success':
+                action_logs['success'].append(vcf)
+            else:
+                action_logs['fail'][vcf] = resp['status']
+    action.output = action_logs
+    if action_logs['fail']:
+        action.status = 'ERROR'
+    else:
+        action.status = 'DONE'
+    return action
+
+
 @check_function(limit_to_uuids="")
 def long_running_wfrs_status(connection, **kwargs):
     """

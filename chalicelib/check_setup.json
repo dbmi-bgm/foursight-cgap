@@ -285,6 +285,18 @@
             }
         }
     },
+    "check_vcf_ingestion_errors": {
+        "title": "Check VCFs for ingestion errors",
+        "group": "Pipeline checks",
+        "schedule": {
+            "morning_checks": {
+                "cgap": {
+                    "kwargs": {"primary": true},
+                    "dependencies": []
+                }
+            }
+        }
+    },
     "problematic_wfrs_status" : {
         "title": "x) Errored Runs",
         "group": "Pipeline checks",
