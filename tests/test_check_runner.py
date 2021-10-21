@@ -5,7 +5,9 @@ def delay_rerun(*args):
     time.sleep(90)
     return True
 
+
 pytestmark = [pytest.mark.flaky(rerun_filter=delay_rerun)]
+
 
 # thanks to Rob Kennedy on S.O. for this bit of code
 @contextmanager
@@ -26,12 +28,13 @@ def captured_output():
     finally:
         sys.stdout, sys.stderr = old_out, old_err
 
-class TestCheckRunner():
+
+class TestCheckRunner:
     environ = DEV_ENV
-    app.set_stage('test')
+    set_stage('test')
     app_utils_obj = app_utils.AppUtils()
     connection = app_utils_obj.init_connection(environ)
-    connection.connections['es'] = None # disable es
+    connection.connections['es'] = None  # disable es
     # set up a queue for test checks
     queue_name = stage.Stage(FOURSIGHT_PREFIX).get_queue_name()
     runner_name = stage.Stage(FOURSIGHT_PREFIX).get_runner_name()
