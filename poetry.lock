@@ -1,6 +1,6 @@
 [[package]]
 name = "ansicon"
-version = "1.90.0"
+version = "1.89.0"
 description = "Python wrapper for loading Jason Hood's ANSICON"
 category = "dev"
 optional = false
