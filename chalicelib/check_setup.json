@@ -29,7 +29,7 @@
         "group": "System checks",
         "conditions": ["put_env"],
         "schedule": {
-            "ten_min_checks": {
+            "hourly_checks": {
                 "all": {
                     "kwargs": {"primary": true},
                     "dependencies": []
@@ -121,7 +121,7 @@
         "title": "Secondary queue deduplication",
         "group": "System checks",
         "schedule": {
-            "ten_min_checks": {
+            "fifteen_min_checks": {
                 "all": {
                     "kwargs": {"primary": true},
                     "dependencies": []

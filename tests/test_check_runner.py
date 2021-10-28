@@ -1,8 +1,9 @@
+import conftest
 from conftest import *
 
 
 def delay_rerun(*args):
-    time.sleep(90)
+    time.sleep(45)
     return True
 
 
@@ -191,10 +192,21 @@ class TestCheckRunner:
         assert (test_success)
         assert (runner_res is None)
 
+    @pytest.mark.skip
     def test_queue_check_group(self):
+        """ This test relies on elasticbeanstalk health check, it causes us to get rate limited
+            on that API - so disabling this test. - Will Oct 28 2021
+
+            Checks that a group of checks can be queued. Since this test is disabled, we should
+            watch deployments carefully to ensure checks are being queued, or consider ocasionally
+            running this check and using a special schedule.
+        """
         # find the checks we will be using
         use_schedule = 'ten_min_checks'
-        check_handler = check_utils.CheckHandler(FOURSIGHT_PREFIX)
+
+        check_handler = check_utils.CheckHandler(FOURSIGHT_PREFIX,
+                                                 check_setup_dir=os.path.dirname(chalicelib_path),
+                                                 check_package_name='chalicelib')
         check_schedule = check_handler.get_check_schedule(use_schedule)
         use_checks = [cs[0].split('/')[1] for env in check_schedule for cs in check_schedule[env]]
         # get a reference point for check results
