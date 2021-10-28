@@ -127,7 +127,7 @@ def scale_up_elasticsearch_production(connection, **kwargs):
         check.description = 'Could not trigger cluster resize - check lambda logs'
     else:
         check.status = 'PASS'
-        check.description = 'Downward cluster resize triggered'
+        check.description = 'Upward cluster resize triggered'
     return check
 
 
