@@ -141,18 +141,6 @@
             }
         }
     },
-    "manage_old_filebeat_logs": {
-        "title": "Manage old filebeat logs",
-        "group": "Elasticsearch checks",
-        "schedule": {
-            "morning_checks": {
-                "cgap": {
-                    "kwargs": {"primary": true},
-                    "dependencies": []
-                }
-            }
-        }
-    },
     "check_suggested_enum_values": {
         "title": "Check fields with suggested enum",
         "group": "Metadata checks",
