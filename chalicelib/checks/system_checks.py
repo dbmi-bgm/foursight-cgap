@@ -580,7 +580,8 @@ def snapshot_rds(connection, **kwargs):
         )
         if not res.get('DBSnapshot'):
             check.status = 'FAIL'
-            check.summary = check.description = 'Something went wrong during snapshot creation'
+            check.summary = check.description = (f'Something went wrong during snapshot creation'
+                                                 f' of {rds_name} with identifier {snapshot_name}')
             check.full_output = res
         else:
             check.status = 'PASS'
