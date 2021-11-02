@@ -570,6 +570,7 @@ def snapshot_rds(connection, **kwargs):
         check.status = 'FAIL'
         check.summary = check.description = 'RDS_NAME not set in environment!'
     else:
+        # kwargs['uuid'] is a timestamp
         snap_time = datetime.datetime.strptime(kwargs['uuid'], "%Y-%m-%dT%H:%M:%S.%f").strftime("%Y-%m-%dT%H-%M-%S")
         # snapshot ID can only have letters, numbers, and hyphens
         snapshot_name = 'foursight-snapshot-%s-%s' % (rds_name, snap_time)
