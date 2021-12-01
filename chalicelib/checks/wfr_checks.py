@@ -18,7 +18,7 @@ from .helpers.linecount_dicts import *
 default_pipelines_to_run = ['WGS Trio v25', 'WGS Proband-only Cram v25', 'CNV v2',
     'WES Proband-only v25', 'WES Family v25', 'WES Trio v25', 'WGS Trio v26',
     'WGS Proband-only Cram v26', 'WES Proband-only v26', 'WES Family v26', 'WES Trio v26',
-    'WGS Proband-only v26']
+    'WGS Proband-only v26', 'WGS Family v26']
 
 
 @check_function(file_type='File', start_date=None)
