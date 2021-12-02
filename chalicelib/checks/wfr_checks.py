@@ -1155,14 +1155,14 @@ def ingest_vcf_start(connection, **kwargs):
     return action
 
 
-@check_function(file_accessions=[])
+@check_function(file_accessions="")
 def check_vcf_ingestion_errors(connection, **kwargs):
     """
     Check for finding full annotated VCFs that have failed ingestion, so that they
     can be reset and the ingestion rerun if needed.
     """
     check = CheckResult(connection, 'check_vcf_ingestion_errors')
-    accessions = [accession.strip() for accession in kwargs.get('file_accessions', []) if accession]
+    accessions = [accession.strip() for accession in kwargs.get('file_accessions', '').split(',') if accession]
     ingestion_error_search = 'search/?file_type=full+annotated+VCF&type=FileProcessed&file_ingestion_status=Error'
     if accessions:
         ingestion_error_search += '&accession='
