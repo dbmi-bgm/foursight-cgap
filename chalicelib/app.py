@@ -32,8 +32,9 @@ def monday_at_2_am_est():
 
 
 def end_of_day_on_weekdays():
-    """ Cron schedule that runs at 6pm EST (22:00 UTC) on weekdays. Used for deployments. """
-    return Cron('0', '22', '?', '*', 'MON-FRI', '*')
+    """ Cron schedule that runs at 11pm EST (03:00 UTC) on weekdays. Used for deployments. """
+    return Cron('0', '3', '?', '*', 'TUE-SAT', '*')
+
 
 # this dictionary defines the CRON schedules for the dev and prod foursight
 # stagger them to reduce the load on Fourfront. Times are UTC
