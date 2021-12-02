@@ -1162,7 +1162,7 @@ def check_vcf_ingestion_errors(connection, **kwargs):
     can be reset and the ingestion rerun if needed.
     """
     check = CheckResult(connection, 'check_vcf_ingestion_errors')
-    accessions = [accession.strip() for accession in kwargs.get('file_accessions', '').split(',') if accession]
+    accessions = [accession.strip() for accession in kwargs.get('file_accessions', []) if accession]
     ingestion_error_search = 'search/?file_type=full+annotated+VCF&type=FileProcessed&file_ingestion_status=Error'
     if accessions:
         ingestion_error_search += '&accession='
