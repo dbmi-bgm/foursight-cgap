@@ -1,4 +1,5 @@
 from conftest import *
+import time
 
 
 class TestESConnection():
@@ -39,6 +40,7 @@ class TestESConnection():
         assert (obj['name'] + '/' + obj['uuid']) == uuid
         self.es.delete_keys([uuid])
         self.es.refresh_index()
+        time.sleep(1)
         assert self.es.get_object(uuid) == None
         assert self.es.get_size_bytes() > 0
         assert self.es.delete_index(self.index)

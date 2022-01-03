@@ -1157,7 +1157,7 @@ def ingest_vcf_start(connection, **kwargs):
     return action
 
 
-@check_function(file_accessions=[])
+@check_function(file_accessions="")
 def check_vcf_ingestion_errors(connection, **kwargs):
     """
     Check for finding full annotated VCFs that have failed ingestion, so that they
