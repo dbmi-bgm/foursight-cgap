@@ -1573,3 +1573,356 @@ def problematic_wfrs_start(connection, **kwargs):
     action.status = 'DONE'
 
     return action
+
+
+
+
+"""
+Redoing things for MWFRs that describe how/where/what to patch incoming files.
+
+Overall flow:
+    - Find MWFRs that have recently finished (?) and haven't had their
+        files patched (will need prop on MWFR (?) to indicate file patch status)
+    - Ensure such MWFRs have passed all QCs
+        - If not, make note and don't patch any files (?)
+    - Search through output processed files and collect those with patching instructions
+        - FileProcessed schema will need additional fields for patching instructions
+            - What exactly is needed here? Probably choice of Sample, SampleProcessing,
+                probably a dict for future flexibility
+        - MWF custom_pf_fields will need update with strict enum for this field
+            so MWFR with typos invalidate
+    - Generic patch function to patch files to appropriate location
+        - Can try to validate all such patches and then proceed
+            - If something doesn't validate, make note and stop (?)
+            - If patch fails after validation, make note and continue (?)
+    - Update MWFR file patch status property to success/fail/etc.
+
+May want to add in another check to do something if a patch failed on a MWFR
+even though it validated?
+
+Other checks/actions required?
+"""
+
+def make_embed_request(ids=None, fields=None, connection=None):
+    """"""
+    post_body = {"ids": ids, "fields": fields}
+    result = ff_utils.authorized_request(
+        "/embed", verb="POST", auth=connection.ff_key, data=json.dumps(post_body)
+    )
+    return result
+
+
+QC_PASS = "PASS"
+
+
+def nested_getter(item, fields):
+    """"""
+    if not fields:
+        return None
+    field_to_get = fields.pop(0)
+    if isinstance(item, dict):
+        result = item.get(field_to_get)
+    elif isinstance(item, list):
+        result = []
+        for sub_item in item:
+            result.append(nested_getter(sub_item, [field_to_get]))
+    else:
+        result = None
+    if fields:
+        result = nested_getter(result, fields)
+    if isinstance(result, list):
+        if len(result) == 1:
+            result = result[0]
+    return result
+
+
+def evaluate_meta_workflow_run_qcs(meta_workflow_run_metadata, connection=None):
+    """"""
+    overall_qcs = meta_workflow_run_metadata.get("overall_qcs", [])
+    for overall_qc in overall_qcs:
+        overall_qc_value = overall_qc.get("value")
+        if overall_qc_value != QC_PASS:
+            return False
+    uuid = meta_workflow_run_metadata.get("uuid")
+    embed_field = (
+        "workflow_runs.workflow_run.output_files.value_qc.overall_quality_status"
+    )
+    post_response = make_embed_request(
+        ids=[uuid], fields=[embed_field], connection=connection
+    )
+    for result in post_response:
+        qc_status_fields = nested_getter(result, embed_field.split("."))
+        if qc_status_fields:
+            for qc_status in qc_status_fields:
+                if qc_status != QC_PASS:
+                    return False
+    return True
+
+
+@check_function()
+def find_successful_metaworkflowruns(connection, **kwargs):
+    """"""
+    check = CheckResult(connection, "find_successful_metaworkflowruns")
+    check.description = ""
+    check.brief_output = []
+    check.summary = ""
+    check.full_output = {}
+    check.status = "PASS"
+    check.action = ""
+    check.allow_action = True
+    check.action_message = "Add MetaWorkflowRuns' output files to their cases."
+
+    query = (
+        "/search/?type=MetaWorkflowRun&final_status=completed"
+        "&output_files_linked=No+value"
+    )
+    search = ff_utils.search_metadata(query, key=connection.ff_keys)
+    if not search:
+        msg = (
+            "Found no completed MetaWorkflowRuns with output files to add to their"
+            " respective cases."
+        )
+        check.brief_output.append(msg)
+    meta_workflow_runs_failed_qc = []
+    meta_workflow_runs_passed_qc = []
+    for meta_workflow_run in search:
+        uuid = meta_workflow_run.get("uuid")
+        qc_check = evaluate_meta_workflow_run_qcs(meta_workflow_run)
+        if qc_check is False:
+            meta_workflow_runs_failed_qc.append(uuid)
+        else:
+            meta_workflow_runs_passed_qc.append(uuid)
+    if meta_workflow_runs_failed_qc:
+        check.status = "WARN"
+        msg = (
+            "%s MetaWorkflowRuns have failed QC checks and won't have output files"
+            " added to their respective cases."
+            % len(meta_workflow_runs_failed_qc)
+        )
+        check.brief_output.append(msg)
+        check.full_output["failed_qc"] = meta_workflow_runs_failed_qc
+    if meta_workflow_runs_passed_qc:
+        msg = (
+            "%s MetaWorkflowRuns have passed QC checks and will have output files"
+            " added to their respective cases."
+            % len(meta_workflow_runs_failed_qc)
+        )
+        check.brief_output.append(msg)
+        check.full_output["passed_qc"] = meta_workflow_runs_passed_qc
+    return check
+
+
+def update_meta_workflow_run_files_linked(
+    meta_workflow_run_uuid, errors=None, connection=None
+):
+    """"""
+    if not errors:
+        patch_body = {"output_files_linked_status": "success"}
+    else:
+        patch_body = {
+            "output_files_linked_status": "error",
+            "output_files_linked_errors": errors
+        }
+    ff_utils.patch_metadata(patch_body, meta_workflow_run_uuid, key=connection.ff_key)
+
+
+#def update_dictionary_value_list(dictionary, key, value):
+#    """"""
+#    if key in dictionary:
+#        dictionary[key].append(value)
+#    else:
+#        dictionary[key] = [value]
+#
+#
+#def get_output_file_link_locations(output_file_metadata, link_locations, link_errors):
+#    """"""
+#    file_uuid = output_file_metadata.get("uuid")
+#    case_accession = output_file_metadata.get("associated_case")
+#    linktos_to_make = output_file_metadata.get("linkto_placement")
+#    if linktos_to_make and not case_accession:
+#        error_msg = "Missing case information"
+#        update_dictionary_value_list(link_errors, file_uuid, error_msg)
+#    elif linktos_to_make:
+#        for linkto_to_make in linktos_to_make:
+#            file_linkto_location = linkto_to_make.get("location")
+#            if not file_linkto_location:
+#                continue
+#            update_dictionary_value_list(
+#                link_locations, file_linkto_location, file_uuid
+#            )
+
+
+# def make_file_linkto(file_uuid, item_to_link, field_to_link, link_type, connection=None):
+#     """Assuming field_to_link is top-level on item_to_link."""
+#     linkto_error = None
+#     item_metadata = ff_utils.get(item_to_link, add_on="frame=raw&datastore=database", key=connection.ff_key)
+#     item_field_to_link = item_metadata.get(field_to_link)
+#     item_type = item_metadata.get("@type")[0]
+#     item_schema = ff_utils.get("/profiles/" + item_type + ".json",
+#             key=connection.ff_key)
+#     item_properties = item_schema.get("properties", {})
+#     field_properties = item_properties.get(field_to_link, {})
+#     field_type = field_properties.get("type")
+#     # Perhaps check that field is a linkTo as well???
+#     if field_type == "array":
+#         if item_field_to_link and file_uuid not in item_field_to_link:
+#             item_field_to_link.append(file_uuid)
+#             patch_body = {field_to_link: item_field_to_link}
+#             ff_utils.patch_metadata(patch_body, item_to_link, key=connection.ff_key)
+#     elif field_type == "string" and item_field_to_link != file_uuid:
+#         patch_body = {field_to_link: file_uuid}
+#         ff_utils.patch_metadata(patch_body, item_to_link, key=connection.ff_key)
+#     else:
+#         linkto_error = "Something"
+#     return linkto_error
+# 
+# 
+# def create_file_linktos(files_to_link, connection=None):
+#     """"""
+#     # TODO: Make patch to file linkTo
+#     files_with_link_errors = set()
+#     for file_uuid, linkto_placement_metadata in files_to_link.items():
+#         for linkto_placement in linkto_placement_metadata:
+#             errors = []
+#             linkto_error = None
+#             item_to_link = linkto_placement.get("item")
+#             if not item_to_link:
+#                 errors.append("Missing \"item\" field")
+#             field_to_link = linkto_placement.get("field")
+#             if not field_to_link:
+#                 errors.append("Missing \"field\" field")
+#             link_type = linkto_placement.get("type")
+#             if not link_type:
+#                 errors.append("Missing \"type\" field")
+#             if not errors:
+#                 linkto_error = make_file_linkto(file_uuid, item_to_link, field_to_link, link_type,
+#                     connection=connection)
+#             if linkto_error:
+#                 errors.append(linkto_error)
+#             if errors:
+#                 files_with_link_errors.add(file_uuid)
+#     return list(files_with_link_errors)
+
+
+def get_sample_mapping(meta_workflow_run_uuid, connection=None):
+    """"""
+    result = {}
+    meta_workflow_run = ff_utils.get_metadata(
+        meta_workflow_run_uuid, addon="?frame=raw"
+    )
+    associated_case = meta_workflow_run.get("associated_case")
+    meta_workflow_run_input = meta_workflow_run.get("input", [])
+    ordered_sample_ids = []
+    for item in meta_workflow_run_input:
+        argument_name = item.get("argument_name")
+        if argument_name == "sample_names_proband_first":
+            ordered_sample_ids = json.loads(item.get("value"))
+            break
+    case = ff_utils.get_metadata(associated_case, addon="?frame=raw")
+    sample_processing = case.get("sample_processing", {})
+    sample_processing_uuid = sample_processing.get("uuid")
+    result["SampleProcessing"] = sample_processing_uuid
+    ordered_sample_uuids = [x for x in ordered_sample_ids]
+    samples = sample_processing.get("samples", [])
+    for sample in samples:
+        sample_uuid = sample.get("uuid")
+        sample_id = sample.get("bam_sample_id")
+        if sample_id in ordered_sample_ids:
+            idx = ordered_sample_ids.index(sample_id)
+            ordered_sample_uuids[idx] = sample_uuid
+    result["Sample"] = ordered_sample_uuids
+    return result
+
+
+def create_file_linktos(output_files_to_link, sample_mapping, connection=None):
+    """"""
+    failed_file_linktos = []
+    to_patch = {}
+    for file_uuid, linkto_type in output_files_to_link.items():
+        linkto_locations = linkto_type.get("locations")
+        if "Sample" in linkto_locations:
+            sample_idx = linkto_type.get("shard")
+            sample_uuid = sample_mapping.get("Sample")[sample_idx]
+            add_to_patch(to_patch, sample_uuid, file_uuid)
+        if "SampleProcessing" in linkto_locations:
+            sample_processing_uuid = sample_mapping.get("SampleProcessing")
+            add_to_patch(to_patch, sample_processing_uuid, file_uuid)
+    for item_to_patch, files_to_patch in to_patch.items():
+        need_to_patch = False
+        item = ff_utils.get_metadata(
+            item_to_patch, connection=connection, addon="?frame=raw"
+        )
+        item_processed_files = item.get("processed_files", [])
+        for processed_file in files_to_patch:
+            if processed_file not in item_processed_files:
+                need_to_patch = True
+                item_processed_files.append(processed_file)
+        if need_to_patch:
+            patch_body = {"processed_files": item_processed_files}
+            patch_response = ff_utils.patch_metadata(
+                item_to_patch, patch_body, connection=connection
+            )
+            if patch_response.get("status") != "success":
+                failed_file_linktos += files_to_patch
+    return failed_file_linktos
+
+
+def add_to_dict_as_list(dictionary, key, value):
+    """"""
+    existing_item_value = dictionary.get(key)
+    if existing_item_value:
+        existing_item_value.append(value)
+    else:
+        dictionary[key] = [value]
+
+
+@action_function()
+def move_meta_workflow_run_output_files_to_case(connection, **kwargs):
+    """"""
+    action = ActionResult(connection, "")
+    actions.status = "FAIL"
+    action.output = {"successful": [], "errored": []}
+
+    file_linkto_field = "linkto_location"
+
+    check_results = action.get_associated_check_result(kwargs)
+    meta_workflow_run_uuids = check_results.get("passed_qc", [])
+    for meta_workflow_run_uuid in meta_workflow_run_uuids:
+        output_files_to_link = {}
+        embed_fields = [
+            "workflow_runs.output.shard",
+            "workflow_runs.output.file.uuid",
+            "worflow_runs.output.file." + file_linkto_field + ".*",
+        ]
+        embed_request = make_embed_request(
+            ids=[meta_workflow_run_uuid], fields=embed_fields, connection=connection
+        )
+        for embed_result in embed_request:
+            output = embed_result.get("workflow_runs", {}).get("output", [])
+            for item in output:
+                output_file = item.get("file", {})
+                output_file_uuid = output_file.get("uuid")
+                output_file_linkto_field = output_file.get(file_linkto_field)
+                if not output_file_linkto_field:
+                    continue
+                shard = item.get("shard")
+                if shard:
+                    shard = int(shard[0])  # Used as index for sample mapping
+                file_fields = {"locations": output_file_linkto_field, "shard": shard}
+                output_files_to_link[output_file_uuid] = file_fields
+        if output_files_to_link:
+            sample_mapping = get_sample_mapping(
+                meta_workflow_run_uuid, connection=connection
+            )
+            link_errors = create_file_linktos(
+                output_files_to_link, sample_mapping, connection=connection
+            )
+        update_meta_workflow_run_files_linked(
+            meta_workflow_run_uuid, errors=link_errors, connection=connection
+        )
+        if link_errors:
+            action.output["errored"].append(meta_workflow_run_uuid)
+        else:
+            action.output["successful"].append(meta_workflow_run_uuid)
+    action.status = "DONE"
+    return action
