@@ -22,3 +22,6 @@ requirements.txt
 
 # PyCharm
 .idea/
+
+# Vim
+*.swp
