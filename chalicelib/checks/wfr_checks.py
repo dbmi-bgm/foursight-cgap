@@ -242,7 +242,7 @@ def metawfrs_to_check_linecount(connection, **kwargs):
 @action_function()
 def line_count_test(connection, **kwargs):
     start = datetime.utcnow()
-    action = ActionResult(connection, 'run_metawfrs')
+    action = ActionResult(connection, 'line_count_test')
     action_logs = {'metawfrs_that_passed_linecount_test': [], 'metawfrs_that_failed_linecount_test': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
@@ -507,7 +507,7 @@ def spot_failed_metawfrs(connection, **kwargs):
 @action_function()
 def reset_spot_failed_metawfrs(connection, **kwargs):
     start = datetime.utcnow()
-    action = ActionResult(connection, 'spot_failed_metawfrs')
+    action = ActionResult(connection, 'reset_spot_failed_metawfrs')
     action_logs = {'runs_reset': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
@@ -611,7 +611,7 @@ def failed_metawfrs(connection, **kwargs):
 @action_function()
 def reset_failed_metawfrs(connection, **kwargs):
     start = datetime.utcnow()
-    action = ActionResult(connection, 'failed_metawfrs')
+    action = ActionResult(connection, 'reset_failed_metawfrs')
     action_logs = {'runs_reset': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
