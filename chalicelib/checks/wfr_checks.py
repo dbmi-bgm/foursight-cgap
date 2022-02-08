@@ -15,11 +15,11 @@ from .helpers.confchecks import *
 from .helpers.linecount_dicts import *
 
 
-default_pipelines_to_run = ['CNV v2', 'WGS Trio v26',
+default_pipelines_to_run = ['CNV Germline v1', 'WGS Trio v26',
     'WGS Proband-only Cram v26', 'WES Proband-only v26', 'WES Family v26', 'WES Trio v26',
     'WGS Proband-only v26', 'WGS Family v26', 'WGS Trio v27', 'WGS Proband-only Cram v27',
     'WES Proband-only v27', 'WES Family v27', 'WES Trio v27', 'WGS Proband-only v27',
-    'WGS Family v27', 'SV Germline v3']
+    'WGS Family v27', 'SV Germline v3', 'WGS Upstream GATK Proband v27']
 
 
 @check_function(file_type='File', start_date=None)
