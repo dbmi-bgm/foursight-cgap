@@ -2,16 +2,13 @@ from conftest import *
 import time
 
 
-class TestESConnection():
+class TestESConnection:
     environ = DEV_ENV
     app_utils_obj = app_utils.AppUtils()
     conn = app_utils_obj.init_connection(environ)
     index = 'unit_test_index'
-    try:
-        es = es_connection.ESConnection(index, host=HOST)
-        es.delete_index(index)
-    except:
-        es = None # tests should be marked as skip
+    es = es_connection.ESConnection(index, host=HOST)
+    es.delete_index(index)
 
     @staticmethod
     def uuid(check):
@@ -38,10 +35,10 @@ class TestESConnection():
         self.es.put_object(uuid, check)
         obj = self.es.get_object(uuid)
         assert (obj['name'] + '/' + obj['uuid']) == uuid
-        self.es.delete_keys([uuid])
+        assert self.es.delete_keys([uuid])
         self.es.refresh_index()
         time.sleep(5)
-        assert self.es.get_object(uuid) == None
+        assert self.es.get_object(uuid) is None
         assert self.es.get_size_bytes() > 0
         assert self.es.delete_index(self.index)
 
