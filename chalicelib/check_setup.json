@@ -305,10 +305,6 @@
                 "cgap": {
                     "kwargs": {"primary": true},
                     "dependencies": []
-                },
-                "cgapwolf": {
-                    "kwargs": {"primary": true},
-                    "dependencies": []
                 }
             }
         }
@@ -329,34 +325,8 @@
         "group": "Elasticsearch checks",
         "schedule" : {
             "morning_checks": {
-                "cgapdev": {
+                "cgap": {
                     "kwargs": {"primary": true}
-                }
-            }
-        }
-    },
-    "indexer_server_status": {
-        "title": "Indexer Server Status",
-        "group": "Deployment Checks",
-        "schedule": {
-            "manual_checks": {
-                "cgap": {
-                    "kwargs": {
-                        "primary": true
-                    }
-                }
-            }
-        }
-    },
-    "provision_indexer_environment": {
-        "title": "Provision Indexer Environment",
-        "group": "Deployment Checks",
-        "schedule": {
-            "manual_checks": {
-                "cgap": {
-                    "kwargs": {
-                        "primary": true
-                    }
                 }
             }
         }
@@ -378,7 +348,7 @@
         "title": "Deploy CGAP-portal master to the cgap production environment",
         "group": "Deployment Checks",
         "schedule": {
-            "deployment_checks": {
+            "manual_checks": {
                 "cgap": {
                     "kwargs": {
                         "primary": true
@@ -391,7 +361,7 @@
         "title": "Wipe Checks Older Than One Month",
         "group": "System checks",
         "schedule": {},
-        "display": ["cgapdev"]
+        "display": ["cgap"]
     },
     "wipe_cgap_build_indices": {
         "title": "Wipe CGAP build indices",
