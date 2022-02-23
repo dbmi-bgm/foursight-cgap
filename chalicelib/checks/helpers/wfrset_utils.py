@@ -49,9 +49,6 @@ def step_settings(step_name, my_organism, attribution, overwrite=None):
             template['custom_pf_fields'][an_output_file]['genome_assembly'] = genome
 
     update_config = {
-        "spot_instance": True,
-        "log_bucket": "tibanna-output",
-        "key_name": "4dn-encode",
         "public_postrun_json": True,
         "behavior_on_capacity_limit": "wait_and_retry"
         }

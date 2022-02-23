@@ -12,9 +12,11 @@ htmlcov/
 coverage.xml
 *.ipynb
 !*LocalTest.ipynb
+.python-version
 requirements.txt
 
 # Virtual environments
+.python-version
 *env/
 
 # Emacs

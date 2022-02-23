@@ -2,7 +2,9 @@
 Foursight-CGAP
 ==============
 
-A serverless chalice application to monitor and run tasks on `CGAP portal <https://github.com/dbmi-bgm/cgap-portal>`_. Essentially, the app provides an number of endpoints to run checks, fetch results, dynamically create environments to check, and more.
+A serverless chalice application to monitor and run tasks on `CGAP portal <https://github.com/dbmi-bgm/cgap-portal>`_.
+Essentially, the app provides an number of endpoints to run checks, fetch results, dynamically create environments to
+check, and more.
 
 
 .. image:: https://travis-ci.org/dbmi-bgm/foursight-cgap.svg?branch=production

@@ -6,7 +6,7 @@ import os
 import sys
 import time
 import boto3
-import app
+from chalicelib.app import set_stage
 from foursight_core import (
     fs_connection,
     s3_connection,
@@ -25,14 +25,22 @@ from chalicelib import (
 )
 from chalicelib.vars import *
 from chalicelib import __file__ as chalicelib_path
-from chalicelib.checks.helpers.confchecks import * 
+from chalicelib.checks.helpers.confchecks import *
 from dcicutils import s3_utils, ff_utils
 from contextlib import contextmanager
 import pytest
 
+# This file basically just exports all of the above imports
+# so they are available by the import name above in all the
+# test files. Probably not a great method, but remains for historical reasons -Will Oct 7 2021
+
+
 @pytest.fixture(scope='session', autouse=True)
 def setup():
-    app.set_stage('test')  # set the stage info for tests
+    """ Purge the queues on the "test" stage (should be empty anyway), but
+        note that this strategy might cause test runs to interfere with one another.
+    """
+    set_stage('test')  # set the stage info for tests
     test_client = boto3.client('sqs')  # purge test queue
     queue_url = sqs_utils.SQS(FOURSIGHT_PREFIX).get_sqs_queue().url
     try:

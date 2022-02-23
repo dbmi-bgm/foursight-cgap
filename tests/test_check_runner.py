@@ -1,11 +1,14 @@
 from conftest import *
+from io import StringIO
 
 
 def delay_rerun(*args):
-    time.sleep(90)
+    time.sleep(20)
     return True
 
+
 pytestmark = [pytest.mark.flaky(rerun_filter=delay_rerun)]
+
 
 # thanks to Rob Kennedy on S.O. for this bit of code
 @contextmanager
@@ -13,11 +16,6 @@ def captured_output():
     """
     Capture stdout and stderr
     """
-    try:
-        from StringIO import StringIO
-    except ImportError:
-        from io import StringIO
-
     new_out, new_err = StringIO(), StringIO()
     old_out, old_err = sys.stdout, sys.stderr
     try:
@@ -26,12 +24,15 @@ def captured_output():
     finally:
         sys.stdout, sys.stderr = old_out, old_err
 
-class TestCheckRunner():
+
+class TestCheckRunner:
     environ = DEV_ENV
-    app.set_stage('test')
+    # NOTE: this interaction is broken and needs to be refactored.
+    # The integrated dev stage runner will not poll the test stage queues! - Will Feb 23 2022
+    set_stage('test')
     app_utils_obj = app_utils.AppUtils()
     connection = app_utils_obj.init_connection(environ)
-    connection.connections['es'] = None # disable es
+    connection.connections['es'] = None  # disable es
     # set up a queue for test checks
     queue_name = stage.Stage(FOURSIGHT_PREFIX).get_queue_name()
     runner_name = stage.Stage(FOURSIGHT_PREFIX).get_runner_name()
@@ -71,15 +72,20 @@ class TestCheckRunner():
         return found_clear
 
     def test_queue_basics(self):
+        """ This test illustrates why later tests are broken.
+            If you run this setup as an integrated test, the dev-check_runner will never
+            process checks on the test-check_queue. Have to manually invoke the lambda locally.
+        """
         # ensure we have the right queue and runner names
         assert (self.queue_name == FOURSIGHT_PREFIX + '-test-check_queue')
         assert (self.runner_name == FOURSIGHT_PREFIX + '-dev-check_runner')
 
+    @pytest.mark.common_fail
     def test_check_runner_manually(self):
         """
         Queue a check and make sure it is run
         Invoke run_check_runner manually, not via AWS lambda.
-        This test can fail if other self-propogating check runner sare hanging
+        This test can fail if other self-propagating check runners are hanging
         around, so run this before other checks that queue
         """
         cleared = self.clear_queue_and_runners()
@@ -98,7 +104,7 @@ class TestCheckRunner():
             run_uuid = self.app_utils_obj.send_single_to_queue(self.environ, to_send, None, invoke_runner=False)
             time.sleep(1)
             with captured_output() as (out, err):
-                # invoke runner manually (without a lamba)
+                # invoke runner manually (without a lambda)
                 res = self.app_utils_obj.run_check_runner({'sqs_url': self.queue.url}, propogate=False)
             read_out = out.getvalue().strip()
             if res and res.get('uuid') == run_uuid:
@@ -119,7 +125,8 @@ class TestCheckRunner():
         assert ({'run_id', 'receipt', 'sqs_url'} <= set(post_res['kwargs']['_run_info'].keys()))
         assert (post_res['kwargs']['_run_info']['run_id'] == run_uuid)
 
-    def test_check_runner_manually_with_associated_action(self):
+    @pytest.mark.common_fail
+    def test_check_runners_manually_with_associated_action(self):
         print("Clearing queue..")
         cleared = self.clear_queue_and_runners()
         assert (cleared)
@@ -188,10 +195,21 @@ class TestCheckRunner():
         assert (test_success)
         assert (runner_res is None)
 
+    @pytest.mark.skip
     def test_queue_check_group(self):
+        """ This test relies on elasticbeanstalk health check, it causes us to get rate limited
+            on that API - so disabling this test. - Will Oct 28 2021
+
+            Checks that a group of checks can be queued. Since this test is disabled, we should
+            watch deployments carefully to ensure checks are being queued, or consider ocasionally
+            running this check and using a special schedule.
+        """
         # find the checks we will be using
         use_schedule = 'ten_min_checks'
-        check_handler = check_utils.CheckHandler(FOURSIGHT_PREFIX)
+
+        check_handler = check_utils.CheckHandler(FOURSIGHT_PREFIX,
+                                                 check_setup_dir=os.path.dirname(chalicelib_path),
+                                                 check_package_name='chalicelib')
         check_schedule = check_handler.get_check_schedule(use_schedule)
         use_checks = [cs[0].split('/')[1] for env in check_schedule for cs in check_schedule[env]]
         # get a reference point for check results
@@ -228,11 +246,16 @@ class TestCheckRunner():
             assert (res_compare[check_name]['prior'] != res_compare[check_name]['post'])
 
     def test_queue_check(self):
+        """ This used to be an integrated test, but fails now due to changes in the structure
+            of foursight (test stage here does not interact well because no test stage runner).
+            To fix this, invoke the runner manually with the configured setup locally.
+        """
         check = run_result.CheckResult(self.connection, 'test_random_nums')
         run_uuid = self.app_utils_obj.queue_check(self.environ, 'test_random_nums')
         # both check and action separately must make it through queue
         tries = 0
         while True:
+            self.app_utils_obj.run_check_runner({'sqs_url': self.queue.url}, propogate=False)
             time.sleep(1)
             latest_check_res = check.get_latest_result()
             if latest_check_res and latest_check_res['uuid'] >= run_uuid:
@@ -248,12 +271,17 @@ class TestCheckRunner():
         assert (run_check['kwargs']['uuid'] == run_uuid)
 
     def test_queue_action(self):
+        """ This used to be an integrated test, but fails now due to changes in the structure
+            of foursight (test stage here does not interact well because no test stage runner).
+            To fix this, invoke the runner manually with the configured setup locally.
+        """
         # this action will fail because it has no check-related kwargs
         action = run_result.ActionResult(self.connection, 'add_random_test_nums')
         run_uuid = self.app_utils_obj.queue_action(self.environ, 'add_random_test_nums')
         # both check and action separately must make it through queue
         tries = 0
         while True:
+            self.app_utils_obj.run_check_runner({'sqs_url': self.queue.url}, propogate=False)
             time.sleep(1)
             latest_act_res = action.get_latest_result()
             if latest_act_res and latest_act_res['uuid'] >= run_uuid:

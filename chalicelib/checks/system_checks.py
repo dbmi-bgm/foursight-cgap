@@ -1,17 +1,16 @@
-import requests
+import os
 import json
 import datetime
 import boto3
 import time
-import geocoder
 from foursight_core.stage import Stage
 from foursight_core.checks.helpers.sys_utils import (
-    parse_datetime_to_utc,
     wipe_build_indices
 )
 from dcicutils import (
     ff_utils,
     es_utils,
+    ecs_utils
 )
 
 # Use confchecks to import decorators object and its methods for each check module
@@ -90,10 +89,10 @@ def scale_down_elasticsearch_production(connection, **kwargs):
             )
     if not success:
         check.status = 'ERROR'
-        check.description = 'Could not trigger cluster resize - check lambda logs'
+        check.description = check.summary = 'Could not trigger cluster resize - check lambda logs'
     else:
         check.status = 'PASS'
-        check.description = 'Downward cluster resize triggered'
+        check.description = check.summary = 'Downward cluster resize triggered'
     return check
 
 
@@ -124,10 +123,10 @@ def scale_up_elasticsearch_production(connection, **kwargs):
             )
     if not success:
         check.status = 'ERROR'
-        check.description = 'Could not trigger cluster resize - check lambda logs'
+        check.description = check.summary = 'Could not trigger cluster resize - check lambda logs'
     else:
         check.status = 'PASS'
-        check.description = 'Downward cluster resize triggered'
+        check.description = check.summary = 'Upward cluster resize triggered'
     return check
 
 
@@ -466,261 +465,6 @@ def secondary_queue_deduplication(connection, **kwargs):
 
 
 @check_function()
-def manage_old_filebeat_logs(connection, **kwargs):
-    # import curator
-    check = CheckResult(connection, 'manage_old_filebeat_logs')
-
-    # temporary -- disable this check
-    check.status = 'PASS'
-    check.description = 'Not currently running this check'
-    return check
-
-    # check.status = "WARNING"
-    # check.description = "not able to get data from ES"
-    #
-    # # configure this thing
-    # start_backup = 14
-    # trim_backup = 30
-    # timestring = '%Y.%m.%d'
-    #
-    # log_index = 'filebeat-'
-    # #TODO: this probably needs to change when namespacing is implemented
-    # snapshot = 'backup-%s-' % connection.ff_env
-    # today = datetime.datetime.today().strftime(timestring)
-    #
-    # # run the check
-    # client = es_utils.create_es_client(connection.ff_es, True)
-    # # store backups in foursight s3, cause I know we have access to this..
-    # # maybe this should change?
-    # es_utils.create_snapshot_repo(client, snapshot[:-1], 'foursight-runs')
-    #
-    # # amazon es auto backups first 14 days, so we only need backup after that
-    # ilo = es_utils.get_index_list(client, log_index, start_backup, timestring)
-    #
-    # if len(ilo.indices) > 0:
-    #     try:
-    #         new_snapshot = curator.Snapshot(ilo, repository=snapshot[:-1], name='%s%s' % (snapshot, today))
-    #         new_snapshot.do_action()
-    #         check.full_output = "Snapshot taken for %s indices" % len(ilo.indices)
-    #     except curator.exceptions.FailedExecution as e:
-    #         # snapshot already exists
-    #         if "Invalid snapshot name" in str(e):
-    #             check.full_output = "Snapshot already exists with same name for %s indices, so skipping." % len(ilo.indices)
-    #         else:
-    #             raise(e)
-    #
-    # # now trim further to only be indexes 30-days or older and delete
-    # ilo = es_utils.get_index_list(client, log_index, trim_backup, timestring, ilo=ilo)
-    #
-    # if len(ilo.indices) > 0:
-    #     cleanupIndices = curator.DeleteIndices(ilo)
-    #     cleanupIndices.do_action()
-    #     check.full_output += " Cleaned up %s old indices" % len(ilo.indices)
-    #
-    # check.status = "PASS"
-    # check.description = 'Performed auto-backup to repository %s' % snapshot[:-1]
-    # return check
-
-
-@check_function()
-def process_download_tracking_items(connection, **kwargs):
-    """
-    Do a few things here, and be mindful of the 5min lambda limit.
-    - Consolidate tracking items with download_tracking.range_query=True
-    - Change remote_ip to geo_country and geo_city
-    - If the user_agent looks to be a bot, set status=deleted
-    - Change unused range query items to status=deleted
-    """
-    check = CheckResult(connection, 'process_download_tracking_items')
-    # maybe handle this in check_setup.json
-    if Stage.is_stage_prod() is False:
-        check.full_output = 'Will not run on dev foursight.'
-        check.status = 'PASS'
-        return check
-    # hold warning messages
-    check.brief_output = {'cannot_parse_date_created': []}
-    range_cache = {}
-    # duration we want to consolidate range queries over
-    # search older entries since range_consolidation_hrs * 2 to avoid duplication
-    range_consolidation_hrs = 1
-    cons_date = (datetime.datetime.utcnow() -
-                 datetime.timedelta(hours=range_consolidation_hrs * 2)).strftime('%Y-%m-%dT%H\:%M')
-    range_search_query = ''.join(['search/?type=TrackingItem&tracking_type=download_tracking',
-                                  '&download_tracking.range_query=true&sort=-date_created',
-                                  '&status=released&q=last_modified.date_modified:>=', cons_date])
-    cons_query = ff_utils.search_metadata(range_search_query, key=connection.ff_keys)
-    for tracking in cons_query:
-        dl_info = tracking['download_tracking']
-        user_agent = dl_info.get('user_agent', 'unknown_user_agent').lower()
-        range_key = '//'.join([dl_info['remote_ip'], dl_info['filename'],
-                               user_agent, dl_info['user_uuid']])
-        parsed_date = parse_datetime_to_utc(tracking['date_created'])
-        # check for date parsing error
-        if parsed_date is None:
-            continue
-        if range_key in range_cache:
-            range_cache[range_key].append(parsed_date)
-        else:
-            range_cache[range_key] = [parsed_date]
-    del cons_query
-    ip_cache = {}
-    time_limit = 270  # 4.5 minutes
-    # list of strings used to flag user_agent as a bot. By no means complete
-    bot_agents = ['bot', 'crawl', 'slurp', 'spider', 'mediapartners', 'ltx71']
-    # list of user_agents we always consider range_query=True
-    range_query_agents = ['igv', 'java', 'python-requests']
-    t0 = time.time()  # keep track of how start time
-
-    # batch large groups of tracking items at once to save time with geocoder
-    # for now, this function will process only <search_limit> results.
-    # I would love to use a generator, but search results change as items are indexed...
-    search_limit = 1000
-    search_query = ''.join(['search/?type=TrackingItem&tracking_type=download_tracking',
-                            '&download_tracking.geo_country=No+value',
-                            '&status=in+review+by+lab&sort=-date_created&limit=', str(search_limit)])
-    search_page = ff_utils.search_metadata(search_query, key=connection.ff_keys, page_limit=200)
-    counts = {'proc': 0, 'deleted': 0, 'released': 0}
-
-    page_ips = set([tracking['download_tracking']['remote_ip'] for tracking in search_page])
-    # transform all IP addresses into GEO information with a persistent connection
-    with requests.Session() as session:
-        for track_ip in page_ips:
-            if track_ip in ip_cache:
-                continue
-            geo = geocoder.ip(track_ip, session=session)
-            geo_country = getattr(geo, 'country') or 'Unknown'
-            geo_city = getattr(geo, 'city') or 'Unknown'
-            geo_state = getattr(geo, 'state', None)
-            if geo_state:
-                geo_city = ', '.join([geo_city, geo_state])
-            # cache the geo info in an arbitrary form
-            ip_cache[track_ip] = '//'.join([geo_city, geo_country])
-
-    # iterate over the individual tracking items
-    for tracking in search_page:
-        if round(time.time() - t0, 2) > time_limit:
-            break
-        dl_info = tracking['download_tracking']
-        user_agent = dl_info.get('user_agent', 'unknown_user_agent').lower()
-        # remove request_headers, which may contain sensitive information
-        if 'request_headers' in dl_info:
-            del dl_info['request_headers']
-        geo_info = ip_cache[dl_info['remote_ip']]
-        dl_info['geo_city'], dl_info['geo_country'] = geo_info.split('//')
-        patch_body = {'status': 'released', 'download_tracking': dl_info}
-        # delete items from bot user agents
-        if (any(bot_str in user_agent for bot_str in bot_agents)
-            and dl_info['user_uuid'] == 'anonymous'):
-            patch_body['status'] = 'deleted'
-        # set range_query=True for select user agents
-        if (any(ua_str in user_agent for ua_str in range_query_agents)):
-            dl_info['range_query'] = True
-        # deduplicate range query requests by ip/filename/user_agent/user_uuid
-        if patch_body['status'] != 'deleted' and dl_info['range_query'] is True:
-            range_key = '//'.join([dl_info['remote_ip'], dl_info['filename'],
-                                   user_agent, dl_info['user_uuid']])
-            parsed_date = parse_datetime_to_utc(tracking['date_created'])
-            if parsed_date is not None:
-                if range_key in range_cache:
-                    # for all reference range queries with this info, see if this one
-                    # was created within one hour of it. if so, it is redundant and delete
-                    for range_reference in range_cache[range_key]:
-                        compare_date_low = range_reference - datetime.timedelta(hours=range_consolidation_hrs)
-                        compare_date_high = range_reference + datetime.timedelta(hours=range_consolidation_hrs)
-                        if parsed_date > compare_date_low and parsed_date < compare_date_high:
-                            patch_body['status'] = 'deleted'
-                            break
-                    if patch_body['status'] != 'deleted':
-                        range_cache[range_key].append(parsed_date)
-                else:
-                    # set the upper limit for for range queries to consolidate
-                    range_cache[range_key] = [parsed_date]
-            else:
-                check.brief_output['cannot_parse_date_created'].append(tracking['uuid'])
-
-        ff_utils.patch_metadata(patch_body, tracking['uuid'], key=connection.ff_keys)
-        counts['proc'] += 1
-        if patch_body['status'] == 'released':
-            counts['released'] += 1
-        else:
-            counts['deleted'] += 1
-    if any(check.brief_output.values()):
-        check.status = 'WARN'
-    else:
-        check.status = 'PASS'
-    check.summary = 'Successfully processed %s download tracking items' % counts['proc']
-    check.description = '%s. Released %s items and deleted %s items' % (check.summary, counts['released'], counts['deleted'])
-    return check
-
-
-@check_function()
-def purge_download_tracking_items(connection, **kwargs):
-    """
-    This check was originally created to take in any search through kwargs.
-    Changed to hardcode a search for tracking items, but it can easily
-    adapted; as it is, already handles recording for any number of item types.
-    Ensure search includes limit, field=uuid, and status=deleted
-    """
-    check = CheckResult(connection, 'purge_download_tracking_items')
-
-    # Don't run if staging deployment is running
-    # Only need to check if our env is data
-    # XXX: Removing for now as we find the check can never run without this
-    # if the staging deploy takes long enough or errors
-    # if connection.fs_env == 'data':
-    #     from ..app_utils import AppUtils
-    #     staging_conn = AppUtils().init_connection('staging')
-    #     staging_deploy = CheckResult(staging_conn, 'staging_deployment').get_primary_result()
-    #     if staging_deploy['status'] != 'PASS':
-    #         check.summary = 'Staging deployment is running - skipping'
-    #         return check
-
-    if Stage.is_stage_prod() is False:
-        check.summary = check.description = 'This check only runs on Foursight prod'
-        return check
-
-    time_limit = 270  # 4.5 minutes
-    t0 = time.time()
-    check.full_output = {}  # purged items by item type
-    search = '/search/?type=TrackingItem&tracking_type=download_tracking&status=deleted&field=uuid&limit=300'
-    search_res = ff_utils.search_metadata(search, key=connection.ff_keys)
-    search_uuids = [res['uuid'] for res in search_res]
-    client = es_utils.create_es_client(connection.ff_es, True)
-    # a bit convoluted, but we want the frame=raw, which does not include uuid
-    # use get_es_metadata to handle this. Use it as a generator
-    for to_purge in ff_utils.get_es_metadata(search_uuids, es_client=client, is_generator=True,
-                                             key=connection.ff_keys):
-        if round(time.time() - t0, 2) > time_limit:
-            break
-        purge_properties = to_purge['properties']
-        purge_properties['uuid'] = to_purge['uuid']  # add uuid to frame=raw
-        try:
-            purge_res = ff_utils.purge_metadata(to_purge['uuid'], key=connection.ff_keys)
-        except Exception as exc:
-            purge_status = 'error'
-            purge_detail = str(exc)
-        else:
-            purge_status = purge_res['status']
-            purge_detail = purge_properties if purge_status == 'success' else purge_res
-        purge_record = {'uuid': to_purge['uuid'], 'result': purge_detail}
-        if to_purge['item_type'] not in check.full_output:
-            check.full_output[to_purge['item_type']] = {}
-        if purge_status not in check.full_output[to_purge['item_type']]:
-            check.full_output[to_purge['item_type']][purge_status] = []
-        check.full_output[to_purge['item_type']][purge_status].append(purge_record)
-    purge_out_str = '. '.join(['%s: %s' % (it, len(check.full_output[it]['success']))
-                               for it in check.full_output if check.full_output[it].get('success')])
-    check.description = 'Purged: ' + purge_out_str + '. Search used: %s' % search
-    if any([it for it in check.full_output if check.full_output[it].get('error')]):
-        check.status = 'WARN'
-        check.summary = 'Some items failed to purge. See full output'
-    else:
-        check.status = 'PASS'
-        check.summary = 'Items purged successfully'
-    return check
-
-
-@check_function()
 def check_long_running_ec2s(connection, **kwargs):
     """
     Flag all ec2s that have been running for longer than 1 week (WARN) or 2 weeks
@@ -812,4 +556,39 @@ def check_long_running_ec2s(connection, **kwargs):
     else:
         check.status = 'PASS'
         check.summary = '%s EC2s running longer than 1 week' % (len(check.full_output))
+    return check
+
+
+@check_function()
+def snapshot_rds(connection, **kwargs):
+    check = CheckResult(connection, 'snapshot_rds')
+    if Stage.is_stage_prod() is False:
+        check.summary = check.description = 'This check only runs on Foursight prod'
+        return check
+    rds_name = os.environ.get('RDS_NAME')
+    if not rds_name:
+        check.status = 'FAIL'
+        check.summary = check.description = 'RDS_NAME not set in environment!'
+    else:
+        # kwargs['uuid'] is a timestamp
+        snap_time = datetime.datetime.strptime(kwargs['uuid'], "%Y-%m-%dT%H:%M:%S.%f").strftime("%Y-%m-%dT%H-%M-%S")
+        # snapshot ID can only have letters, numbers, and hyphens
+        snapshot_name = 'foursight-snapshot-%s-%s' % (rds_name, snap_time)
+        client = boto3.client('rds', region_name=ecs_utils.CGAP_ECS_REGION)  # TODO: make configurable
+        res = client.create_db_snapshot(
+                 DBSnapshotIdentifier=snapshot_name,
+                 DBInstanceIdentifier=rds_name
+        )
+        if not res.get('DBSnapshot'):
+            check.status = 'FAIL'
+            check.summary = check.description = (f'Something went wrong during snapshot creation'
+                                                 f' of {rds_name} with identifier {snapshot_name}')
+            check.full_output = res
+        else:
+            check.status = 'PASS'
+            # there is a datetime in the response that must be str formatted
+            res['DBSnapshot']['InstanceCreateTime'] = str(res['DBSnapshot']['InstanceCreateTime'])
+            check.full_output = res
+            check.summary = 'Snapshot successfully created'
+            check.description = 'Snapshot succesfully created with name: %s' % snapshot_name
     return check

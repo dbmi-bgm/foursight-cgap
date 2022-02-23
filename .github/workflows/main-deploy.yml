@@ -2,7 +2,7 @@
 
 name: deploy-prod
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -19,6 +19,8 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
+        with:
+          python-version: '3.6'
 
       - name: Build
         run: make build
@@ -36,5 +38,5 @@ jobs:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
           DEV_SECRET: ${{ secrets.DEV_SECRET }}
-        run: poetry run python -m deploy prod
+        run: poetry run python -m chalicelib.deploy prod
 

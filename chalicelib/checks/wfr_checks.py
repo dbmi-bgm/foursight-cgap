@@ -14,10 +14,12 @@ from .helpers.wfrset_utils import lambda_limit
 from .helpers.confchecks import *
 from .helpers.linecount_dicts import *
 
-#-----------------------------------------------------------
-#           Pipelines and Versions supported
-#-----------------------------------------------------------
-default_pipelines_to_run = ['WGS Trio v25', 'WGS Proband-only Cram v25', 'CNV v2']
+
+default_pipelines_to_run = ['CNV Germline v1', 'WGS Trio v26',
+    'WGS Proband-only Cram v26', 'WES Proband-only v26', 'WES Family v26', 'WES Trio v26',
+    'WGS Proband-only v26', 'WGS Family v26', 'WGS Trio v27', 'WGS Proband-only Cram v27',
+    'WES Proband-only v27', 'WES Family v27', 'WES Trio v27', 'WGS Proband-only v27',
+    'WGS Family v27', 'SV Germline v3', 'WGS Upstream GATK Proband v27']
 
 
 
@@ -457,7 +459,7 @@ def metawfrs_to_check_linecount(connection, **kwargs):
 @action_function()
 def line_count_test(connection, **kwargs):
     start = datetime.utcnow()
-    action = ActionResult(connection, 'run_metawfrs')
+    action = ActionResult(connection, 'line_count_test')
     action_logs = {'metawfrs_that_passed_linecount_test': [], 'metawfrs_that_failed_linecount_test': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
@@ -757,7 +759,7 @@ def spot_failed_metawfrs(connection, **kwargs):
 @action_function()
 def reset_spot_failed_metawfrs(connection, **kwargs):
     start = datetime.utcnow()
-    action = ActionResult(connection, 'spot_failed_metawfrs')
+    action = ActionResult(connection, 'reset_spot_failed_metawfrs')
     action_logs = {'runs_reset': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
@@ -870,7 +872,7 @@ def failed_metawfrs(connection, **kwargs):
 @action_function()
 def reset_failed_metawfrs(connection, **kwargs):
     start = datetime.utcnow()
-    action = ActionResult(connection, 'failed_metawfrs')
+    action = ActionResult(connection, 'reset_failed_metawfrs')
     action_logs = {'runs_reset': []}
     my_auth = connection.ff_keys
     env = connection.ff_env
@@ -1315,6 +1317,68 @@ def ingest_vcf_start(connection, **kwargs):
     action.output = action_logs
     action.status = 'DONE'
 
+    return action
+
+
+@check_function(file_accessions="")
+def check_vcf_ingestion_errors(connection, **kwargs):
+    """
+    Check for finding full annotated VCFs that have failed ingestion, so that they
+    can be reset and the ingestion rerun if needed.
+    """
+    check = CheckResult(connection, 'check_vcf_ingestion_errors')
+    accessions = [accession.strip() for accession in kwargs.get('file_accessions', '').split(',') if accession]
+    ingestion_error_search = 'search/?file_type=full+annotated+VCF&type=FileProcessed&file_ingestion_status=Error'
+    if accessions:
+        ingestion_error_search += '&accession='
+        ingestion_error_search += '&accession='.join(accessions)
+    ingestion_error_search += '&field=@id&field=file_ingestion_error'
+    results = ff_utils.search_metadata(ingestion_error_search, key=connection.ff_keys)
+    output = {}
+    for result in results:
+        if len(result.get('file_ingestion_error')) > 0:
+            # usually there are 100 errors, so just report first error, user can view item to see others
+            output[result['@id']] = result['file_ingestion_error'][0].get('body')
+    check.full_output = output
+    check.brief_output = list(output.keys())
+    if output:
+        check.status = 'WARN'
+        check.summary = f'{len(check.brief_output)} VCFs failed ingestion'
+        check.description = check.summary
+        check.allow_action = True
+        check.action = ''
+    else:
+        check.status = 'PASS'
+        check.summary = 'No VCFs found with ingestion errors'
+        check.description = check.summary
+    return check
+
+
+@action_function()
+def reset_vcf_ingestion_errors(connection, **kwargs):
+    """
+    Takes VCFs with ingestion errors, patches file_ingestion_status to 'N/A', and
+    removes file_ingestion_error property. This will allow ingestion to be retried.
+    """
+    action = ActionResult(connection, 'reset_vcf_ingestion_errors')
+    check_result_vcfs = action.get_associated_check_result(kwargs).get('brief_output', [])
+    action_logs = {'success': [], 'fail': {}}
+    for vcf in check_result_vcfs:
+        patch = {'file_ingestion_status': 'N/A'}
+        try:
+            resp = ff_utils.patch_metadata(patch, vcf + '?delete_fields=file_ingestion_error', key=connection.ff_keys)
+        except Exception as e:
+            action_logs['fail'][vcf] = str(e)
+        else:
+            if resp['status'] == 'success':
+                action_logs['success'].append(vcf)
+            else:
+                action_logs['fail'][vcf] = resp['status']
+    action.output = action_logs
+    if action_logs['fail']:
+        action.status = 'ERROR'
+    else:
+        action.status = 'DONE'
     return action
 
 
