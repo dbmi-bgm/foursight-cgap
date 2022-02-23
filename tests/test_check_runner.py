@@ -27,7 +27,9 @@ def captured_output():
 
 class TestCheckRunner:
     environ = DEV_ENV
-    set_stage('test')  # NOTE: this interaction is broken and needs to be refactored - Will Feb 23 2022
+    # NOTE: this interaction is broken and needs to be refactored.
+    # The integrated dev stage runner will not poll the test stage queues! - Will Feb 23 2022
+    set_stage('test')
     app_utils_obj = app_utils.AppUtils()
     connection = app_utils_obj.init_connection(environ)
     connection.connections['es'] = None  # disable es
@@ -243,7 +245,6 @@ class TestCheckRunner:
             assert ('post' in res_compare[check_name] and 'prior' in res_compare[check_name])
             assert (res_compare[check_name]['prior'] != res_compare[check_name]['post'])
 
-    @pytest.mark.common_fail
     def test_queue_check(self):
         """ This used to be an integrated test, but fails now due to changes in the structure
             of foursight (test stage here does not interact well because no test stage runner).
@@ -269,7 +270,6 @@ class TestCheckRunner:
         assert (run_check is not None)
         assert (run_check['kwargs']['uuid'] == run_uuid)
 
-    @pytest.mark.common_fail
     def test_queue_action(self):
         """ This used to be an integrated test, but fails now due to changes in the structure
             of foursight (test stage here does not interact well because no test stage runner).
