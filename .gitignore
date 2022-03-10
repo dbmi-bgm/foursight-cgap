@@ -27,3 +27,6 @@ requirements.txt
 
 # Vim
 *.swp
+
+# Flake8
+.flake8
