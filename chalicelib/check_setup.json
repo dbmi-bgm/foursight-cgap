@@ -5,7 +5,9 @@
         "schedule": {
             "hourly_checks": {
                 "all": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {
+                        "primary": true
+                    },
                     "dependencies": []
                 }
             }
@@ -14,12 +16,18 @@
     "indexing_progress": {
         "title": "Indexing progress",
         "group": "Elasticsearch checks",
-        "conditions": ["put_env"],
+        "conditions": [
+            "put_env"
+        ],
         "schedule": {
             "hourly_checks": {
                 "all": {
-                    "kwargs": {"primary": true},
-                    "dependencies": ["item_counts_by_type"]
+                    "kwargs": {
+                        "primary": true
+                    },
+                    "dependencies": [
+                        "item_counts_by_type"
+                    ]
                 }
             }
         }
@@ -27,17 +35,23 @@
     "elastic_beanstalk_health": {
         "title": "Elastic Beanstalk health",
         "group": "System checks",
-        "conditions": ["put_env"],
+        "conditions": [
+            "put_env"
+        ],
         "schedule": {
             "hourly_checks": {
                 "all": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {
+                        "primary": true
+                    },
                     "dependencies": []
                 }
             },
             "morning_checks": {
                 "all": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {
+                        "primary": true
+                    },
                     "dependencies": []
                 }
             }
@@ -46,11 +60,15 @@
     "status_of_elasticsearch_indices": {
         "title": "Status of elasticsearch indices",
         "group": "Elasticsearch checks",
-        "conditions": ["put_env"],
+        "conditions": [
+            "put_env"
+        ],
         "schedule": {
             "thirty_min_checks": {
                 "all": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {
+                        "primary": true
+                    },
                     "dependencies": []
                 }
             }
@@ -59,11 +77,15 @@
     "indexing_records": {
         "title": "Indexing records",
         "group": "Elasticsearch checks",
-        "conditions": ["put_env"],
+        "conditions": [
+            "put_env"
+        ],
         "schedule": {
             "thirty_min_checks": {
                 "all": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {
+                        "primary": true
+                    },
                     "dependencies": []
                 }
             }
@@ -75,7 +97,9 @@
         "schedule": {
             "morning_checks_2": {
                 "all": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {
+                        "primary": true
+                    },
                     "dependencies": []
                 }
             }
@@ -87,7 +111,9 @@
         "schedule": {
             "morning_checks": {
                 "all": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {
+                        "primary": true
+                    },
                     "dependencies": []
                 }
             }
@@ -99,7 +125,9 @@
         "schedule": {
             "morning_checks": {
                 "all": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {
+                        "primary": true
+                    },
                     "dependencies": []
                 }
             }
@@ -111,7 +139,9 @@
         "schedule": {
             "morning_checks": {
                 "all": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {
+                        "primary": true
+                    },
                     "dependencies": []
                 }
             }
@@ -123,7 +153,9 @@
         "schedule": {
             "fifteen_min_checks": {
                 "all": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {
+                        "primary": true
+                    },
                     "dependencies": []
                 }
             }
@@ -135,7 +167,9 @@
         "schedule": {
             "morning_checks": {
                 "all": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {
+                        "primary": true
+                    },
                     "dependencies": []
                 }
             }
@@ -147,91 +181,68 @@
         "schedule": {
             "monday_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {
+                        "primary": true
+                    },
                     "dependencies": []
                 }
             }
         }
     },
-    "metawfrs_to_run" : {
+    "metawfrs_to_run": {
         "title": "Metawfrs_to_run",
         "group": "Pipeline checks",
         "schedule": {
             "fifteen_min_checks_3": {
                 "cgap": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
+                    "kwargs": {
+                        "primary": true,
+                        "queue_action": "prod"
+                    },
                     "dependencies": []
                 }
             }
         }
     },
-    "metawfrs_to_checkstatus" : {
+    "metawfrs_to_checkstatus": {
         "title": "Metawfrs to check status",
         "group": "Pipeline checks",
         "schedule": {
             "fifteen_min_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
+                    "kwargs": {
+                        "primary": true,
+                        "queue_action": "prod"
+                    },
                     "dependencies": []
                 }
             }
         }
     },
-    "spot_failed_metawfrs" : {
+    "spot_failed_metawfrs": {
         "title": "Spot-failed Metawfrs",
         "group": "Pipeline checks",
         "schedule": {
             "fifteen_min_checks_2": {
                 "cgap": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
+                    "kwargs": {
+                        "primary": true,
+                        "queue_action": "prod"
+                    },
                     "dependencies": []
                 }
             }
         }
     },
-    "failed_metawfrs" : {
+    "failed_metawfrs": {
         "title": "Failed Metawfrs",
         "group": "Pipeline checks",
         "schedule": {
             "manual_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true},
-                    "dependencies": []
-                }
-            }
-        }
-    },
-    "metawfrs_to_patch_samples": {
-        "title": "Metawfrs to patch samples with processed files",
-        "group": "Pipeline checks",
-        "schedule": {
-            "hourly_checks_2": {
-                "cgap": {
-                    "kwargs": {"primary": true},
-                    "dependencies": []
-                }
-            }
-        }
-    },
-    "SNV_metawfrs_to_patch_sample_processing": {
-        "title": "SNV metawfrs to patch sample processing with processed files",
-        "group": "Pipeline checks",
-        "schedule": {
-            "hourly_checks_2": {
-                "cgap": {
-                    "kwargs": {"primary": true},
-                    "dependencies": []
-                }
-            }
-        }
-    },
-    "SV_metawfrs_to_patch_sample_processing": {
-        "title": "SV metawfrs to patch sample processing with processed files",
-        "group": "Pipeline checks",
-        "schedule": {
-            "hourly_checks_2": {
-                "cgap": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {
+                        "primary": true
+                    },
                     "dependencies": []
                 }
             }
@@ -243,31 +254,38 @@
         "schedule": {
             "hourly_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {
+                        "primary": true
+                    },
                     "dependencies": []
                 }
             }
         }
     },
-    "md5runCGAP_status" : {
+    "md5runCGAP_status": {
         "title": "a) md5 runs",
         "group": "Pipeline checks",
         "schedule": {
             "hourly_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
+                    "kwargs": {
+                        "primary": true,
+                        "queue_action": "prod"
+                    },
                     "dependencies": []
                 }
             }
         }
     },
-    "ingest_vcf_status" : {
+    "ingest_vcf_status": {
         "title": "d) CGAP trigger VCF ingestion",
         "group": "Pipeline checks",
         "schedule": {
             "hourly_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {
+                        "primary": true
+                    },
                     "dependencies": []
                 }
             }
@@ -279,54 +297,36 @@
         "schedule": {
             "morning_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true},
+                    "kwargs": {
+                        "primary": true
+                    },
                     "dependencies": []
                 }
             }
         }
     },
-    "problematic_wfrs_status" : {
-        "title": "x) Errored Runs",
-        "group": "Pipeline checks",
-        "schedule": {
-            "hourly_checks": {
-                "cgap": {
-                    "kwargs": {"primary": true},
-                    "dependencies": []
-                }
-            }
-        }
-    },
-    "long_running_wfrs_status" : {
-        "title": "x) Long Running Runs",
-        "group": "Pipeline checks",
-        "schedule": {
-            "hourly_checks": {
-                "cgap": {
-                    "kwargs": {"primary": true},
-                    "dependencies": []
-                }
-            }
-        }
-    },
-    "elastic_search_space" : {
+    "elastic_search_space": {
         "title": "ES Disk Space Check",
         "group": "Elasticsearch checks",
         "schedule": {
             "morning_checks": {
                 "all": {
-                    "kwargs" : {"primary": true}
+                    "kwargs": {
+                        "primary": true
+                    }
                 }
             }
         }
     },
-    "elasticsearch_s3_count_diff" : {
+    "elasticsearch_s3_count_diff": {
         "title": "S3/ES Check Count Differential",
         "group": "Elasticsearch checks",
-        "schedule" : {
+        "schedule": {
             "morning_checks": {
                 "cgap": {
-                    "kwargs": {"primary": true}
+                    "kwargs": {
+                        "primary": true
+                    }
                 }
             }
         }
@@ -357,17 +357,19 @@
             }
         }
     },
-    "clean_s3_es_checks" : {
+    "clean_s3_es_checks": {
         "title": "Wipe Checks Older Than One Month",
         "group": "System checks",
         "schedule": {},
-        "display": ["cgap"]
+        "display": [
+            "cgap"
+        ]
     },
     "wipe_cgap_build_indices": {
         "title": "Wipe CGAP build indices",
         "group": "System checks",
         "schedule": {
-             "morning_checks": {
+            "morning_checks": {
                 "cgap": {
                     "kwargs": {
                         "primary": true
@@ -376,7 +378,7 @@
             }
         }
     },
-    "core_project_status":{
+    "core_project_status": {
         "title": "Ensure CGAP Core project items are shared",
         "group": "Metadata checks",
         "schedule": {
@@ -384,10 +386,20 @@
                 "cgap": {
                     "kwargs": {
                         "primary": true,
-                        "item_type": ["VariantSample", "Case", "Family",
-                            "Individual", "WorkflowRun", "FileFastq",
-                            "FileProcessed", "Sample", "SampleProcessing",
-                            "Report", "QualityMetric", "FilterSet"]
+                        "item_type": [
+                            "VariantSample",
+                            "Case",
+                            "Family",
+                            "Individual",
+                            "WorkflowRun",
+                            "FileFastq",
+                            "FileProcessed",
+                            "Sample",
+                            "SampleProcessing",
+                            "Report",
+                            "QualityMetric",
+                            "FilterSet"
+                        ]
                     }
                 }
             }
@@ -405,7 +417,9 @@
                 }
             }
         },
-        "display": ["cgap"]
+        "display": [
+            "cgap"
+        ]
     },
     "scale_up_elasticsearch_production": {
         "title": "Scale up production ElasticSearch Cluster",
@@ -419,9 +433,11 @@
                 }
             }
         },
-        "display": ["cgap"]
+        "display": [
+            "cgap"
+        ]
     },
-    "update_variant_genelist":{
+    "update_variant_genelist": {
         "title": "Add gene lists to variants/variant samples",
         "group": "Metadata checks",
         "schedule": {

@@ -42,10 +42,6 @@ SPOT_FAILURE_DESCRIPTIONS = ["EC2 unintended termination", "EC2 Idle error"]
 # TODO: Figure out line_count check with Michele --> should really be a QualityMetric
 # produced by MWFR
 
-# TODO: File type changes need to be accounted for or reverted. Potentially can add new
-# property to FileProcessed to indicate file is to be ingested, used for HiGlass,
-# etc.
-
 
 def initialize_check(connection):
     """Create a CheckResult with default attributes."""
@@ -354,24 +350,35 @@ def metawfrs_to_check_linecount(connection, **kwargs):
     check.action = "line_count_test"
     check.description = "Find MetaWorkflowRuns that need linecount QC check."
 
+    meta_workflow_run_uuids = []
+    meta_workflow_run_titles = []
     my_auth = connection.ff_keys
-    query = (
-        "search/?type=MetaWorkflowRun&overall_qcs.name!=linecount_test"
-        "&final_status=completed&field=uuid&field=title"
+    query = (  # Overall QCs not empty but missing linecount
+        "search/?type=MetaWorkflowRun&final_status=completed&field=uuid&field=title"
+        "&overall_qcs.name!=linecount_test"
     )
-    need_linecount_test = ff_utils.search_metadata(query, key=my_auth)
-    metawfr_uuids = [r["uuid"] for r in need_linecount_test]
-    metawfr_titles = [r["title"] for r in need_linecount_test]
-    msg = "%s MetaWorkflowRuns may require line count checks." % len(
-        need_linecount_test
+    search_result = ff_utils.search_metadata(query, key=my_auth)
+    get_and_add_uuids(search_result, meta_workflow_run_uuids)
+    get_and_add_field(search_result, "title", meta_workflow_run_titles)
+    query = (  # No overall QCs
+        "search/?type=MetaWorkflowRun&final_status=completed&field=uuid&field=title"
+        "&overall_qcs=No+value"
+    )
+    search_result = ff_utils.search_metadata(query, key=my_auth)
+    get_and_add_uuids(search_result, meta_workflow_run_uuids)
+    get_and_add_field(search_result, "title", meta_workflow_run_titles)
+    msg = "%s MetaWorkflowRun(s) may require line count checks." % len(
+        meta_workflow_run_uuids
     )
     check.summary = msg
     check.brief_output.append(msg)
     check.status = "WARN"
     check.full_output["metawfrs_to_run"] = {
-        "titles": metawfr_titles,
-        "uuids": metawfr_uuids,
+        "titles": meta_workflow_run_titles,
+        "uuids": meta_workflow_run_uuids,
     }
+    if not meta_workflow_run_uuids:
+        check.allow_action = False
     return check
 
 
@@ -716,7 +723,7 @@ def failed_metawfrs(connection, meta_workflow_runs=None, **kwargs):
         search_response = ff_utils.search_metadata(query, key=connection.ff_keys)
         get_and_add_uuids(search_response, meta_workflow_run_uuids)
         get_and_add_field(search_response, "title", meta_workflow_run_titles)
-    msg = "%s MetaWorkflowRuns have failed WorkflowRuns to reset" % len(
+    msg = "%s MetaWorkflowRun(s) have failed WorkflowRuns to reset" % len(
         meta_workflow_run_uuids
     )
     check.summary = msg
@@ -781,6 +788,8 @@ def ingest_vcf_status(connection, start_date=None, file_accessions=None, **kwarg
     check.action = "ingest_vcf_start"
     check.description = "Find VCFs to ingest"
 
+    vcfs_to_ingest_uuids = []
+    vcfs_to_ingest_accessions = []
     env = connection.ff_env
     indexing_queue = ff_utils.stuff_in_queues(env, check_secondary=True)
     if indexing_queue:
@@ -789,29 +798,43 @@ def ingest_vcf_status(connection, start_date=None, file_accessions=None, **kwarg
         check.summary = msg
         check.allow_action = False
         return check
-    query = (
+    old_style_query = (
         "/search/?file_type=full+annotated+VCF&type=FileProcessed"
         "&file_ingestion_status=No value&file_ingestion_status=N/A"
         "&status!=uploading&status!=to be uploaded by workflow&status!=upload failed"
     )
+    new_style_query = (
+        "/search/?vcf_to_be_ingested=true&type=FileProcessed"
+        "&file_ingestion_status=No value&file_ingestion_status=N/A"
+        "&status!=uploading&status!=to be uploaded by workflow&status!=upload failed"
+    )
+    queries = [old_style_query, new_style_query]
     if start_date:
-        query += "&date_created.from=" + start_date
+        for idx, query in enumerate(queries):
+            query += "&date_created.from=" + start_date
+            queries[idx] = query
     if file_accessions:
         file_accessions = format_kwarg_list(file_accessions)
-        for an_acc in file_accessions:
-            query += "&accession={}".format(an_acc)
-    results = ff_utils.search_metadata(query, key=connection.ff_keys)
-    if not results:
+        for idx, query in enumerate(queries):
+            for an_acc in file_accessions:
+                query += "&accession={}".format(an_acc)
+            queries[idx] = query
+    for query in queries:
+        search_results = ff_utils.search_metadata(query, key=connection.ff_keys)
+        get_and_add_uuids(search_results, vcfs_to_ingest_uuids)
+        get_and_add_field(search_results, "accession", vcfs_to_ingest_accessions)
+    if not vcfs_to_ingest_uuids:
         check.summary = "All Good!"
         check.allow_action = False
         return check
-    msg = "{} files will be added to the ingestion_queue".format(str(len(results)))
-    files = [i["uuid"] for i in results]
+    msg = "{} file(s) will be added to the ingestion queue".format(
+        str(len(vcfs_to_ingest_uuids))
+    )
     check.brief_output.append(msg)
     check.summary = msg
     check.full_output = {
-        "files": files,
-        "accessions": [i["accession"] for i in results],
+        "files": vcfs_to_ingest_uuids,
+        "accessions": vcfs_to_ingest_accessions,
     }
     return check
 
@@ -862,7 +885,7 @@ def check_vcf_ingestion_errors(connection, file_accessions=None, **kwargs):
             # usually there are 100 errors, but just report first error here
             first_error = ingestion_errors[0].get("body")
         files_with_ingestion_errors[file_atid] = first_error
-    msg = "%s Files found with ingestion errors" % len(search_response)
+    msg = "%s File(s) found with ingestion errors" % len(search_response)
     check.brief_output.append(msg)
     check.summary = msg
     check.full_output = files_with_ingestion_errors
@@ -912,7 +935,7 @@ def find_meta_workflow_runs_requiring_output_linktos(connection, **kwargs):
     )
     search_response = ff_utils.search_metadata(query, key=connection.ff_keys)
     get_and_add_uuids(search_response, meta_workflow_runs)
-    msg = "%s MetaworkflowRuns found to PATCH output files" % len(meta_workflow_runs)
+    msg = "%s MetaworkflowRun(s) found to PATCH output files" % len(meta_workflow_runs)
     check.summary = msg
     check.brief_output.append(msg)
     check.full_output["meta_workflow_runs"] = meta_workflow_runs
@@ -1108,7 +1131,7 @@ def find_meta_workflow_runs_with_linkto_errors(
         )
         search = ff_utils.search_metadata(query, key=connection.ff_keys)
         get_and_add_uuids(search, meta_workflow_runs_found)
-    msg = "%s MetaWorkflowRuns found with errors for output file links" % len(
+    msg = "%s MetaWorkflowRun(s) found with errors for output file links" % len(
         meta_workflow_runs_found
     )
     check.summary = msg
@@ -1119,7 +1142,7 @@ def find_meta_workflow_runs_with_linkto_errors(
     else:
         check.allow_action = False
     if meta_workflow_runs_not_found:
-        msg = "%s MetaWorkflowRuns could not be found" % len(
+        msg = "%s MetaWorkflowRun(s) could not be found" % len(
             meta_workflow_runs_not_found
         )
         check.brief_output.append(msg)
@@ -1186,8 +1209,15 @@ def find_meta_workflow_runs_to_kill(
                 search_query, key=connection.ff_keys
             )
             get_and_add_uuids(search_results, meta_workflow_runs_to_kill)
+    if meta_workflow_uuids is None and meta_workflow_run_uuids is None:
+        query = (
+            "search/?type=MetaWorkflowRun&field=uuid"
+            + "".join(["&final_status=" + status for status in FINAL_STATUS_TO_KILL])
+        )
+        search_results = ff_utils.search_metadata(query, key=connection.ff_keys)
+        get_and_add_uuids(search_results, meta_workflow_runs_to_kill)
     meta_workflow_runs_to_kill = list(set(meta_workflow_runs_to_kill))
-    msg = "%s MetaWorkflowRuns found to stop" % len(meta_workflow_runs_to_kill)
+    msg = "%s MetaWorkflowRun(s) found to stop" % len(meta_workflow_runs_to_kill)
     check.summary = msg
     check.brief_output.append(msg)
     check.full_output["found"] = meta_workflow_runs_to_kill
@@ -1246,15 +1276,15 @@ def find_sample_processing_for_meta_workflow(
     check.action = "create_meta_workflow_runs_for_items"
 
     sample_processings_for_meta_workflow = []
-    meta_workflow = None
-    meta_workflow_found, _ = validate_items_existence(meta_workflow, connection)
-    if meta_workflow_found:
-        meta_workflow_properties = meta_workflow_found[0]  # Only 1 MWF expected
-        meta_workflow_name = meta_workflow_properties.get("name")
-        meta_workflow = meta_workflow_properties.get("uuid")
-        msg = "MetaWorkflow found: %s" % meta_workflow_name
-        check.brief_output.append(msg)
-        check.full_output["meta_workflow"] = meta_workflow
+    if meta_workflow:
+        meta_workflow_found, _ = validate_items_existence(meta_workflow, connection)
+        if meta_workflow_found:
+            meta_workflow_properties = meta_workflow_found[0]  # Only 1 MWF expected
+            meta_workflow_name = meta_workflow_properties.get("name")
+            meta_workflow = meta_workflow_properties.get("uuid")
+            msg = "MetaWorkflow found: %s" % meta_workflow_name
+            check.brief_output.append(msg)
+            check.full_output["meta_workflow"] = meta_workflow
     else:
         msg = "MetaWorkflow not found: %s" % meta_workflow
         check.brief_output.append(msg)
@@ -1275,18 +1305,16 @@ def find_sample_processing_for_meta_workflow(
                 sample_processings_for_meta_workflow.append(sample_processing)
             else:
                 cases_without_sample_processing.append(case_uuid)
-        msg = "%s Cases were found" % len(cases_found)
+        msg = "%s Case(s) found" % len(cases_found)
         check.brief_output.append(msg)
         check.full_output["cases_found"] = cases_found
         if cases_not_found:
-            not_found_uuids = []
-            get_and_add_uuids(cases_not_found, not_found_uuids)
-            msg = "%s Cases were not found" % len(cases_not_found)
+            msg = "%s Case(s) not found" % len(cases_not_found)
             check.status = "WARN"
             check.brief_output.append(msg)
             check.full_output["cases_not_found"] = cases_not_found
         if cases_without_sample_processing:
-            msg = "%s Cases lacked a SampleProcessing" % len(
+            msg = "%s Case(s) lacked a SampleProcessing" % len(
                 cases_without_sample_processing
             )
             check.status = "WARN"
@@ -1300,18 +1328,18 @@ def find_sample_processing_for_meta_workflow(
         found, not_found = validate_items_existence(sample_processings, connection)
         get_and_add_uuids(found, sample_processings_found)
         sample_processings_for_meta_workflow += sample_processings_found
-        msg = "%s SampleProcessings were found" % len(sample_processings_found)
+        msg = "%s SampleProcessing(s) were found" % len(sample_processings_found)
         check.brief_output.append(msg)
         check.full_output["sample_processings_found"] = sample_processings_found
         if not_found:
-            msg = "%s SampleProcessings were not found" % len(not_found)
+            msg = "%s SampleProcessing(s) not found" % len(not_found)
             check.status = "WARN"
             check.brief_output.append(msg)
             check.full_output["sample_processings_not_found"] = not_found
     sample_processings_for_meta_workflow = list(
         set(sample_processings_for_meta_workflow)
     )
-    msg = "%s SampleProcessings found to use for MetaWorkflowRun creation" % len(
+    msg = "%s SampleProcessing(s) found to use for MetaWorkflowRun creation" % len(
         sample_processings_for_meta_workflow
     )
     check.brief_output.append(msg)
@@ -1319,8 +1347,8 @@ def find_sample_processing_for_meta_workflow(
         "sample_processing_for_meta_workflow"
     ] = sample_processings_for_meta_workflow
     if sample_processings_for_meta_workflow and meta_workflow:
-        msg = "Action will create %s MetaWorkflowRuns for MetaWorkflow %s" % (
-            len(sample_processings),
+        msg = "Action will create %s MetaWorkflowRun(s) for MetaWorkflow %s" % (
+            len(sample_processings_for_meta_workflow),
             meta_workflow,
         )
         check.brief_output.append(msg)
@@ -1394,7 +1422,7 @@ def find_meta_workflow_runs_with_quality_metric_failure(
     else:
         check.allow_action = False
     if meta_workflow_runs_not_found:
-        msg = "%s MetaWorkflowRuns could not be found" % len(
+        msg = "%s MetaWorkflowRun(s) could not be found" % len(
             meta_workflow_runs_not_found
         )
         check.brief_output.append(msg)
@@ -1402,7 +1430,7 @@ def find_meta_workflow_runs_with_quality_metric_failure(
     return check
 
 
-@action_function
+@action_function()
 def ignore_quality_metric_failure_for_meta_workflow_run(connection, **kwargs):
     """Ignore output QualityMetric failures on MetaWorkflowRuns to
     allow MetaWorkflowRuns to continue.
