@@ -650,7 +650,8 @@ def reset_spot_failed_metawfrs(connection, **kwargs):
                 workflow_run_name = workflow_run.get("name")
                 if workflow_run_status == "failed":
                     query = (
-                        "/search/?type=WorkflowRunAwsem&awsem_job_id=%s"
+                        "/search/?type=WorkflowRunAwsem&field=description"
+                        "&awsem_job_id=%s"
                         % workflow_run_jobid
                     )
                     search_response = ff_utils.search_metadata(
@@ -717,7 +718,7 @@ def failed_metawfrs(connection, meta_workflow_runs=None, **kwargs):
         get_and_add_field(found, "title", meta_workflow_run_titles)
         meta_workflow_runs_not_found += not_found
     else:
-        query = "/search/?type=MetaWorkflowRun" + "".join(
+        query = "/search/?type=MetaWorkflowRun&field=uuid&field=title" + "".join(
             ["&final_status=" + st for st in FINAL_STATUS_TO_RESET]
         )
         search_response = ff_utils.search_metadata(query, key=connection.ff_keys)
