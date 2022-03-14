@@ -190,7 +190,7 @@
         }
     },
     "metawfrs_to_run": {
-        "title": "Metawfrs_to_run",
+        "title": "MetaWorkflowRuns to run",
         "group": "Pipeline checks",
         "schedule": {
             "fifteen_min_checks_3": {
@@ -205,7 +205,7 @@
         }
     },
     "metawfrs_to_checkstatus": {
-        "title": "Metawfrs to check status",
+        "title": "MetaWorkflowRuns to check status",
         "group": "Pipeline checks",
         "schedule": {
             "fifteen_min_checks": {
@@ -220,7 +220,7 @@
         }
     },
     "spot_failed_metawfrs": {
-        "title": "Spot-failed Metawfrs",
+        "title": "Spot-failed MetaWorkflowRuns",
         "group": "Pipeline checks",
         "schedule": {
             "fifteen_min_checks_2": {
@@ -235,7 +235,7 @@
         }
     },
     "failed_metawfrs": {
-        "title": "Failed Metawfrs",
+        "title": "Failed MetaWorkflowRuns",
         "group": "Pipeline checks",
         "schedule": {
             "manual_checks": {
@@ -249,7 +249,7 @@
         }
     },
     "metawfrs_to_check_linecount": {
-        "title": "Metawfrs to run line count qc",
+        "title": "MetaWorkflowRuns for line count qc",
         "group": "Pipeline checks",
         "schedule": {
             "hourly_checks": {
@@ -262,8 +262,74 @@
             }
         }
     },
+    "find_meta_workflow_runs_requiring_output_linktos": {
+        "title": "MetaWorkflowRuns for output file PATCHes",
+        "group": "Pipeline checks",
+        "schedule": {
+            "hourly_checks": {
+                "cgap": {
+                    "kwargs": {
+                        "primary": true,
+                        "queue_action": "prod"
+                    }
+                }
+            }
+        }
+    },
+    "find_meta_workflow_runs_with_linkto_errors": {
+        "title": "MetaWorkflowRuns with output file PATCH errors",
+        "group": "Pipeline checks",
+        "schedule": {
+            "morning_checks": {
+                "cgap": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
+        }
+    },
+    "find_meta_workflow_runs_to_kill": {
+        "title": "MetaWorkflowRuns to stop",
+        "group": "Pipeline checks",
+        "schedule": {
+            "manual_checks": {
+                "cgap": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
+        }
+    },
+    "find_sample_processing_for_meta_workflow": {
+        "title": "Create MetaWorkflowRun",
+        "group": "Pipeline checks",
+        "schedule": {
+            "manual_checks": {
+                "cgap": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
+        }
+    },
+    "find_meta_workflow_runs_with_quality_metric_failure": {
+        "title": "MetaWorkflowRuns with QC failure(s)",
+        "group": "Pipeline checks",
+        "schedule": {
+            "hourly_checks": {
+                "cgap": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
+        }
+    },
     "md5runCGAP_status": {
-        "title": "a) md5 runs",
+        "title": "Files for MD5 runs",
         "group": "Pipeline checks",
         "schedule": {
             "hourly_checks": {
@@ -278,7 +344,7 @@
         }
     },
     "ingest_vcf_status": {
-        "title": "d) CGAP trigger VCF ingestion",
+        "title": "VCFs to ingest",
         "group": "Pipeline checks",
         "schedule": {
             "hourly_checks": {

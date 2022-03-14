@@ -842,7 +842,7 @@ def ingest_vcf_status(connection, start_date=None, file_accessions=None, **kwarg
 @action_function()
 def ingest_vcf_start(connection, **kwargs):
     """POST VCF UUIDs to ingestion endpoint."""
-    action, check_result = initialize_action(connection, **kwargs)
+    action, check_result = initialize_action(connection, kwargs)
 
     my_auth = connection.ff_keys
     targets = check_result["files"]
@@ -855,7 +855,7 @@ def ingest_vcf_start(connection, **kwargs):
     return action
 
 
-@check_function(file_accessions="")
+@check_function(file_accessions=None)
 def check_vcf_ingestion_errors(connection, file_accessions=None, **kwargs):
     """
     Check for finding full annotated VCFs that have failed ingestion, so that they
