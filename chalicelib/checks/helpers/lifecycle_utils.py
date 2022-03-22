@@ -13,23 +13,36 @@ lifecycle_status = {
 }
 
 default_lifecycle_policy = {
-    "final_bam": {
-        "move_to_ia_after": 0,
-        "move_to_da_after": 3,
+    "result": {
+        "move_to_infrequent_access_after": 0,
+        "move_to_deep_archive_after": 3,
+        "expire_after": 36,
+    },
+    "persistent_result": {
+        "move_to_infrequent_access_after": 0,
         "expire_after": 36,
     },
     "reads": {
-        "move_to_da_after": 0,
+        "move_to_deep_archive_after": 0,
         "expire_after": 12,
     },
     "intermediate_output": {
         "expire_after": 0,
     },
     "intermediate_result": {
-        "move_to_da_after": 0,
+        "move_to_deep_archive_after": 0,
         "expire_after": 36,
     },
 }
+
+
+
+
+
+
+
+
+
 
 
 # TODO To implement
@@ -57,7 +70,7 @@ def get_lifecycle_category(file_metadata):
     if file_format in ["fastq", "cram"]:
         return "reads"
     elif file_format in ["bam"] and file_type == "alignments":
-        return "final_bam"
+        return "result"
     elif file_format in ["bam"] and file_type == "intermediate file":
         return "intermediate_output"
     else:
@@ -114,17 +127,17 @@ def get_lifecycle_status(file_metadata, file_lifecycle_policy):
 
 
 def map_lifecycle_policy_to_status(policy_category):
-    """Converts a lifecycle policy category (e.g. "move_to_da_after") to the corresponding status (e.g. "da").
+    """Converts a lifecycle policy category (e.g. "move_to_deep_archive_after") to the corresponding status (e.g. "da").
 
     Args:
-        policy_category(string): lifecycle policy category (e.g. "move_to_da_after")
+        policy_category(string): lifecycle policy category (e.g. "move_to_deep_archive_after")
 
     Returns:
         A string : lifecylce status (defaults to "standard")
     """
-    if policy_category == "move_to_ia_after":
+    if policy_category == "move_to_infrequent_access_after":
         return "ia"
-    elif policy_category == "move_to_da_after":
+    elif policy_category == "move_to_deep_archive_after":
         return "da"
     elif policy_category == "expire_after":
         return "deleted"
