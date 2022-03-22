@@ -1,24 +1,12 @@
 {
     
-    "md5runCGAP_status" : {
-        "title": "a) md5 runs",
-        "group": "Pipeline checks",
-        "schedule": {
-            "hourly_checks": {
-                "cgap": {
-                    "kwargs": {"primary": true, "queue_action": "prod"},
-                    "dependencies": []
-                }
-            }
-        }
-    },
-    
+
     "check_metawfrs_lifecycle_status": {
         "title": "Check for files that require lifecycle updates",
         "group": "Metadata checks",
         "schedule": {
             "hourly_checks": {
-                "cgap": {
+                "all": {
                     "kwargs": {
                         "metawfrs_per_run": 5, 
                         "max_checking_frequency": 7
