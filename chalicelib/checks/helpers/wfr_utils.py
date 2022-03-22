@@ -759,10 +759,9 @@ def extract_file_info(obj_uuid, arg_name, additional_parameters):
 
 
 def run_missing_wfr(input_json, input_files_and_params, run_name, auth, env, sfn):
+    """Create workflow run and execute with Tibanna"""
     all_inputs = []
-    # input_files container
     input_files = {k: v for k, v in input_files_and_params.items() if k != 'additional_file_parameters'}
-    # additional input file parameters
     input_file_parameters = input_files_and_params.get('additional_file_parameters', {})
     for arg, files in input_files.items():
         additional_params = input_file_parameters.get(arg, {})
@@ -770,13 +769,11 @@ def run_missing_wfr(input_json, input_files_and_params, run_name, auth, env, sfn
         all_inputs.append(inp)
     # tweak to get bg2bw working
     all_inputs = sorted(all_inputs, key=itemgetter('workflow_argument_name'))
-    print("all_inputs=%s" % str(all_inputs))
     # shorten long name_tags
     # they get combined with workflow name, and total should be less then 80
     # (even less since repeats need unique names)
     if len(run_name) > 30:
         run_name = run_name[:30] + '...'
-    """Creates the trigger json that is used by tibanna."""
     input_json['input_files'] = all_inputs
     input_json["_tibanna"] = {
         "env": env,
@@ -784,11 +781,8 @@ def run_missing_wfr(input_json, input_files_and_params, run_name, auth, env, sfn
         "run_id": run_name
     }
     input_json['public_postrun_json'] = True
-    print("input_json=" + str(input_json))
     try:
-        #e = ff_utils.post_metadata(input_json, 'WorkflowRun/run', key=auth)
         res = API().run_workflow(input_json, sfn=sfn, verbose=False)
-        print("run_workflow res=" + str(res))
         url = res['_tibanna']['url']
         return url
     except Exception as e:
