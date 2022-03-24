@@ -7,7 +7,7 @@ from .wfrset_utils import (
     # use wf_dict in workflow version check to make sure latest version and workflow uuid matches
     wf_dict,
     step_settings,
-    lambda_limit
+    LAMBDA_LIMIT,
 )
 
 
