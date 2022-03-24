@@ -6,7 +6,7 @@ from magma_ff import reset_metawfr, run_metawfr, status_metawfr
 from magma_ff.create_metawfr import MetaWorkflowRunFromSampleProcessing
 from pipeline_utils.check_lines import check_lines, fastqs_dict
 
-from . import constants
+from .helpers import constants
 from .helpers import wfr_utils
 from .helpers.confchecks import action_function, check_function
 from .helpers.linecount_dicts import CNV_dict, proband_SNV_dict, trio_SNV_dict
