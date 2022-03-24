@@ -1,5 +1,5 @@
 # lambda limit
-LAMDBA_LIMIT = 800
+LAMBDA_LIMIT = 800
 
 # Step Settings
 mapper = {'human': 'GRCh38',
