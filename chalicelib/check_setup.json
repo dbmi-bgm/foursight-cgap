@@ -133,6 +133,22 @@
             "<env-name>"
         ]
     },
+    "workflow_run_has_deleted_input_file": {
+        "title": "WorkflowRun linked to deleted Files",
+        "group": "Metadata Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
     "check_suggested_enum_values": {
         "title": "Check fields with suggested enum",
         "group": "Metadata Checks",
@@ -149,184 +165,8 @@
             "<env-name>"
         ]
     },
-    "ingest_vcf_status": {
-        "title": "d) CGAP trigger VCF ingestion",
-        "group": "Pipeline Checks",
-        "schedule": {
-            "hourly_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true
-                    }
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
-    "elastic_search_space": {
-        "title": "ES Disk Space Check",
-        "group": "Elasticsearch Checks",
-        "schedule": {
-            "manual_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true
-                    }
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
-    "elasticsearch_s3_count_diff": {
-        "title": "S3/ES Check Count Differential",
-        "group": "Elasticsearch Checks",
-        "schedule": {
-            "morning_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true
-                    }
-                }
-            }
-        }
-    },
-    "clean_s3_es_checks": {
-        "title": "Wipe Checks Older Than One Month",
-        "group": "System Checks",
-        "schedule": {
-            "manual_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true
-                    }
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
-    "core_project_status": {
-        "title": "Ensure CGAP Core project items are shared",
-        "group": "Metadata Checks",
-        "schedule": {
-            "morning_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true,
-                        "item_type": [
-                            "VariantSample",
-                            "Case",
-                            "Family",
-                            "Individual",
-                            "WorkflowRun",
-                            "FileFastq",
-                            "FileProcessed",
-                            "Sample",
-                            "SampleProcessing",
-                            "Report",
-                            "QualityMetric",
-                            "FilterSet"
-                        ]
-                    }
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
-    "workflow_run_has_deleted_input_file": {
-        "title": "WorkflowRun linked to deleted Files",
-        "group": "Metadata Checks",
-        "schedule": {
-            "manual_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true
-                    },
-                    "dependencies": []
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
-    "update_variant_genelist": {
-        "title": "Add gene lists to variants/variant samples",
-        "group": "Metadata Checks",
-        "schedule": {
-            "manual_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true,
-                        "queue_action": "prod"
-                    }
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
-    "long_running_wfrs_status": {
-        "title": "x) Long Running Runs",
-        "group": "Pipeline Checks",
-        "schedule": {
-            "manual_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true
-                    },
-                    "dependencies": []
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
-    "ecs_status": {
-        "title": "ECS Status",
-        "group": "ECS Checks",
-        "schedule": {
-            "manual_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true
-                    },
-                    "dependencies": []
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
-    "update_ecs_application_versions": {
-        "title": "Update ECS Cluster Application Versions",
-        "group": "ECS Checks",
-        "schedule": {
-            "manual_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true
-                    },
-                    "dependencies": []
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
     "metawfrs_to_run": {
-        "title": "Metawfrs_to_run",
+        "title": "Metawfrs to run",
         "group": "Pipeline Checks",
         "schedule": {
             "fifteen_min_checks_3": {
@@ -355,8 +195,8 @@
             }
         }
     },
-    "failed_metawfrs": {
-        "title": "Failed Metawfrs",
+    "spot_failed_metawfrs": {
+        "title": "Spot-failed Metawfrs",
         "group": "Pipeline Checks",
         "schedule": {
             "fifteen_min_checks_2": {
@@ -370,15 +210,14 @@
             }
         }
     },
-    "spot_failed_metawfrs": {
-        "title": "Spot-failed Metawfrs",
+    "failed_metawfrs": {
+        "title": "Failed Metawfrs",
         "group": "Pipeline Checks",
         "schedule": {
-            "fifteen_min_checks_2": {
+            "manual_checks": {
                 "<env-name>": {
                     "kwargs": {
-                        "primary": true,
-                        "queue_action": "prod"
+                        "primary": true
                     },
                     "dependencies": []
                 }
@@ -446,10 +285,25 @@
         }
     },
     "md5runCGAP_status": {
-        "title": "a) md5 runs",
+        "title": "MD5 runs",
         "group": "Pipeline Checks",
         "schedule": {
             "hourly_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true,
+                        "queue_action": "prod"
+                    },
+                    "dependencies": []
+                }
+            }
+        }
+    },
+    "ingest_vcf_status": {
+        "title": "Trigger VCF ingestion",
+        "group": "Pipeline Checks",
+        "schedule": {
+            "manual_checks": {
                 "<env-name>": {
                     "kwargs": {
                         "primary": true
@@ -457,11 +311,78 @@
                     "dependencies": []
                 }
             }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "check_vcf_ingestion_errors": {
+        "title": "Check VCFs for ingestion errors",
+        "group": "Pipeline Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "long_running_wfrs_status": {
+        "title": "Long Running Runs",
+        "group": "Pipeline Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "elastic_search_space": {
+        "title": "ES Disk Space Check",
+        "group": "Elasticsearch Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "elasticsearch_s3_count_diff": {
+        "title": "S3/ES Check Count Differential",
+        "group": "Elasticsearch Checks",
+        "schedule": {
+            "morning_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
         }
     },
-    "get_metadata_for_cases_to_clone": {
-        "title": "Get Clone Case Metadata",
-        "group": "Metadata Checks",
+    "clean_s3_es_checks": {
+        "title": "Wipe Checks Older Than One Month",
+        "group": "System Checks",
         "schedule": {
             "manual_checks": {
                 "<env-name>": {
@@ -481,6 +402,105 @@
         "group": "System Checks",
         "schedule": {
             "monthly_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "core_project_status": {
+        "title": "Ensure CGAP Core project items are shared",
+        "group": "Metadata Checks",
+        "schedule": {
+            "morning_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true,
+                        "queue_action": "prod",
+                        "item_type": [
+                            "VariantSample",
+                            "Case",
+                            "Family",
+                            "Individual",
+                            "WorkflowRun",
+                            "FileFastq",
+                            "FileProcessed",
+                            "Sample",
+                            "SampleProcessing",
+                            "Report",
+                            "QualityMetric",
+                            "FilterSet"
+                        ]
+                    }
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "update_variant_genelist": {
+        "title": "Add gene lists to variants/variant samples",
+        "group": "Metadata Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true,
+                        "queue_action": "prod"
+                    }
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "get_metadata_for_cases_to_clone": {
+        "title": "Get Clone Case Metadata",
+        "group": "Metadata Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "ecs_status": {
+        "title": "ECS Status",
+        "group": "ECS Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "update_ecs_application_versions": {
+        "title": "Update ECS Cluster Application Versions",
+        "group": "ECS Checks",
+        "schedule": {
+            "manual_checks": {
                 "<env-name>": {
                     "kwargs": {
                         "primary": true
