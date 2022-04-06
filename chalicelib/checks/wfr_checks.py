@@ -390,7 +390,7 @@ def run_metawfrs(connection, **kwargs):
     success = []
     error = {}
     env = connection.ff_env
-    step_function_name = get_step_function_name(env)
+    step_function_name = get_step_function_name(connection)
     meta_workflow_runs = check_result.get("meta_workflow_runs", {})
     meta_workflow_run_uuids = meta_workflow_runs.get("uuids", [])
     random.shuffle(meta_workflow_run_uuids)  # Ensure later ones hit within time limits
@@ -608,7 +608,7 @@ def failed_metawfrs(connection, meta_workflow_runs=None, **kwargs):
     else:
         meta_workflow_runs_found.search_final_status(FINAL_STATUS_TO_RESET)
     msg = "%s MetaWorkflowRun(s) have failed WorkflowRuns to reset" % len(
-        meta_workflow_runs.uuids
+        meta_workflow_runs_found.uuids
     )
     check.summary = msg
     check.brief_output.append(msg)
@@ -1094,7 +1094,7 @@ def find_meta_workflow_runs_to_kill(
     """Find MetaWorkflowRuns to stop (won't be picked up by other
     MetaWorkflowRun checks/actions).
     """
-    check = initialize_check(connection)
+    check = initialize_check("find_meta_workflow_runs_to_kill", connection)
     check.description = "Find MetaWorkflowRuns to stop further checks/actions"
     check.action = "kill_meta_workflow_runs"
 
@@ -1144,7 +1144,7 @@ def kill_meta_workflow_runs(connection, **kwargs):
 
     success = []
     error = {}
-    meta_workflow_runs_to_patch = check_result["found"]
+    meta_workflow_runs_to_patch = check_result["meta_workflow_runs"]
     patch_body = {"final_status": "stopped"}
     for meta_workflow_run_uuid in meta_workflow_runs_to_patch:
         try:
@@ -1176,7 +1176,7 @@ def find_sample_processing_for_meta_workflow(
     """Find SampleProcessing items and MetaWorkflow to create new
     MetaWorkflowRun.
     """
-    check = initialize_check(connection)
+    check = initialize_check("find_sample_processing_for_meta_workflow", connection)
     check.description = (
         "Find SampleProcessing items and MetaWorkflow to create new MetaWorkflowRuns"
     )

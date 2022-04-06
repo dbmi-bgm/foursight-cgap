@@ -1,5 +1,5 @@
-import datetime
 import json
+from datetime import datetime
 
 from dcicutils import ff_utils
 
@@ -89,7 +89,7 @@ def make_embed_request(ids, fields, connection):
     id_chunks = chunk_ids(ids)
     for id_chunk in id_chunks:
         post_body = {"ids": ids, "fields": fields}
-        endpoint = connection.ff_server + "embed"
+        endpoint = connection.ff_server + "/embed"
         embed_response = ff_utils.authorized_request(
             endpoint, verb="POST", auth=connection.ff_keys, data=json.dumps(post_body)
         ).json()
