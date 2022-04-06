@@ -272,22 +272,6 @@
             "<env-name>"
         ]
     },
-    "metawfrs_to_check_linecount": {
-        "title": "Metawfrs to run line count qc",
-        "group": "Pipeline Checks",
-        "schedule": {
-            "manual_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true
-                    }
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
     "find_sample_processing_for_meta_workflow": {
         "title": "Create MetaWorkflowRun",
         "group": "Pipeline Checks",
