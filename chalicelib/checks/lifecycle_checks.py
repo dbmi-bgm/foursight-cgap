@@ -45,6 +45,7 @@ def check_metawfrs_lifecycle_status(connection, **kwargs):
     max_checking_frequency = kwargs.get("max_checking_frequency", 7)
     print(num_metawfrs_in_portal, num_metawfrs_to_check)
 
+    # Get {num_metawfrs_to_check} random MetaWorkflowRuns
     limit = str(num_metawfrs_to_check)
     search_from = str(random.randint(0, num_metawfrs_in_portal))
     search_from = str(78)

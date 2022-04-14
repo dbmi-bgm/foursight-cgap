@@ -1,5 +1,6 @@
-#FOURSIGHT_PREFIX = 'foursight-cgap'
-FOURSIGHT_PREFIX = 'cgap-biotest-main-foursight-envs'
+from os.path import dirname, join
+
+FOURSIGHT_PREFIX = 'foursight-cgap'
 DEV_ENV = 'cgap'
-#HOST = 'https://search-foursight-fourfront-ylxn33a5qytswm63z52uytgkm4.us-east-1.es.amazonaws.com'
-HOST = 'https://vpc-es-cgap-wolf-nzizh2u7cygiokkxxnar4te2tu.us-east-1.es.amazonaws.com:443'
+HOST = 'https://search-foursight-fourfront-ylxn33a5qytswm63z52uytgkm4.us-east-1.es.amazonaws.com'
+CHECK_SETUP_FILE = join(dirname(__file__), "check_setup.json")
