@@ -89,7 +89,7 @@
         "title": "Pages with bad routes",
         "group": "Audit Checks",
         "schedule": {
-            "manual_checks": {
+            "monthly_checks": {
                 "<env-name>": {
                     "kwargs": {
                         "primary": true
@@ -121,7 +121,7 @@
         "title": "Search for Validation Errors",
         "group": "Audit Checks",
         "schedule": {
-            "manual_checks": {
+            "monthly_checks": {
                 "<env-name>": {
                     "kwargs": {
                         "primary": true
@@ -374,7 +374,7 @@
         "title": "S3/ES Check Count Differential",
         "group": "Elasticsearch Checks",
         "schedule": {
-            "morning_checks": {
+            "monthly_checks": {
                 "<env-name>": {
                     "kwargs": {
                         "primary": true
@@ -405,6 +405,23 @@
         "group": "System Checks",
         "schedule": {
             "monthly_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "secondary_queue_deduplication": {
+        "title": "Secondary queue deduplication",
+        "group": "System Checks",
+        "schedule": {
+            "manual_checks": {
                 "<env-name>": {
                     "kwargs": {
                         "primary": true
@@ -449,10 +466,10 @@
         ]
     },
     "update_variant_genelist": {
-        "title": "Add gene lists to variants/variant samples",
+        "title": "Add gene lists to variant samples",
         "group": "Metadata Checks",
         "schedule": {
-            "manual_checks": {
+            "morning_checks": {
                 "<env-name>": {
                     "kwargs": {
                         "primary": true,
