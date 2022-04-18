@@ -1025,6 +1025,7 @@ def add_grouped_with_file_relation(connection, **kwargs):
     action.output = action_logs
     return action
 
+
 @check_function(item_type=['VariantSample'])
 def core_project_status(connection, **kwargs):
     """
@@ -1069,6 +1070,7 @@ def core_project_status(connection, **kwargs):
                              ' {}'.format(item_type))
     return check
 
+
 @action_function()
 def share_core_project(connection, **kwargs):
     """
@@ -1101,6 +1103,7 @@ def share_core_project(connection, **kwargs):
         action.status = 'DONE'
     action.output = action_logs
     return action
+
 
 @check_function(days_back=1.02)
 def update_variant_genelist(connection, **kwargs):
@@ -1182,6 +1185,7 @@ def update_variant_genelist(connection, **kwargs):
         )
         check.description = check.summary
     return check
+
 
 @action_function()
 def queue_variants_to_update_genelist(connection, **kwargs):

@@ -24,3 +24,9 @@ requirements.txt
 
 # PyCharm
 .idea/
+
+# Flake8
+.flake8
+
+# Vim
+*.swp
