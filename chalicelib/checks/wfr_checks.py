@@ -485,7 +485,7 @@ def spot_failed_metawfrs(connection, **kwargs):
     )
 
     meta_workflow_runs = MetaWorkflowRunsFound(connection)
-    meta_workflow_runs.search_final_status(FINAL_STATUS_TO_CHECK)
+    meta_workflow_runs.search_final_status(FINAL_STATUS_TO_RESET)
     msg = "%s MetaWorkflowRun(s) may have spot-failed WorkflowRuns to reset" % len(
         meta_workflow_runs.uuids
     )
