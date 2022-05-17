@@ -48,21 +48,25 @@ def check_metawfrs_lifecycle_status(connection, **kwargs):
     # Get {num_metawfrs_to_check} random MetaWorkflowRuns
     limit = str(num_metawfrs_to_check)
     search_from = str(random.randint(0, num_metawfrs_in_portal))
-    search_from = str(10)
+    search_from = str(50)
+    limit = str(1)
     search_metawfrs = (
         "/search/?type=MetaWorkflowRun" + "&limit=" + limit + "&from=" + search_from
     )
     result_metawfrs = ff_utils.search_metadata(search_metawfrs, key=my_auth)
     print(search_metawfrs)
-
+    #print(result_metawfrs)
+    import pdb; pdb.set_trace()
     # This will contain the metawfr that have been processed and require meta data updates
     metawfrs_to_update = []
+    metawfrs_not_being_checked = []
     files_without_lifecycle_category = []
     files_to_update = []
 
     for metawfr in result_metawfrs:
-
+        print(metawfr['uuid'])
         if not lifecycle_utils.should_mwfr_be_checked(metawfr, max_checking_frequency):
+            metawfrs_not_being_checked.append(metawfr['uuid'])
             continue
 
         lifecycle_policy = lifecycle_utils.default_lifecycle_policy
@@ -86,7 +90,8 @@ def check_metawfrs_lifecycle_status(connection, **kwargs):
             for file in input["files"]:
                 file_info = file["file"]
                 all_files.append({
-                    "uuid": file_info["uuid"]
+                    "uuid": file_info["uuid"],
+                    "metawfr_uuid": metawfr["uuid"],
                 })
 
         for workflow in metawfr["workflow_runs"]:
@@ -99,7 +104,8 @@ def check_metawfrs_lifecycle_status(connection, **kwargs):
                 file_info = file["file"]
                 all_files.append({
                     "uuid": file_info["uuid"],
-                    "wf_name": wf_name
+                    "wf_name": wf_name,
+                    "metawfr_uuid": metawfr["uuid"],
                 })
 
         # The lifecycle status of the metawfr will be "pending" if there exists an associated file
@@ -107,6 +113,7 @@ def check_metawfrs_lifecycle_status(connection, **kwargs):
         metawfr_lifecycle_status = lifecycle_utils.COMPLETE
 
         for file in all_files:
+            pdb.set_trace()
             file_metadata = ff_utils.get_metadata(file["uuid"], key=my_auth)
 
             # This is a best guess of the lifecycle category.
@@ -122,7 +129,7 @@ def check_metawfrs_lifecycle_status(connection, **kwargs):
 
             if not file_lifecycle_category:
                 check.status = "WARN"
-                check.warning = "Could not assign a lifecycle category to some files."
+                check.warning = "Could not assign a lifecycle category to some files. Is the custom_pf field set correctly in the MetaWorkflow?"
                 files_without_lifecycle_category.append(file)
                 metawfr_lifecycle_status = lifecycle_utils.PENDING
             else:
@@ -172,6 +179,7 @@ def check_metawfrs_lifecycle_status(connection, **kwargs):
     check.summary = f'{len(files_to_update)} files in {len(metawfrs_to_update)} MetaWorkflowRuns require patching.'
 
     check.full_output = {
+        "metawfrs_not_being_checked": metawfrs_not_being_checked,
         "metawfrs_to_update": metawfrs_to_update,
         "files_without_lifecycle_category": files_without_lifecycle_category,
         "files_to_update": files_to_update,

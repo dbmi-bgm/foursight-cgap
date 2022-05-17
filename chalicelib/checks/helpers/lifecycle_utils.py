@@ -5,12 +5,15 @@ import pprint
 
 pp = pprint.PrettyPrinter(indent=2)
 
-# Schema constants
+## Schema constants ##
+
+# lifecycle categories
 RESULT = "result"
 PERSISTENT_RESULT = "persistent_result"
 READS = "reads"
 INTERMEDIATE_OUTPUT = "intermediate_output"
 INTERMEDIATE_RESULT = "intermediate_result"
+
 MOVE_TO_INFREQUENT_ACCESS_AFTER = "move_to_infrequent_access_after"
 MOVE_TO_DEEP_ARCHIVE_AFTER = "move_to_deep_archive_after"
 EXPIRE_AFTER = "expire_after"
@@ -22,12 +25,6 @@ IGNORE = "ignore"
 PENDING = "pending"
 COMPLETE = "complete"
 
-# lifecycle_status = {
-#     "standard": "Standard",
-#     "ia": "Infrequent Access",
-#     "da": "Deep Archive",
-#     "deleted": "Deleted",
-# }
 
 default_lifecycle_policy = {
     RESULT: {
@@ -71,10 +68,11 @@ def should_mwfr_be_checked(metawfr, max_checking_frequency):
     if metawfr["final_status"] not in valid_final_status:
         return False
 
-    # Check when the MWFR has been created. If it is younger than 2 weeks, don't check it
+    # Check when the MWFR has been last modified. If it has benn less than 2 weeks, don't check it
     now = datetime.utcnow()
-    date_created = convert_es_timestamp_to_datetime(metawfr["date_created"])
-    metawfr_age = now - date_created
+    date_last_mod = metawfr["last_modified"]["date_modified"]
+    date_last_mod = convert_es_timestamp_to_datetime(date_last_mod)
+    metawfr_age = now - date_last_mod
     if metawfr_age.total_seconds() < 14 * 24 * 60 * 60:
         return False
 
@@ -92,6 +90,8 @@ def should_mwfr_be_checked(metawfr, max_checking_frequency):
 
         if status == "pending":
             return True
+    else:
+        return True
 
     return False
 
