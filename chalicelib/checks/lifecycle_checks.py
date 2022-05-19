@@ -44,21 +44,21 @@ def check_file_lifecycle_status(connection, **kwargs):
     # We only want to get files from the portal that have a lifecycle category set and have either never been checked
     # or previously checked sufficiently long ago - as far as I know this can't be combined into one query. Furthermore,
     # they should be at least {first_check_after} days old
-    treshold_date_fca = datetime.date.today() - datetime.timedelta(first_check_after)
-    treshold_date_fca = treshold_date_fca.strftime("%Y-%m-%d")
-    treshold_date_mcf = datetime.date.today() - datetime.timedelta(max_checking_frequency)
-    treshold_date_mcf = treshold_date_mcf.strftime("%Y-%m-%d")
+    threshold_date_fca = datetime.date.today() - datetime.timedelta(first_check_after)
+    threshold_date_fca = threshold_date_fca.strftime("%Y-%m-%d")
+    threshold_date_mcf = datetime.date.today() - datetime.timedelta(max_checking_frequency)
+    threshold_date_mcf = threshold_date_mcf.strftime("%Y-%m-%d")
 
     search_query_base = (
         "/search/?type=FileProcessed&type=FileFastq"
         "&s3_lifecycle_category%21=No+value"
-        f"&last_modified.date_modified.to={treshold_date_fca}"
+        f"&date_created.to={threshold_date_fca}"
         "&status=uploaded"
         "&status=archived"
         "&status=shared"
         f"&limit={num_files_to_check // 2}"
         )
-    search_query_1 = f"{search_query_base}&s3_lifecycle_last_checked.to={treshold_date_mcf}"
+    search_query_1 = f"{search_query_base}&s3_lifecycle_last_checked.to={threshold_date_mcf}"
     search_query_2 = f"{search_query_base}&s3_lifecycle_last_checked=No+value"
 
     all_files = ff_utils.search_metadata(search_query_1, key=my_auth)
