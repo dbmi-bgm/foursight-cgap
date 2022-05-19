@@ -15,174 +15,131 @@ from .helpers.confchecks import *
 pp = pprint.PrettyPrinter(indent=2)
 
 
-@check_function(metawfrs_per_run=5, max_checking_frequency=7)
-def check_metawfrs_lifecycle_status(connection, **kwargs):
+@check_function(files_per_run=100, first_check_after=14, max_checking_frequency=14)
+def check_file_lifecycle_status(connection, **kwargs):
     """
-    Inspect metaworkflow runs and find files whose lifecycle status needs patching.
+    Inspect and find files whose lifecycle status need patching.
     Additional argumements:
-    metawfrs_per_run (int): determines how many metawfrs to check at once. Default: 5
-    max_checking_frequency (int): determines how often a metawfr is checked at most (in days). Default 7 (days).
+    files_per_run (int): determines how many files to check at once. Default: 20
+    first_check_after (int): number of days after upload of a file, when lifecycle status starts to be checked
+    max_checking_frequency (int): determines how often a file is checked at most (in days). Default 14 (days).
     """
 
-    check = CheckResult(connection, "check_metawfrs_lifecycle_status")
+    check = CheckResult(connection, "check_file_lifecycle_status")
     my_auth = connection.ff_keys
     check.action = "patch_file_lifecycle_status"
     check.description = (
-        "Inspect metaworkflow runs and find files whose lifecycle status needs patching"
+        "Inspect and find files whose lifecycle status need patching"
     )
     check.summary = ""
     check.full_output = {}
     check.status = "PASS"
 
-    # check indexing queue
-    env = connection.ff_env
-
-    counts_info = ff_utils.get_counts_page(ff_env=env)
-    counts_info_metawfrs = counts_info["db_es_compare"]["MetaWorkflowRun"]
-    num_metawfrs_in_portal = int(counts_info_metawfrs.split()[1])
-    num_metawfrs_to_check = kwargs.get("metawfrs_per_run", 5)
-    max_checking_frequency = kwargs.get("max_checking_frequency", 7)
-    print("num_metawfrs_in_portal", num_metawfrs_in_portal)
-    print("num_metawfrs_to_check", num_metawfrs_to_check)
-
-    # Get {num_metawfrs_to_check} random MetaWorkflowRuns
-    limit = str(num_metawfrs_to_check)
-    search_from = str(random.randint(0, num_metawfrs_in_portal))
-    search_from = str(50)
-    limit = str(1)
-    search_metawfrs = (
-        "/search/?type=MetaWorkflowRun" + "&limit=" + limit + "&from=" + search_from
-    )
-    result_metawfrs = ff_utils.search_metadata(search_metawfrs, key=my_auth)
-    print(search_metawfrs)
-    #print(result_metawfrs)
     import pdb; pdb.set_trace()
-    # This will contain the metawfr that have been processed and require meta data updates
-    metawfrs_to_update = []
-    metawfrs_not_being_checked = []
-    files_without_lifecycle_category = []
-    files_to_update = []
 
-    for metawfr in result_metawfrs:
-        print(metawfr['uuid'])
-        if not lifecycle_utils.should_mwfr_be_checked(metawfr, max_checking_frequency):
-            metawfrs_not_being_checked.append(metawfr['uuid'])
+    num_files_to_check = kwargs.get("files_per_run", 100)
+    first_check_after = kwargs.get("first_check_after", 14)
+    max_checking_frequency = kwargs.get("max_checking_frequency", 14)
+
+    # We only want to get files from the portal that have a lifecycle category set and have either never been checked
+    # or previously checked sufficiently long ago - as far as I know this can't be combined into one query. Furthermore,
+    # they should be at least {first_check_after} days old
+    treshold_date_fca = datetime.date.today() - datetime.timedelta(first_check_after)
+    treshold_date_fca = treshold_date_fca.strftime("%Y-%m-%d")
+    treshold_date_mcf = datetime.date.today() - datetime.timedelta(max_checking_frequency)
+    treshold_date_mcf = treshold_date_mcf.strftime("%Y-%m-%d")
+
+    search_query_base = (
+        "/search/?type=FileProcessed&type=FileFastq"
+        "&s3_lifecycle_category%21=No+value"
+        f"&last_modified.date_modified.to={treshold_date_fca}"
+        "&status=uploaded"
+        "&status=archived"
+        "&status=shared"
+        f"&limit={num_files_to_check // 2}"
+        )
+    search_query_1 = f"{search_query_base}&s3_lifecycle_last_checked.to={treshold_date_mcf}"
+    search_query_2 = f"{search_query_base}&s3_lifecycle_last_checked=No+value"
+
+    all_files = ff_utils.search_metadata(search_query_1, key=my_auth)
+    all_files = all_files + ff_utils.search_metadata(search_query_2, key=my_auth)
+        
+    # This will contain the files that require lifecycle updates  
+    files_to_update = []
+    files_not_being_checked = []
+    logs = []
+
+    # This dict will contain all the lifecycle policies per project that are relevant
+    # for the current set of files. "project.lifecycle_policy" is not embedded in the File
+    # item and we want to retrieve the project metadata only once for each project.
+    lifecycle_policies_by_project = {}
+
+    for file in all_files:
+        file_uuid = file['uuid']
+        print(file_uuid)
+
+        if file["s3_lifecycle_category"] == lifecycle_utils.IGNORE:
+            files_not_being_checked.append(file_uuid)
             continue
 
-        lifecycle_policy = lifecycle_utils.default_lifecycle_policy
-        if "lifecycle_policy" in metawfr["project"]:
-            lifecycle_policy = metawfr["project"]["lifecycle_policy"]
-
-        # Information about the lifecycle categories of workflow files
-        # can be found in the meta workflow (custom_pf_field of each workflow)
-        meta_workflow_uuid = metawfr["meta_workflow"]["uuid"]
-        meta_workflow = ff_utils.get_metadata(meta_workflow_uuid, key=my_auth)
-
-        # This dict contains information about the output file lifecycle category of a workflow
-        wf_lc_map = lifecycle_utils.get_workflow_lifecycle_category_map(meta_workflow)
-
-        # we are collecting all files that are connected to the metawfr and then check if they need updating
-        all_files = []
-
-        for input in metawfr["input"]:
-            if input["argument_type"] != "file":
-                continue
-            for file in input["files"]:
-                file_info = file["file"]
-                all_files.append({
-                    "uuid": file_info["uuid"],
-                    "metawfr_uuid": metawfr["uuid"],
-                })
-
-        for workflow in metawfr["workflow_runs"]:
-            if "output" not in workflow:
-                continue
-            wf_name = workflow["name"]
-            for file in workflow["output"]:
-                if "file" not in file:
-                    continue
-                file_info = file["file"]
-                all_files.append({
-                    "uuid": file_info["uuid"],
-                    "wf_name": wf_name,
-                    "metawfr_uuid": metawfr["uuid"],
-                })
-
-        # The lifecycle status of the metawfr will be "pending" if there exists an associated file
-        # that is not deleted or ignored
-        metawfr_lifecycle_status = lifecycle_utils.COMPLETE
-
-        for file in all_files:
-            pdb.set_trace()
-            file_metadata = ff_utils.get_metadata(file["uuid"], key=my_auth)
-
-            # This is a best guess of the lifecycle category.
-            # Input files don't have their lifecycle category stored in the metadata,
-            # therefore we have to rely on this function for those
-            file_lifecycle_category = lifecycle_utils.get_lifecycle_category(file_metadata)
-
-            # If we deal with a workflow output file, try to replace the lifecycle category with the one
-            # attached to the corresponding metadata.
-            wf_name = file.get("wf_name")
-            if wf_name:
-                file_lifecycle_category = wf_lc_map.get(wf_name)
-
-            if not file_lifecycle_category:
-                check.status = "WARN"
-                check.warning = "Could not assign a lifecycle category to some files. Is the custom_pf field set correctly in the MetaWorkflow?"
-                files_without_lifecycle_category.append(file)
-                metawfr_lifecycle_status = lifecycle_utils.PENDING
+        # Get the correct lifecylce policy - load it from the metadata only once
+        project_uuid = file["project"]["uuid"]
+        if project_uuid not in lifecycle_policies_by_project:
+            project = ff_utils.get_metadata(project_uuid, key=my_auth)
+            if "lifecycle_policy" in project:
+                lifecycle_policies_by_project[project_uuid] = project["lifecycle_policy"]
             else:
-                old_file_lifecycle_status = file_metadata.get("s3_lifecycle_status")
-                if old_file_lifecycle_status == lifecycle_utils.IGNORE:
-                    continue
-                
-                file_lifecycle_policy = lifecycle_policy.get(file_lifecycle_category)
-                new_file_lifecycle_status = lifecycle_utils.get_file_lifecycle_status(
-                    file_metadata, file_lifecycle_policy
-                )
+                lifecycle_policies_by_project[project_uuid] = lifecycle_utils.default_lifecycle_policy
 
-                if new_file_lifecycle_status != lifecycle_utils.DELETED:
-                    metawfr_lifecycle_status = lifecycle_utils.PENDING
+        lifecycle_policy = lifecycle_policies_by_project[project_uuid]
 
-                if old_file_lifecycle_status != new_file_lifecycle_status:
-                    update_dict = {
-                            "uuid": file_metadata["uuid"],
-                            "upload_key": file_metadata["upload_key"],
-                            "old_lifecycle_status": old_file_lifecycle_status,
-                            "new_lifecycle_status": new_file_lifecycle_status,
-                            "metawfr_uuid": metawfr["uuid"], 
-                            "is_extra_file": False
-                        }
-                    files_to_update.append(update_dict)
+        file_lifecycle_category = file["s3_lifecycle_category"] # e.g. "long_term_archive"
+        if file_lifecycle_category not in lifecycle_policy:
+            check.status = "WARN"
+            check.warning = "Some files have unknown lifecycle categories. Check logs."
+            logs.append(f'File {file_uuid} has an unknown lifecycle category {file_lifecycle_category}')
+            continue
 
-                    # Get extra files and update those as well. They will be treated like the original file
-                    extra_files = file_metadata.get("extra_files")
-                    for ef in extra_files:
-                        ef_update_dict = update_dict.copy()
-                        ef_update_dict["upload_key"] = ef["upload_key"]
-                        ef_update_dict["is_extra_file"] = True
-                        files_to_update.append(ef_update_dict)
-                        
+        # This contains the applicable rules for the current file, e.g., {MOVE_TO_DEEP_ARCHIVE_AFTER: 0, EXPIRE_AFTER: 12}
+        file_lifecycle_policy = lifecycle_policy[file_lifecycle_category]
 
-        # Update the lifecycle status of the metawfr itself. It has status "pending" until 
-        # all files associated with it have been deleted or can be ignored.
-        now_es = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f")
-        metawfrs_to_update.append(
-            {
-                "uuid": metawfr["uuid"],
-                "new_lifecycle_status": metawfr_lifecycle_status,
-                "last_checked": now_es
-            }
-        )
+        file_old_lifecycle_status = file["s3_lifecycle_status"]
+        file_new_lifecycle_status = lifecycle_utils.get_file_lifecycle_status(file, file_lifecycle_policy)
 
-    check.summary = f'{len(files_to_update)} files in {len(metawfrs_to_update)} MetaWorkflowRuns require patching.'
+        #Check that the new storage class is indeed "deeper" than the old one. We can't transfer files to more accessible storage classes
+        file_old_lifecycle_status_int = lifecycle_utils.lifecycle_status_to_int(file_old_lifecycle_status)
+        file_new_lifecycle_status_int = lifecycle_utils.lifecycle_status_to_int(file_new_lifecycle_status)
+        if(file_old_lifecycle_status_int > file_new_lifecycle_status_int):
+            check.status = "WARN"
+            check.warning = "Unsupported storage class transition for some file. Check logs"
+            logs.append(f'File {file_uuid} wants to transition from {file_old_lifecycle_status} to {file_new_lifecycle_status}')
+            continue
+
+        if file_old_lifecycle_status != file_new_lifecycle_status:
+            update_dict = {
+                    "uuid": file_uuid,
+                    "upload_key": file["upload_key"],
+                    "old_lifecycle_status": file_old_lifecycle_status,
+                    "new_lifecycle_status": file_new_lifecycle_status,
+                    "is_extra_file": False
+                }
+            files_to_update.append(update_dict)
+
+            # Get extra files and update those as well. They will be treated like the original file
+            extra_files = file.get("extra_files")
+            for ef in extra_files:
+                ef_update_dict = update_dict.copy()
+                ef_update_dict["upload_key"] = ef["upload_key"]
+                ef_update_dict["is_extra_file"] = True
+                files_to_update.append(ef_update_dict)
+
+
+    check.summary = f'{len(files_to_update)} files require patching.'
 
     check.full_output = {
-        "metawfrs_not_being_checked": metawfrs_not_being_checked,
-        "metawfrs_to_update": metawfrs_to_update,
-        "files_without_lifecycle_category": files_without_lifecycle_category,
         "files_to_update": files_to_update,
+        "files_not_being_checked": files_not_being_checked,
+        "logs": logs
     }
 
     return check
@@ -202,60 +159,49 @@ def patch_file_lifecycle_status(connection, **kwargs):
     check_output = check_result.get('full_output', {})
     action_logs = {}
     action_logs['check_output'] = check_output
-    action_logs['patched_metawfrs'] = []
     action_logs['patched_files'] = []
     action_logs['error'] = []
 
     files = check_output.get('files_to_update', [])
-    metawfrs = check_output.get('metawfrs_to_update', [])
 
-    for metawfr_dict in metawfrs:
-        metawfr_uuid = metawfr_dict["uuid"]
-        metawfr_files = [f for f in files if f['metawfr_uuid'] == metawfr_uuid]
-        
-        for metawfr_file in metawfr_files:
-            f_uuid = metawfr_file["uuid"]
-            f_upload_key = metawfr_file["upload_key"]
-            f_ols = metawfr_file["old_lifecycle_status"]
-            f_nls = metawfr_file["new_lifecycle_status"]
-            f_is_extra = metawfr_file["is_extra_file"]
+    for file in files:
+        uuid = file["uuid"]
+        upload_key = file["upload_key"]
+        old_lifecycle_status = file["old_lifecycle_status"]
+        new_lifecycle_status = file["new_lifecycle_status"]
+        is_extra_file = file["is_extra_file"]
 
-            # Before tagging the file, we need to verify that it actually exists on S3. However, the correct
-            # bucket cannot be easily inferred from the file meta data currently. Most files will be
-            # in the out_bucket.
-            f_bucket = None 
-            if my_s3_util.does_key_exist(f_upload_key, bucket=out_bucket, print_error=False):
-                f_bucket = out_bucket
-            elif my_s3_util.does_key_exist(f_upload_key, bucket=raw_bucket, print_error=False):
-                f_bucket = raw_bucket
-            if not f_bucket:
-                action_logs['error'].append(f'Cannot patch file {f_uuid}: not found on S3')
-                continue
-
-            try:
-                if not f_is_extra:
-                    ff_utils.patch_metadata({'s3_lifecycle_status': f_nls}, f_uuid, key=my_auth)
-                s3_tag = lifecycle_utils.lifecycle_status_to_s3_tag(f_nls)
-                if s3_tag:
-                    my_s3_util.set_object_tags(f_upload_key, f_bucket, s3_tag, replace_tags=True)
-                else: 
-                    raise Exception("Could not determine S3 tag")
-                action_logs['patched_files'].append(f'Lifecycle status of file {f_uuid} changed from {f_ols} to {f_nls}')
-            
-            except Exception as e:
-                action_logs['error'].append(f'Error patching or tagging file {f_uuid}: {str(e)}')
-                continue
+        # Before tagging the file, we need to verify that it actually exists on S3. However, the correct
+        # bucket cannot be easily inferred from the file meta data currently. Most files will be
+        # in the out_bucket.
+        file_bucket = None 
+        if my_s3_util.does_key_exist(upload_key, bucket=out_bucket, print_error=False):
+            file_bucket = out_bucket
+        elif my_s3_util.does_key_exist(upload_key, bucket=raw_bucket, print_error=False):
+            file_bucket = raw_bucket
+        if not file_bucket:
+            action_logs['error'].append(f'Cannot patch file {uuid}: not found on S3')
+            continue
 
         try:
-            updated_mwfr_lifecycle_status = {
-                "status": metawfr_dict["new_lifecycle_status"],
-                "last_checked": metawfr_dict["last_checked"],
-            }
-            ff_utils.patch_metadata({'lifecycle_status': updated_mwfr_lifecycle_status}, metawfr_uuid, key=my_auth)
-            action_logs['patched_metawfrs'].append(metawfr_uuid)
-
+            if not is_extra_file:
+                today = datetime.date.today().strftime("%Y-%m-%d")
+                file_status = lifecycle_utils.lifecycle_status_to_file_status[new_lifecycle_status]
+                patch_dict = {
+                    's3_lifecycle_status': new_lifecycle_status,
+                    's3_lifecycle_last_checked': today,
+                    'status': file_status
+                }
+                ff_utils.patch_metadata(patch_dict, uuid, key=my_auth)
+            s3_tag = lifecycle_utils.lifecycle_status_to_s3_tag(new_lifecycle_status)
+            if s3_tag:
+                my_s3_util.set_object_tags(upload_key, file_bucket, s3_tag, replace_tags=True)
+            else: 
+                raise Exception("Could not determine S3 tag")
+            action_logs['patched_files'].append(f'Lifecycle status of file {uuid} changed from {old_lifecycle_status} to {new_lifecycle_status}')
+        
         except Exception as e:
-            action_logs['error'].append(f'Error patching MetaWorkflowRun {metawfr_uuid}: {str(e)}')
+            action_logs['error'].append(f'Error patching or tagging file {uuid}: {str(e)}')
             continue
 
     action.output = action_logs

@@ -8,156 +8,85 @@ pp = pprint.PrettyPrinter(indent=2)
 ## Schema constants ##
 
 # lifecycle categories
-RESULT = "result"
-PERSISTENT_RESULT = "persistent_result"
-READS = "reads"
-INTERMEDIATE_OUTPUT = "intermediate_output"
-INTERMEDIATE_RESULT = "intermediate_result"
+SHORT_TERM_ACCESS_LONG_TERM_ARCHIVE = "short_term_access_long_term_archive"
+LONG_TERM_ACCESS_LONG_TERM_ARCHIVE = "long_term_access_long_term_archive"
+LONG_TERM_ACCESS = "long_term_access"
+SHORT_TERM_ACCESS = "short_term_access"
+LONG_TERM_ARCHIVE = "long_term_archive"
+SHORT_TERM_ARCHIVE = "short_term_archive"
+NO_STORAGE = "no_storage"
+IGNORE = "ignore"
+
 
 MOVE_TO_INFREQUENT_ACCESS_AFTER = "move_to_infrequent_access_after"
+MOVE_TO_GLACIER_AFTER = "move_to_glacier_after"
 MOVE_TO_DEEP_ARCHIVE_AFTER = "move_to_deep_archive_after"
 EXPIRE_AFTER = "expire_after"
 STANDARD = "standard"
 INFREQUENT_ACCESS = "infrequent access"
+GLACIER = "glacier"
 DEEP_ARCHIVE = "deep archive"
 DELETED = "deleted"
-IGNORE = "ignore"
 PENDING = "pending"
 COMPLETE = "complete"
+UPLOADED = "uploaded"
+ARCHIVED = "archived"
 
 
 default_lifecycle_policy = {
-    RESULT: {
+    SHORT_TERM_ACCESS_LONG_TERM_ARCHIVE: {
         MOVE_TO_INFREQUENT_ACCESS_AFTER: 0,
         MOVE_TO_DEEP_ARCHIVE_AFTER: 3,
         EXPIRE_AFTER: 36,
     },
-    PERSISTENT_RESULT: {
+    LONG_TERM_ACCESS_LONG_TERM_ARCHIVE: {
+        MOVE_TO_INFREQUENT_ACCESS_AFTER: 0,
+        MOVE_TO_DEEP_ARCHIVE_AFTER: 12,
+        EXPIRE_AFTER: 36,
+    },
+    SHORT_TERM_ACCESS: {
+        MOVE_TO_INFREQUENT_ACCESS_AFTER: 0,
+        EXPIRE_AFTER: 12,
+    },
+    LONG_TERM_ACCESS: {
         MOVE_TO_INFREQUENT_ACCESS_AFTER: 0,
         EXPIRE_AFTER: 36,
     },
-    READS: {
+    SHORT_TERM_ARCHIVE: {
         MOVE_TO_DEEP_ARCHIVE_AFTER: 0,
         EXPIRE_AFTER: 12,
     },
-    INTERMEDIATE_OUTPUT: {
-        EXPIRE_AFTER: 0,
-    },
-    INTERMEDIATE_RESULT: {
+    LONG_TERM_ARCHIVE: {
         MOVE_TO_DEEP_ARCHIVE_AFTER: 0,
         EXPIRE_AFTER: 36,
     },
+    NO_STORAGE: {
+        EXPIRE_AFTER: 0,
+    },
+}
+
+lifecycle_status_to_file_status = {
+    STANDARD: UPLOADED,
+    INFREQUENT_ACCESS: UPLOADED,
+    GLACIER: ARCHIVED,
+    DEEP_ARCHIVE: ARCHIVED,
+    DELETED: DELETED
 }
 
 
-
-
-
-def should_mwfr_be_checked(metawfr, max_checking_frequency):
-    """This function determines if a MetaWorkflowRun should be checked for lifecycle updates
-
-    Args:
-        metawfr(dict): MetaWorkflowRun from portal
-        max_checking_frequency (int): determines how often a metawfr is checked at most (in days). Default 7 (days).
-
-    Returns:
-        boolean
-    """
-    # TODO: Add stopped, inactive here as well?
-    valid_final_status = ["completed"]  # Only these are checked in the following
-    if metawfr["final_status"] not in valid_final_status:
-        return False
-
-    # Check when the MWFR has been last modified. If it has benn less than 2 weeks, don't check it
-    now = datetime.utcnow()
-    date_last_mod = metawfr["last_modified"]["date_modified"]
-    date_last_mod = convert_es_timestamp_to_datetime(date_last_mod)
-    metawfr_age = now - date_last_mod
-    if metawfr_age.total_seconds() < 14 * 24 * 60 * 60:
-        return False
-
-    # If lifecycle_status is present, the metawfr was been checked before.
-    # Make sure enough time passed to check it again
-    # TODO Check the following, once the metatdata is there
-    if "lifecycle_status" in metawfr:
-        metawfr_lifecycle_info = metawfr["lifecycle_status"]
-        last_checked = convert_es_timestamp_to_datetime(metawfr_lifecycle_info["last_checked"])
-        status = metawfr_lifecycle_info["status"]
-        delta = now - last_checked
-        # check this metawfr at most every {max_checking_frequency} days
-        if delta.total_seconds() < max_checking_frequency * 24 * 60 * 60:
-            return False
-
-        if status == "pending":
-            return True
-    else:
-        return True
-
-    return False
-
-
-
-def get_lifecycle_category(file_metadata):
-    """This function assigns a lifecycle category to to a given file. 
-    It is currently only working for certain types of files and return None for all other files
-
-    Args:
-        file_metadata(dict): file metadata from portal
-
-    Returns:
-        A string : lifecylce category (defaults to None)
-    """
-    file_format = file_metadata.get("file_format").get("file_format")
-    file_type = file_metadata.get("file_type")
-    if file_format in ["fastq", "cram"]:
-        return READS
-    elif file_format in ["bam"] and file_type == "alignments":
-        return RESULT
-    elif file_format in ["bam"] and file_type == "intermediate file":
-        return INTERMEDIATE_OUTPUT
-    else:
-        return None
-
-
-def get_workflow_lifecycle_category_map(meta_workflow):
-    """This function extracts a mapping "workflow name -> lifecycle category" from a meta workflow
-    as stored in the custom PF field of the workflow. This category represents the lifecycle category
-    of the output files of the corresponding workflow
-
-    Args:
-        meta_workflow(dict): meta workflow from portal
-
-    Returns:
-        dict : mapping workflow name -> output files lifecycle category
-    """
-    workflows = meta_workflow.get("workflows")
-    #pp.pprint(workflows)
-    mapping = {}
-
-    for workflow in workflows:
-        if "custom_pf_fields" not in workflow:
-            continue
-        custom_pf_fields = workflow["custom_pf_fields"]
-        if "output_files_lifecycle_catgory" not in custom_pf_fields:
-            continue
-        mapping[workflow["name"]] = custom_pf_fields["output_files_lifecycle_catgory"]
-
-    return mapping
-
-
-def get_file_lifecycle_status(file_metadata, file_lifecycle_policy):
+def get_file_lifecycle_status(file, file_lifecycle_policy):
     """This function returns the correct lifecycle status for a given file, i.e.
        which S3 storage class it should currently be in.
 
     Args:
-        file_metadata(dict) : file meta data from portal
+        file(dict) : file meta data from portal
         file_lifecycle_policy (dict) : Policy for that file, e.g. {MOVE_TO_DEEP_ARCHIVE_AFTER: 0, EXPIRE_AFTER: 12}
 
     Returns:
         string : correct lifecycle status of file given its lifecycle policy and age
     """
 
-    date_created = convert_es_timestamp_to_datetime(file_metadata.get("date_created"))
+    date_created = convert_es_timestamp_to_datetime(file.get("date_created"))
     now = datetime.utcnow()
     # We are using the file creation for simplicity, we should use the time from when the workflow run
     # completed successfully. We asssume that those dates are sufficiently close.
@@ -181,6 +110,8 @@ def lifecycle_policy_to_status(policy_category):
     """
     if policy_category == MOVE_TO_INFREQUENT_ACCESS_AFTER:
         return INFREQUENT_ACCESS
+    elif policy_category == MOVE_TO_GLACIER_AFTER:
+        return GLACIER
     elif policy_category == MOVE_TO_DEEP_ARCHIVE_AFTER:
         return DEEP_ARCHIVE
     elif policy_category == EXPIRE_AFTER:
@@ -200,12 +131,35 @@ def lifecycle_status_to_s3_tag(lifecycle_status):
     """
     if lifecycle_status == INFREQUENT_ACCESS:
         return [{'Key': 'Lifecycle','Value': 'IA'}]
+    elif lifecycle_status == GLACIER:
+        return [{'Key': 'Lifecycle','Value': 'Glacier'}]
     elif lifecycle_status == DEEP_ARCHIVE:
         return [{'Key': 'Lifecycle','Value': 'GlacierDA'}]
     elif lifecycle_status == DELETED:
         return [{'Key': 'Lifecycle','Value': 'expire'}]
     else:
         return []
+
+
+def lifecycle_status_to_int(lifecycle_status):
+    """Converts a lifecycle status to an integer which represents how accessible the storage class is. 
+       Smaller number means more accessible
+
+    Args:
+        lifecycle_status(string): lifecycle status from portal (e.g. "deep archive")
+
+    Returns:
+        an integer
+    """
+    mapping = {
+        STANDARD: 1,
+        INFREQUENT_ACCESS: 2,
+        GLACIER: 3,
+        DEEP_ARCHIVE: 4,
+        DELETED: 5
+    }
+    
+    return mapping[lifecycle_status]
 
 
 def convert_es_timestamp_to_datetime(raw):
