@@ -35,8 +35,6 @@ def check_file_lifecycle_status(connection, **kwargs):
     check.full_output = {}
     check.status = "PASS"
 
-    import pdb; pdb.set_trace()
-
     num_files_to_check = kwargs.get("files_per_run", 100)
     first_check_after = kwargs.get("first_check_after", 14)
     max_checking_frequency = kwargs.get("max_checking_frequency", 14)
@@ -126,7 +124,7 @@ def check_file_lifecycle_status(connection, **kwargs):
             files_to_update.append(update_dict)
 
             # Get extra files and update those as well. They will be treated like the original file
-            extra_files = file.get("extra_files")
+            extra_files = file.get("extra_files", [])
             for ef in extra_files:
                 ef_update_dict = update_dict.copy()
                 ef_update_dict["upload_key"] = ef["upload_key"]
