@@ -1,6 +1,6 @@
 import json
 import datetime
-from dcicutils import ff_utils, s3Utils
+from dcicutils import ff_utils
 import pprint
 
 pp = pprint.PrettyPrinter(indent=2)

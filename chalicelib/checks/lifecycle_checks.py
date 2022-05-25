@@ -2,8 +2,8 @@ import json
 import random
 import pprint
 import datetime
-from dcicutils import ff_utils, s3Utils
-
+from dcicutils import ff_utils
+from dcicutils.s3_utils import s3Utils
 from .helpers import lifecycle_utils
 
 # Use confchecks to import decorators object and its methods for each check module
@@ -112,7 +112,7 @@ def patch_file_lifecycle_status(connection, **kwargs):
             log_message = f'Lifecycle status of file {uuid} ({upload_key}) changed from {old_lifecycle_status} to {new_lifecycle_status}'
             action_logs['logs'].append(log_message)
             action_logs['patched_files'].append(uuid)
-            
+
         except Exception as e:
             action_logs['error'].append(f'Error patching or tagging file {uuid}: {str(e)}')
             continue
