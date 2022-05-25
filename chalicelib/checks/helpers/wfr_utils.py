@@ -1,7 +1,9 @@
 import json
 from datetime import datetime
 from operator import itemgetter
-from dcicutils import ff_utils, s3Utils
+# from dcicutils import ff_utils, s3Utils
+from dcicutils import ff_utils
+from dcicutils.s3_utils import s3Utils
 from tibanna_cgap.core import API
 from .wfrset_utils import (
     # use wf_dict in workflow version check to make sure latest version and workflow uuid matches
