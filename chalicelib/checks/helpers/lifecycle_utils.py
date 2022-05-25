@@ -189,7 +189,7 @@ def check_file_lifecycle_status(num_files_to_check, first_check_after, max_check
 
 # Factored out, so that it can be mocked in tests. Not pretty, but seemed to be the easiest solution 
 def get_datetime_utcnow():
-    return datetime.utcnow()
+    return datetime.datetime.utcnow()
 
 def get_file_lifecycle_status(file, file_lifecycle_policy):
     """This function returns the correct lifecycle status for a given file, i.e.
