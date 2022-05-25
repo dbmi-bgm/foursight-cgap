@@ -69,6 +69,7 @@ def patch_file_lifecycle_status(connection, **kwargs):
     action_logs = {}
     action_logs['check_output'] = check_output
     action_logs['patched_files'] = []
+    action_logs['logs'] = []
     action_logs['error'] = []
 
     files = check_output.get('files_to_update', [])
@@ -107,8 +108,11 @@ def patch_file_lifecycle_status(connection, **kwargs):
                 my_s3_util.set_object_tags(upload_key, file_bucket, s3_tag, replace_tags=True)
             else: 
                 raise Exception(f'Could not determine S3 tag for file {uuid}')
-            action_logs['patched_files'].append(f'Lifecycle status of file {uuid} changed from {old_lifecycle_status} to {new_lifecycle_status}')
-        
+            
+            log_message = f'Lifecycle status of file {uuid} ({upload_key}) changed from {old_lifecycle_status} to {new_lifecycle_status}'
+            action_logs['logs'].append(log_message)
+            action_logs['patched_files'].append(uuid)
+            
         except Exception as e:
             action_logs['error'].append(f'Error patching or tagging file {uuid}: {str(e)}')
             continue
