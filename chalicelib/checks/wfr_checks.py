@@ -3,7 +3,6 @@ import random
 from magma_ff import run_metawfr, status_metawfr, reset_metawfr
 from pipeline_utils.check_lines import *
 from datetime import datetime
-# from dcicutils import ff_utils, s3Utils
 from dcicutils import ff_utils
 from dcicutils.s3_utils import s3Utils
 from .helpers import wfr_utils

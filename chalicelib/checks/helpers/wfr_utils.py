@@ -1,7 +1,6 @@
 import json
 from datetime import datetime
 from operator import itemgetter
-# from dcicutils import ff_utils, s3Utils
 from dcicutils import ff_utils
 from dcicutils.s3_utils import s3Utils
 from tibanna_cgap.core import API
