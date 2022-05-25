@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+import datetime
 from dcicutils import ff_utils, s3Utils
 import pprint
 
@@ -74,6 +74,123 @@ lifecycle_status_to_file_status = {
 }
 
 
+def check_file_lifecycle_status(num_files_to_check, first_check_after, max_checking_frequency, my_auth):
+    """
+    This main check function. Factored out for easier testing
+    """
+
+    check_result = {
+        "status": "PASS",
+        "warning": ""
+    }
+
+    # We only want to get files from the portal that have a lifecycle category set and have either never been checked
+    # or previously checked sufficiently long ago - as far as I know this can't be combined into one query. Furthermore,
+    # they should be at least {first_check_after} days old
+    threshold_date_fca = datetime.date.today() - datetime.timedelta(first_check_after)
+    threshold_date_fca = threshold_date_fca.strftime("%Y-%m-%d")
+    threshold_date_mcf = datetime.date.today() - datetime.timedelta(max_checking_frequency)
+    threshold_date_mcf = threshold_date_mcf.strftime("%Y-%m-%d")
+
+    search_query_base = (
+        "/search/?type=FileProcessed&type=FileFastq"
+        "&s3_lifecycle_category%21=No+value"
+        f"&date_created.to={threshold_date_fca}"
+        "&status=uploaded"
+        "&status=archived"
+        "&status=shared"
+        f"&limit={num_files_to_check // 2}"
+        )
+    search_query_1 = f"{search_query_base}&s3_lifecycle_last_checked.to={threshold_date_mcf}"
+    search_query_2 = f"{search_query_base}&s3_lifecycle_last_checked=No+value"
+    
+    all_files = ff_utils.search_metadata(search_query_1, key=my_auth)
+    all_files = all_files + ff_utils.search_metadata(search_query_2, key=my_auth)
+        
+    files_to_update = [] # This will contain the files that require lifecycle updates  
+    files_not_being_checked = []
+    files_without_update = []
+    files_with_issues = []
+    logs = []
+
+    # This dict will contain all the lifecycle policies per project that are relevant
+    # for the current set of files. "project.lifecycle_policy" is not embedded in the File
+    # item and we want to retrieve the project metadata only once for each project.
+    lifecycle_policies_by_project = {}
+
+    for file in all_files:
+        file_uuid = file['uuid']
+
+        if file["s3_lifecycle_category"] == IGNORE:
+            files_not_being_checked.append(file_uuid)
+            continue
+
+        # Get the correct lifecycle policy - load it from the metadata only once
+        project_uuid = file["project"]["uuid"]
+        if project_uuid not in lifecycle_policies_by_project:
+            project = ff_utils.get_metadata(project_uuid, key=my_auth)
+            if "lifecycle_policy" in project:
+                lifecycle_policies_by_project[project_uuid] = project["lifecycle_policy"]
+            else:
+                lifecycle_policies_by_project[project_uuid] = default_lifecycle_policy
+
+        lifecycle_policy = lifecycle_policies_by_project[project_uuid]
+
+        file_lifecycle_category = file["s3_lifecycle_category"] # e.g. "long_term_archive"
+        if file_lifecycle_category not in lifecycle_policy:
+            check_result["status"] = "WARN"
+            check_result["warning"] = "Some files have unknown lifecycle categories. Check logs."
+            logs.append(f'File {file_uuid} has an unknown lifecycle category {file_lifecycle_category}')
+            files_with_issues.append(file_uuid)
+            continue
+
+        # This contains the applicable rules for the current file, e.g., {MOVE_TO_DEEP_ARCHIVE_AFTER: 0, EXPIRE_AFTER: 12}
+        file_lifecycle_policy = lifecycle_policy[file_lifecycle_category]
+
+        file_old_lifecycle_status = file["s3_lifecycle_status"]
+        file_new_lifecycle_status = get_file_lifecycle_status(file, file_lifecycle_policy)
+
+        # Check that the new storage class is indeed "deeper" than the old one. We can't transfer files to more accessible storage classes
+        file_old_lifecycle_status_int = lifecycle_status_to_int(file_old_lifecycle_status)
+        file_new_lifecycle_status_int = lifecycle_status_to_int(file_new_lifecycle_status)
+        if(file_old_lifecycle_status_int > file_new_lifecycle_status_int):
+            check_result["status"] = "WARN"
+            check_result["warning"] = "Unsupported storage class transition for some files. Check logs"
+            logs.append(f'File {file_uuid} wants to transition from {file_old_lifecycle_status} to {file_new_lifecycle_status}')
+            files_with_issues.append(file_uuid)
+            continue
+
+        if file_old_lifecycle_status != file_new_lifecycle_status:
+            update_dict = {
+                    "uuid": file_uuid,
+                    "upload_key": file["upload_key"],
+                    "old_lifecycle_status": file_old_lifecycle_status,
+                    "new_lifecycle_status": file_new_lifecycle_status,
+                    "is_extra_file": False
+                }
+            files_to_update.append(update_dict)
+
+            # Get extra files and update those as well. They will be treated like the original file
+            extra_files = file.get("extra_files", [])
+            for ef in extra_files:
+                ef_update_dict = update_dict.copy()
+                ef_update_dict["upload_key"] = ef["upload_key"]
+                ef_update_dict["is_extra_file"] = True
+                files_to_update.append(ef_update_dict)
+        else:
+            files_without_update.append(file_uuid)
+
+    check_result["files_to_update"] = files_to_update
+    check_result["files_without_update"] = files_without_update
+    check_result["files_with_issues"] = files_with_issues
+    check_result["files_not_being_checked"] = files_not_being_checked
+    check_result["logs"] = logs
+    return check_result
+
+# Factored out, so that it can be mocked in tests. Not pretty, but seemed to be the easiest solution 
+def get_datetime_utcnow():
+    return datetime.utcnow()
+
 def get_file_lifecycle_status(file, file_lifecycle_policy):
     """This function returns the correct lifecycle status for a given file, i.e.
        which S3 storage class it should currently be in.
@@ -87,13 +204,18 @@ def get_file_lifecycle_status(file, file_lifecycle_policy):
     """
 
     date_created = convert_es_timestamp_to_datetime(file.get("date_created"))
-    now = datetime.utcnow()
+    now = get_datetime_utcnow()
     # We are using the file creation for simplicity, we should use the time from when the workflow run
-    # completed successfully. We asssume that those dates are sufficiently close.
+    # completed successfully (at least for submitted files). We asssume that those dates are sufficiently close.
     file_age = (now - date_created).days / 30  # in months
 
     # Find the lifecycle policy category that is currently applicable
     active_categories = {k: v for (k, v) in file_lifecycle_policy.items() if v < file_age}
+
+    # File is younger than anything in the policy
+    if not active_categories:
+        return STANDARD
+
     current_category = max(active_categories, key=active_categories.get)
 
     return lifecycle_policy_to_status(current_category)
@@ -182,5 +304,5 @@ def convert_es_timestamp_to_datetime(raw):
     else:
         formatted_date = raw
 
-    converted_date = datetime.strptime(formatted_date, "%Y-%m-%dT%H:%M:%S")
+    converted_date = datetime.datetime.strptime(formatted_date, "%Y-%m-%dT%H:%M:%S")
     return converted_date
