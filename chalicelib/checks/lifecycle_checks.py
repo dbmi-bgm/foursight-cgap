@@ -47,7 +47,6 @@ def check_file_lifecycle_status(connection, **kwargs):
         "files_to_update": res["files_to_update"],
         "files_without_update": res["files_without_update"],
         "files_with_issues": res["files_with_issues"],
-        "files_not_being_checked": res["files_not_being_checked"],
         "logs": res["logs"]
     }
 
