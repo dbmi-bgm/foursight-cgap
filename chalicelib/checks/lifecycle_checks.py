@@ -1,6 +1,3 @@
-import json
-import random
-import pprint
 import datetime
 from dcicutils import ff_utils
 from dcicutils.s3_utils import s3Utils
