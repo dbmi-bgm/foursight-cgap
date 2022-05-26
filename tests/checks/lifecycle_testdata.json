@@ -210,28 +210,6 @@
       "status": "uploaded"
     },
     {
-      "uuid": "file_30",
-      "upload_key": "file_30_upload_key",
-      "s3_lifecycle_category": "ignore",
-      "s3_lifecycle_status": "standard",
-      "date_created": "2021-01-12T17:55:43.217164+00:00",
-      "project": {
-        "uuid": "project_with_lifecycle_policy"
-      },
-      "status": "uploaded"
-    },
-    {
-      "uuid": "file_31",
-      "upload_key": "file_31_upload_key",
-      "s3_lifecycle_category": "ignore",
-      "s3_lifecycle_status": "standard",
-      "date_created": "2021-01-12T17:55:43.217164+00:00",
-      "project": {
-        "uuid": "project_without_lifecycle_policy"
-      },
-      "status": "uploaded"
-    },
-    {
       "uuid": "file_40",
       "upload_key": "file_40_upload_key",
       "s3_lifecycle_category": "short_term_access",

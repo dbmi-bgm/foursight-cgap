@@ -95,6 +95,7 @@ def check_file_lifecycle_status(num_files_to_check, first_check_after, max_check
     search_query_base = (
         "/search/?type=FileProcessed&type=FileFastq"
         "&s3_lifecycle_category%21=No+value"
+        f"&s3_lifecycle_category%21={IGNORE}"
         f"&date_created.to={threshold_date_fca}"
         "&status=uploaded"
         "&status=archived"
@@ -108,7 +109,6 @@ def check_file_lifecycle_status(num_files_to_check, first_check_after, max_check
     all_files = all_files + ff_utils.search_metadata(search_query_2, key=my_auth)
         
     files_to_update = [] # This will contain the files that require lifecycle updates  
-    files_not_being_checked = []
     files_without_update = []
     files_with_issues = []
     logs = []
@@ -120,10 +120,6 @@ def check_file_lifecycle_status(num_files_to_check, first_check_after, max_check
 
     for file in all_files:
         file_uuid = file['uuid']
-
-        if file["s3_lifecycle_category"] == IGNORE:
-            files_not_being_checked.append(file_uuid)
-            continue
 
         # Get the correct lifecycle policy - load it from the metadata only once
         project_uuid = file["project"]["uuid"]
@@ -183,7 +179,6 @@ def check_file_lifecycle_status(num_files_to_check, first_check_after, max_check
     check_result["files_to_update"] = files_to_update
     check_result["files_without_update"] = files_without_update
     check_result["files_with_issues"] = files_with_issues
-    check_result["files_not_being_checked"] = files_not_being_checked
     check_result["logs"] = logs
     return check_result
 

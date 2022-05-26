@@ -45,7 +45,7 @@ class TestLifecycleChecks():
         mock_datetime_utcnow.side_effect = self.get_datetime_utcnow_mock_func 
         # None of the input arguments have actually any effect, as they all go into the search_metadata query, which is mocked
         check_result = check_file_lifecycle_status(1, 1, 1, None)
-
+ 
         assert check_result['status'] == "PASS"
 
         expected_lifecycle_statuses = {
@@ -85,11 +85,6 @@ class TestLifecycleChecks():
         files_without_update = check_result["files_without_update"]
         assert "file_25" in files_without_update
         assert "file_26" in files_without_update
-
-        # File 30 and 31 have been set to ignore
-        files_not_being_checked = check_result["files_not_being_checked"]
-        assert "file_30" in files_not_being_checked
-        assert "file_31" in files_not_being_checked
 
         # Make sure extra files are handled correctly
         file_40_extra = next(filter(lambda x: x["uuid"] == "file_40" and x["is_extra_file"], files_to_update))
