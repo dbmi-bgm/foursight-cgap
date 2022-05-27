@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "foursight-cgap"
-version = "1.7.0b3"
+version = "1.7.0b4"
 description = "Serverless Chalice Application for Monitoring"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
