@@ -23,7 +23,7 @@ from .helpers.utils import (
     get_step_function_name,
     is_past_time_limit,
 )
-from .helpers.wfrset_utils import LAMBDA_LIMIT, step_settings
+from .helpers.wfrset_utils import LAMBDA_LIMIT
 
 
 # TODO: Figure out line_count check with Michele --> should really be a QualityMetric
@@ -1231,7 +1231,9 @@ def create_meta_workflow_runs_for_items(connection, **kwargs):
                 sample_processing_success.append(sample_processing)
             except Exception as error_msg:
                 sample_processing_error[sample_processing] = str(error_msg)
-        action.output["sample_processings_with_meta_workflow_runs"] = sample_processing_success
+        action.output[
+            "sample_processings_with_meta_workflow_runs"
+        ] = sample_processing_success
         action.output["sample_processings_with_errors"] = sample_processing_error
     if samples:
         for sample in samples:
@@ -1267,9 +1269,7 @@ def find_sample_for_meta_workflow(
     MetaWorkflowRun(s).
     """
     check = initialize_check("find_sample_for_meta_workflow", connection)
-    check.description = (
-        "Find Samples and MetaWorkflow to create new MetaWorkflowRuns"
-    )
+    check.description = "Find Samples and MetaWorkflow to create new MetaWorkflowRuns"
     check.action = "create_meta_workflow_runs_for_items"
 
     samples_for_meta_workflow = set()
@@ -1323,7 +1323,7 @@ def find_sample_for_meta_workflow(
         for sample_processing in found:
             sample_processings_found.append(sample_processing.get("uuid"))
             for sample in sample_processing.get("samples", []):
-                samples_from_sample_processing.add(sample)
+                samples_from_sample_processings.add(sample)
         msg = "%s SampleProcessing(s) were found" % len(sample_processings_found)
         check.brief_output.append(msg)
         check.full_output["sample_processings_found"] = sample_processings_found
@@ -1331,10 +1331,9 @@ def find_sample_for_meta_workflow(
             msg = "%s SampleProcessing(s) not found" % len(not_found)
             check.brief_output.append(msg)
             check.full_output["sample_processings_not_found"] = not_found
-    if samples or samples_from_sample_processing:
-        samples_found = []
+    if samples or samples_from_sample_processings:
         samples = format_kwarg_list(samples)
-        samples |= samples_from_sample_processing
+        samples |= samples_from_sample_processings
         found, not_found = validate_items_existence(samples, connection)
         for sample in found:
             samples_for_meta_workflow.add(sample.get("uuid"))

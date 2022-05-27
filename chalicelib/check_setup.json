@@ -273,7 +273,23 @@
         ]
     },
     "find_sample_processing_for_meta_workflow": {
-        "title": "Create MetaWorkflowRun",
+        "title": "Create MetaWorkflowRun For SampleProcessing",
+        "group": "Pipeline Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "find_sample_for_meta_workflow": {
+        "title": "Create MetaWorkflowRun For Sample",
         "group": "Pipeline Checks",
         "schedule": {
             "manual_checks": {
