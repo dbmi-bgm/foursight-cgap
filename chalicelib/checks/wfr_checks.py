@@ -2,7 +2,8 @@ import random
 import re
 from datetime import datetime
 
-from dcicutils import ff_utils, s3Utils
+from dcicutils import ff_utils
+from dcicutils.s3_utils import s3Utils
 from magma_ff import reset_metawfr, run_metawfr, status_metawfr
 from magma_ff.create_metawfr import (
     MetaWorkflowRunFromSampleProcessing,
