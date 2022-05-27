@@ -41,11 +41,11 @@ requests = ">=0.14.0"
 
 [[package]]
 name = "beautifulsoup4"
-version = "4.10.0"
+version = "4.11.1"
 description = "Screen-scraping library"
 category = "main"
 optional = false
-python-versions = ">3.0.0"
+python-versions = ">=3.6.0"
 
 [package.dependencies]
 soupsieve = ">1.2"
@@ -77,14 +77,14 @@ wcwidth = ">=0.1.4"
 
 [[package]]
 name = "boto3"
-version = "1.21.24"
+version = "1.23.9"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.6"
 
 [package.dependencies]
-botocore = ">=1.24.24,<1.25.0"
+botocore = ">=1.26.9,<1.27.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.5.0,<0.6.0"
 
@@ -93,7 +93,7 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.24.24"
+version = "1.26.9"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -105,7 +105,7 @@ python-dateutil = ">=2.1,<3.0.0"
 urllib3 = ">=1.25.4,<1.27"
 
 [package.extras]
-crt = ["awscrt (==0.13.5)"]
+crt = ["awscrt (==0.13.8)"]
 
 [[package]]
 name = "cachetools"
@@ -117,11 +117,11 @@ python-versions = "~=3.5"
 
 [[package]]
 name = "certifi"
-version = "2021.10.8"
+version = "2022.5.18.1"
 description = "Python package for providing Mozilla's CA Bundle."
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6"
 
 [[package]]
 name = "cgap-pipeline-utils"
@@ -137,7 +137,7 @@ magma-suite = ">=0.2.1"
 
 [[package]]
 name = "chalice"
-version = "1.26.6"
+version = "1.27.0"
 description = "Microframework"
 category = "dev"
 optional = false
@@ -148,7 +148,7 @@ attrs = ">=19.3.0,<21.5.0"
 botocore = ">=1.14.0,<2.0.0"
 click = ">=7,<9.0"
 inquirer = ">=2.7.0,<3.0.0"
-jmespath = ">=0.9.3,<1.0.0"
+jmespath = ">=0.9.3,<2.0.0"
 mypy-extensions = "0.4.3"
 pyyaml = ">=5.3.1,<7.0.0"
 six = ">=1.10.0,<2.0.0"
@@ -156,6 +156,7 @@ typing = {version = "3.6.4", markers = "python_version < \"3.7\""}
 
 [package.extras]
 cdk = ["aws-cdk.aws-iam (>=1.85.0,<2.0)", "aws-cdk.aws-s3-assets (>=1.85.0,<2.0)", "aws-cdk.cloudformation-include (>=1.85.0,<2.0)", "aws-cdk.core (>=1.85.0,<2.0)"]
+cdkv2 = ["aws-cdk-lib (>2.0,<3.0)"]
 event-file-poller = ["watchdog (==0.9.0)"]
 
 [[package]]
@@ -198,7 +199,7 @@ toml = ["tomli"]
 
 [[package]]
 name = "dcicutils"
-version = "3.11.0"
+version = "3.13.0"
 description = "Utility package for interacting with the 4DN Data Portal and other 4DN resources"
 category = "main"
 optional = false
@@ -362,7 +363,7 @@ typing-extensions = {version = ">=3.7.4.3", markers = "python_version < \"3.10\"
 
 [[package]]
 name = "google-api-core"
-version = "2.7.1"
+version = "2.8.1"
 description = "Google API client core library"
 category = "main"
 optional = false
@@ -370,14 +371,14 @@ python-versions = ">=3.6"
 
 [package.dependencies]
 google-auth = ">=1.25.0,<3.0dev"
-googleapis-common-protos = ">=1.52.0,<2.0dev"
-protobuf = ">=3.12.0"
+googleapis-common-protos = ">=1.56.2,<2.0dev"
+protobuf = ">=3.15.0,<4.0.0dev"
 requests = ">=2.18.0,<3.0.0dev"
 
 [package.extras]
 grpc = ["grpcio (>=1.33.2,<2.0dev)", "grpcio-status (>=1.33.2,<2.0dev)"]
-grpcgcp = ["grpcio-gcp (>=0.2.2)"]
-grpcio-gcp = ["grpcio-gcp (>=0.2.2)"]
+grpcgcp = ["grpcio-gcp (>=0.2.2,<1.0dev)"]
+grpcio-gcp = ["grpcio-gcp (>=0.2.2,<1.0dev)"]
 
 [[package]]
 name = "google-api-python-client"
@@ -397,7 +398,7 @@ uritemplate = ">=3.0.0,<4dev"
 
 [[package]]
 name = "google-auth"
-version = "2.6.2"
+version = "2.6.6"
 description = "Google Authentication Library"
 category = "main"
 optional = false
@@ -429,17 +430,17 @@ six = "*"
 
 [[package]]
 name = "googleapis-common-protos"
-version = "1.56.0"
+version = "1.56.2"
 description = "Common protobufs used in Google APIs"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-protobuf = ">=3.12.0"
+protobuf = ">=3.15.0,<4.0.0dev"
 
 [package.extras]
-grpc = ["grpcio (>=1.0.0)"]
+grpc = ["grpcio (>=1.0.0,<2.0.0dev)"]
 
 [[package]]
 name = "httplib2"
@@ -506,7 +507,7 @@ i18n = ["Babel (>=0.8)"]
 
 [[package]]
 name = "jinxed"
-version = "1.1.0"
+version = "1.2.0"
 description = "Jinxed Terminal Library"
 category = "dev"
 optional = false
@@ -525,7 +526,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "magma-suite"
-version = "1.0.0b0"
+version = "1.0.0b3"
 description = "Collection of tools to manage meta-workflows automation."
 category = "main"
 optional = false
@@ -545,7 +546,7 @@ python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
 
 [[package]]
 name = "more-itertools"
-version = "8.12.0"
+version = "8.13.0"
 description = "More routines for operating on iterables, beyond itertools"
 category = "main"
 optional = false
@@ -827,7 +828,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "soupsieve"
-version = "2.3.1"
+version = "2.3.2.post1"
 description = "A modern CSS selector implementation for Beautiful Soup."
 category = "main"
 optional = false
@@ -852,7 +853,7 @@ tests = ["coverage", "freezegun (>=0.2.8)", "pretend", "pytest (>=3.3.0)", "simp
 
 [[package]]
 name = "tibanna"
-version = "1.9.1"
+version = "1.9.2"
 description = "Tibanna runs portable pipelines (in CWL/WDL) on the AWS Cloud."
 category = "main"
 optional = false
@@ -1001,7 +1002,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.1,<3.8"
-content-hash = "f354ad61e369dedf8c25a03fef38f69d9864aa66baeef44d18cf8acd28e5e760"
+content-hash = "94509ff963671fc3cd9271b5a22c90bed0e4dd7b0315bca31b7c6653abae8dfc"
 
 [metadata.files]
 ansicon = [
@@ -1021,8 +1022,8 @@ aws-requests-auth = [
     {file = "aws_requests_auth-0.4.3-py2.py3-none-any.whl", hash = "sha256:646bc37d62140ea1c709d20148f5d43197e6bd2d63909eb36fa4bb2345759977"},
 ]
 beautifulsoup4 = [
-    {file = "beautifulsoup4-4.10.0-py3-none-any.whl", hash = "sha256:9a315ce70049920ea4572a4055bc4bd700c940521d36fc858205ad4fcde149bf"},
-    {file = "beautifulsoup4-4.10.0.tar.gz", hash = "sha256:c23ad23c521d818955a4151a67d81580319d4bf548d3d49f4223ae041ff98891"},
+    {file = "beautifulsoup4-4.11.1-py3-none-any.whl", hash = "sha256:58d5c3d29f5a36ffeb94f02f0d786cd53014cf9b3b3951d42e0080d8a9498d30"},
+    {file = "beautifulsoup4-4.11.1.tar.gz", hash = "sha256:ad9aa55b65ef2808eb405f46cf74df7fcb7044d5cbc26487f96eb2ef2e436693"},
 ]
 benchmark-4dn = [
     {file = "Benchmark-4dn-0.5.15.tar.gz", hash = "sha256:941ca3893cacf6ed96e9f10ceeec3477455acabc07c4cdcaf453b51ad9c51ca8"},
@@ -1034,20 +1035,20 @@ blessed = [
     {file = "blessed-1.19.0.tar.gz", hash = "sha256:4db0f94e5761aea330b528e84a250027ffe996b5a94bf03e502600c9a5ad7a61"},
 ]
 boto3 = [
-    {file = "boto3-1.21.24-py3-none-any.whl", hash = "sha256:8c7c296edac2a76d3fdc9e9664d2adac37ac0205b18ffda22e3f1e3c078038ba"},
-    {file = "boto3-1.21.24.tar.gz", hash = "sha256:c971850fa4466ed7ebcd9bbef58d03cd81c9dd3cf4e45cc1a916fc44cf2dcaf8"},
+    {file = "boto3-1.23.9-py3-none-any.whl", hash = "sha256:9e44d22a9cfb72e84add3ce1580e6dfef6a67321da0b958f7f33411de468a7ea"},
+    {file = "boto3-1.23.9.tar.gz", hash = "sha256:5b05d219db06cca7d372cef2cdbbee5acfec23cb1f8dcbbfa95c5fa098269c7f"},
 ]
 botocore = [
-    {file = "botocore-1.24.24-py3-none-any.whl", hash = "sha256:e6b5fe8bf1d3515256ebeea67b9e89d2f0cacf19131c1c86d744e5037f627d6e"},
-    {file = "botocore-1.24.24.tar.gz", hash = "sha256:6f8c79a784f04f074319cfbc4de7f858639049ac73065b26fd97b66839ab3b30"},
+    {file = "botocore-1.26.9-py3-none-any.whl", hash = "sha256:c5f33c814f8c5e1a0bec2084760fe00ea4d43cbfbb868b05fbb83bbeb6303844"},
+    {file = "botocore-1.26.9.tar.gz", hash = "sha256:fef3ae1aa9e214d9da7b44035f13afe1f7239a5b2724ed76c6ec9a0628102307"},
 ]
 cachetools = [
     {file = "cachetools-4.2.4-py3-none-any.whl", hash = "sha256:92971d3cb7d2a97efff7c7bb1657f21a8f5fb309a37530537c71b1774189f2d1"},
     {file = "cachetools-4.2.4.tar.gz", hash = "sha256:89ea6f1b638d5a73a4f9226be57ac5e4f399d22770b92355f92dcb0f7f001693"},
 ]
 certifi = [
-    {file = "certifi-2021.10.8-py2.py3-none-any.whl", hash = "sha256:d62a0163eb4c2344ac042ab2bdf75399a71a2d8c7d47eac2e2ee91b9d6339569"},
-    {file = "certifi-2021.10.8.tar.gz", hash = "sha256:78884e7c1d4b00ce3cea67b44566851c4343c120abd683433ce934a68ea58872"},
+    {file = "certifi-2022.5.18.1-py3-none-any.whl", hash = "sha256:f1d53542ee8cbedbe2118b5686372fb33c297fcd6379b050cca0ef13a597382a"},
+    {file = "certifi-2022.5.18.1.tar.gz", hash = "sha256:9c5705e395cd70084351dd8ad5c41e65655e08ce46f2ec9cf6c2c08390f71eb7"},
 ]
 cgap-pipeline-utils = [
     {file = "cgap-pipeline-utils-23.0.tar.gz", hash = "sha256:a92918b3ef46803ce8cbfa1f7fe07e5bf4221d26618e7b80eeb9d9bff2963d18"},
@@ -1055,8 +1056,8 @@ cgap-pipeline-utils = [
     {file = "cgap_pipeline_utils-23.0-py3.6.egg", hash = "sha256:cf7ac0a5e8bafa9357ced5bbae087ff178070a5a505a6585bb8c40782c292265"},
 ]
 chalice = [
-    {file = "chalice-1.26.6-py3-none-any.whl", hash = "sha256:eeacdbe8979a13420870c3dd1647e2152727ccc8b6a58e53ddab4d1f93ff63c1"},
-    {file = "chalice-1.26.6.tar.gz", hash = "sha256:ad89eb648c6ab3976190385ab423d4e790b9d5e8449a5cde47b392d63599ff43"},
+    {file = "chalice-1.27.0-py3-none-any.whl", hash = "sha256:73c38dc2c2ef41786939411dd17c024461b9abfe5c9cb1ec94fa4910cf7255c4"},
+    {file = "chalice-1.27.0.tar.gz", hash = "sha256:54de3dc28e094b92de7a474e8c86eb7cf20ad8f6e97383da8d1c64b6b446d14b"},
 ]
 charset-normalizer = [
     {file = "charset-normalizer-2.0.12.tar.gz", hash = "sha256:2857e29ff0d34db842cd7ca3230549d1a697f96ee6d3fb071cfa6c7393832597"},
@@ -1120,8 +1121,8 @@ coverage = [
     {file = "coverage-6.2.tar.gz", hash = "sha256:e2cad8093172b7d1595b4ad66f24270808658e11acf43a8f95b41276162eb5b8"},
 ]
 dcicutils = [
-    {file = "dcicutils-3.11.0-py3-none-any.whl", hash = "sha256:a44f45dbff7d183fbce3cb9eafe7faad459fc456a13e1af048834116eb4fe88b"},
-    {file = "dcicutils-3.11.0.tar.gz", hash = "sha256:2118dbb2fda27266799f148ff0a17f4560134bbd2145784bddfc100798de9915"},
+    {file = "dcicutils-3.13.0-py3-none-any.whl", hash = "sha256:01e403cb6ca67f54bb17625632d01d54a576dcaec85c4ac33dff9931463e756e"},
+    {file = "dcicutils-3.13.0.tar.gz", hash = "sha256:dae2239705b23ebcce05a2a20f2a355b3a5ab0be62f25c5fba9dea02dfffdb5e"},
 ]
 decorator = [
     {file = "decorator-5.1.1-py3-none-any.whl", hash = "sha256:b8c3f85900b9dc423225913c5aace94729fe1fa9763b38939a95226f02d37186"},
@@ -1167,24 +1168,24 @@ gitpython = [
     {file = "GitPython-3.1.20.tar.gz", hash = "sha256:df0e072a200703a65387b0cfdf0466e3bab729c0458cf6b7349d0e9877636519"},
 ]
 google-api-core = [
-    {file = "google-api-core-2.7.1.tar.gz", hash = "sha256:b0fa577e512f0c8e063386b974718b8614586a798c5894ed34bedf256d9dae24"},
-    {file = "google_api_core-2.7.1-py3-none-any.whl", hash = "sha256:6be1fc59e2a7ba9f66808bbc22f976f81e4c3e7ab20fa0620ce42686288787d0"},
+    {file = "google-api-core-2.8.1.tar.gz", hash = "sha256:958024c6aa3460b08f35741231076a4dd9a4c819a6a39d44da9627febe8b28f0"},
+    {file = "google_api_core-2.8.1-py3-none-any.whl", hash = "sha256:ce1daa49644b50398093d2a9ad886501aa845e2602af70c3001b9f402a9d7359"},
 ]
 google-api-python-client = [
     {file = "google-api-python-client-1.12.11.tar.gz", hash = "sha256:1b4bd42a46321e13c0542a9e4d96fa05d73626f07b39f83a73a947d70ca706a9"},
     {file = "google_api_python_client-1.12.11-py2.py3-none-any.whl", hash = "sha256:7e0a1a265c8d3088ee1987778c72683fcb376e32bada8d7767162bd9c503fd9b"},
 ]
 google-auth = [
-    {file = "google-auth-2.6.2.tar.gz", hash = "sha256:60d449f8142c742db760f4c0be39121bc8d9be855555d784c252deaca1ced3f5"},
-    {file = "google_auth-2.6.2-py2.py3-none-any.whl", hash = "sha256:3ba4d63cb29c1e6d5ffcc1c0623c03cf02ede6240a072f213084749574e691ab"},
+    {file = "google-auth-2.6.6.tar.gz", hash = "sha256:1ba4938e032b73deb51e59c4656a00e0939cf0b1112575099f136babb4563312"},
+    {file = "google_auth-2.6.6-py2.py3-none-any.whl", hash = "sha256:349ac49b18b01019453cc99c11c92ed772739778c92f184002b7ab3a5b7ac77d"},
 ]
 google-auth-httplib2 = [
     {file = "google-auth-httplib2-0.1.0.tar.gz", hash = "sha256:a07c39fd632becacd3f07718dfd6021bf396978f03ad3ce4321d060015cc30ac"},
     {file = "google_auth_httplib2-0.1.0-py2.py3-none-any.whl", hash = "sha256:31e49c36c6b5643b57e82617cb3e021e3e1d2df9da63af67252c02fa9c1f4a10"},
 ]
 googleapis-common-protos = [
-    {file = "googleapis-common-protos-1.56.0.tar.gz", hash = "sha256:4007500795bcfc269d279f0f7d253ae18d6dc1ff5d5a73613ffe452038b1ec5f"},
-    {file = "googleapis_common_protos-1.56.0-py2.py3-none-any.whl", hash = "sha256:60220c89b8bd5272159bed4929ecdc1243ae1f73437883a499a44a1cbc084086"},
+    {file = "googleapis-common-protos-1.56.2.tar.gz", hash = "sha256:b09b56f5463070c2153753ef123f07d2e49235e89148e9b2459ec8ed2f68d7d3"},
+    {file = "googleapis_common_protos-1.56.2-py2.py3-none-any.whl", hash = "sha256:023eaea9d8c1cceccd9587c6af6c20f33eeeb05d4148670f2b0322dc1511700c"},
 ]
 httplib2 = [
     {file = "httplib2-0.20.4-py3-none-any.whl", hash = "sha256:8b6a905cb1c79eefd03f8669fd993c36dc341f7c558f056cb5a33b5c2f458543"},
@@ -1207,16 +1208,16 @@ jinja2 = [
     {file = "Jinja2-2.10.1.tar.gz", hash = "sha256:065c4f02ebe7f7cf559e49ee5a95fb800a9e4528727aec6f24402a5374c65013"},
 ]
 jinxed = [
-    {file = "jinxed-1.1.0-py2.py3-none-any.whl", hash = "sha256:6a61ccf963c16aa885304f27e6e5693783676897cea0c7f223270c8b8e78baf8"},
-    {file = "jinxed-1.1.0.tar.gz", hash = "sha256:d8f1731f134e9e6b04d95095845ae6c10eb15cb223a5f0cabdea87d4a279c305"},
+    {file = "jinxed-1.2.0-py2.py3-none-any.whl", hash = "sha256:cfc2b2e4e3b4326954d546ba6d6b9a7a796ddcb0aef8d03161d005177eb0d48b"},
+    {file = "jinxed-1.2.0.tar.gz", hash = "sha256:032acda92d5c57cd216033cbbd53de731e6ed50deb63eb4781336ca55f72cda5"},
 ]
 jmespath = [
     {file = "jmespath-0.10.0-py2.py3-none-any.whl", hash = "sha256:cdf6525904cc597730141d61b36f2e4b8ecc257c420fa2f4549bac2c2d0cb72f"},
     {file = "jmespath-0.10.0.tar.gz", hash = "sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9"},
 ]
 magma-suite = [
-    {file = "magma-suite-1.0.0b0.tar.gz", hash = "sha256:47da9832f931df4746e8d687ad86c24aaf4dddd615da501b9862caf4bbe6d9c0"},
-    {file = "magma_suite-1.0.0b0-py3-none-any.whl", hash = "sha256:4e434f58ea0df29f4f6f4fa0dc2768617ab38b71afae89046d896a2e9cff3583"},
+    {file = "magma-suite-1.0.0b3.tar.gz", hash = "sha256:e5b574b5ed40ef88137773fd656efda9b3ddd40e7ddd1b4859e9e1c5596c9da7"},
+    {file = "magma_suite-1.0.0b3-py3-none-any.whl", hash = "sha256:bc9079731540d68d8f14cf7419e7ac3abcb62004184d0b69f5a48b097c7507ad"},
 ]
 markupsafe = [
     {file = "MarkupSafe-1.1.1-cp27-cp27m-macosx_10_6_intel.whl", hash = "sha256:09027a7803a62ca78792ad89403b1b7a73a01c8cb65909cd876f7fcebd79b161"},
@@ -1273,8 +1274,8 @@ markupsafe = [
     {file = "MarkupSafe-1.1.1.tar.gz", hash = "sha256:29872e92839765e546828bb7754a68c418d927cd064fd4708fab9fe9c8bb116b"},
 ]
 more-itertools = [
-    {file = "more-itertools-8.12.0.tar.gz", hash = "sha256:7dc6ad46f05f545f900dd59e8dfb4e84a4827b97b3cfecb175ea0c7d247f6064"},
-    {file = "more_itertools-8.12.0-py3-none-any.whl", hash = "sha256:43e6dd9942dffd72661a2c4ef383ad7da1e6a3e968a927ad7a6083ab410a688b"},
+    {file = "more-itertools-8.13.0.tar.gz", hash = "sha256:a42901a0a5b169d925f6f217cd5a190e32ef54360905b9c39ee7db5313bfec0f"},
+    {file = "more_itertools-8.13.0-py3-none-any.whl", hash = "sha256:c5122bffc5f104d37c1626b8615b511f3427aa5389b94d61e5ef8236bfbc3ddb"},
 ]
 mypy-extensions = [
     {file = "mypy_extensions-0.4.3-py2.py3-none-any.whl", hash = "sha256:090fedd75945a69ae91ce1303b5824f428daf5a028d2f6ab8a299250a846f15d"},
@@ -1468,17 +1469,16 @@ smmap = [
     {file = "smmap-5.0.0.tar.gz", hash = "sha256:c840e62059cd3be204b0c9c9f74be2c09d5648eddd4580d9314c3ecde0b30936"},
 ]
 soupsieve = [
-    {file = "soupsieve-2.3.1-py3-none-any.whl", hash = "sha256:1a3cca2617c6b38c0343ed661b1fa5de5637f257d4fe22bd9f1338010a1efefb"},
-    {file = "soupsieve-2.3.1.tar.gz", hash = "sha256:b8d49b1cd4f037c7082a9683dfa1801aa2597fb11c3a1155b7a5b94829b4f1f9"},
+    {file = "soupsieve-2.3.2.post1-py3-none-any.whl", hash = "sha256:3b2503d3c7084a42b1ebd08116e5f81aadfaea95863628c80a3b774a11b7c759"},
+    {file = "soupsieve-2.3.2.post1.tar.gz", hash = "sha256:fc53893b3da2c33de295667a0e19f078c14bf86544af307354de5fcf12a3f30d"},
 ]
 structlog = [
     {file = "structlog-19.2.0-py2.py3-none-any.whl", hash = "sha256:6640e6690fc31d5949bc614c1a630464d3aaa625284aeb7c6e486c3010d73e12"},
     {file = "structlog-19.2.0.tar.gz", hash = "sha256:4287058cf4ce1a59bc5dea290d6386d37f29a37529c9a51cdf7387e51710152b"},
 ]
 tibanna = [
-    {file = "tibanna-1.9.1-py3-none-any.whl", hash = "sha256:988f24bddbe03f861c5e48dadbcd1bc2f62e0c5484bea58497c32343b62f7517"},
-    {file = "tibanna-1.9.1-py3.6.egg", hash = "sha256:1cf5a7c52108b2e2e0487f74caad3540347b888c5a6d2de9aef0db9b045e1771"},
-    {file = "tibanna-1.9.1.tar.gz", hash = "sha256:10c1e1abbc0098f078c9df6be632a6993badd616cc393c4683546674e16c5084"},
+    {file = "tibanna-1.9.2-py3-none-any.whl", hash = "sha256:4c2ac3f16ecc27d4dcdd2668c2057ac364262f933d3625438a4ef9f81e92dfeb"},
+    {file = "tibanna-1.9.2.tar.gz", hash = "sha256:b31f9a4ffc007a50e2d714b163a12d31b0f626df097ea8f68471a5b55badc38b"},
 ]
 tibanna-ff = [
     {file = "tibanna_ff-1.0.0-py3-none-any.whl", hash = "sha256:4dbd0ae7ac0afb39ecf00eaabdbb47ec1e66ea39d2197eab38fe6779a38d55f7"},

@@ -1,15 +1,17 @@
 import random
+import re
 from datetime import datetime
 
 from dcicutils import ff_utils, s3Utils
 from magma_ff import reset_metawfr, run_metawfr, status_metawfr
-from magma_ff.create_metawfr import MetaWorkflowRunFromSampleProcessing
-from pipeline_utils.check_lines import check_lines, fastqs_dict
+from magma_ff.create_metawfr import (
+    MetaWorkflowRunFromSampleProcessing,
+    MetaWorkflowRunFromSample,
+)
 
 from .helpers import constants
 from .helpers import wfr_utils
 from .helpers.confchecks import action_function, check_function
-from .helpers.linecount_dicts import CNV_dict, proband_SNV_dict, trio_SNV_dict
 from .helpers.utils import (
     initialize_check,
     initialize_action,
@@ -205,29 +207,56 @@ def md5runCGAP_start(connection, start_missing=True, start_not_switched=True, **
     if start_not_switched:
         targets.extend(check_result.get("files_with_run_and_wrong_status", []))
     action.output["targets"] = targets
-    for a_target in targets:
+    md5_workflow_uuid, md5_workflow_version = get_md5_workflow(connection)
+    if md5_workflow_uuid:
+        action.output["md5_workflow_uuid"] = md5_workflow_uuid
+        action.output["md5_workflow_version"] = md5_workflow_version
+    else:
+        msg = "Unable to identify suitable MD5 Workflow on this environment"
+        action.output["error"] = msg
+        action.description = msg
+        return action
+    for target_file in targets:
         if is_past_time_limit(start, LAMBDA_LIMIT):
             action.description = "Did not complete action due to time limitations"
             break
-        a_file = ff_utils.get_metadata(a_target, key=connection.ff_keys)
-        attributions = wfr_utils.get_attribution(a_file)
+        target_file_properties = ff_utils.get_metadata(
+            target_file, key=connection.ff_keys, add_on="frame=raw"
+        )
+        workflow_run_common_fields = {
+            "project": target_file_properties["project"],
+            "institution": target_file_properties["institution"],
+        }
+        workflow_run_template = {
+            "app_name": "md5",
+            "workflow_uuid": md5_workflow_uuid,
+            "config": {
+                "ebs_size": 10,
+                "instance_type": "t3.small",
+                "EBS_optimized": True,
+                "public_postrun_json": True,
+                "behavior_on_capacity_limit": "wait_and_retry",
+            },
+            "common_fields": workflow_run_common_fields,
+            "parameters": {},
+            "custom_qc_fields": {},
+        }
         file_parameters = {
-            "input_file": a_file["uuid"],
+            "input_file": target_file_properties["uuid"],
             "additional_file_parameters": {"input_file": {"mount": True}},
         }
-        wfr_setup = step_settings("md5", "no_organism", attributions)
         run_result = wfr_utils.run_missing_wfr(
-            wfr_setup,
+            workflow_run_template,
             file_parameters,
-            a_file["accession"],
+            target_file_properties["accession"],
             connection.ff_keys,
             connection.ff_env,
             step_function_name,
         )
         if run_result.startswith("http"):  # Success is AWS URL
-            runs_started[a_target] = run_result
+            runs_started[target_file] = run_result
         else:  # Failure is error message
-            runs_failed[a_target] = run_result
+            runs_failed[target_file] = run_result
     action.output["runs_started"] = runs_started
     action.output["runs_failed"] = runs_failed
     if not runs_failed:
@@ -235,125 +264,40 @@ def md5runCGAP_start(connection, start_missing=True, start_not_switched=True, **
     return action
 
 
-# Check and action below should probably be wrapped up in the MWFs as QualityMetrics
-# so that the results can be evaluated. Otherwise, no automated action can be taken
-# on the output.
-# @check_function()
-# def metawfrs_to_check_linecount(connection, **kwargs):
-#     """
-#     Find 'completed' metaworkflowruns
-#     Run a line_count_test qc check
-#     """
-#     check = initialize_check(connection)
-#     check.action = "line_count_test"
-#     check.description = "Find MetaWorkflowRuns that need linecount QC check."
-#
-#     meta_workflow_run_uuids = []
-#     meta_workflow_run_titles = []
-#     my_auth = connection.ff_keys
-#     query = (  # Overall QCs not empty but missing linecount
-#         "search/?type=MetaWorkflowRun&final_status=completed&field=uuid&field=title"
-#         "&overall_qcs.name!=linecount_test"
-#     )
-#     search_result = ff_utils.search_metadata(query, key=my_auth)
-#     get_and_add_uuids(search_result, meta_workflow_run_uuids)
-#     get_and_add_field(search_result, "title", meta_workflow_run_titles)
-#     query = (  # No overall QCs
-#         "search/?type=MetaWorkflowRun&final_status=completed&field=uuid&field=title"
-#         "&overall_qcs=No+value"
-#     )
-#     search_result = ff_utils.search_metadata(query, key=my_auth)
-#     get_and_add_uuids(search_result, meta_workflow_run_uuids)
-#     get_and_add_field(search_result, "title", meta_workflow_run_titles)
-#     msg = "%s MetaWorkflowRun(s) may require line count checks." % len(
-#         meta_workflow_run_uuids
-#     )
-#     check.summary = msg
-#     check.brief_output.append(msg)
-#     check.status = "WARN"
-#     check.full_output["metawfrs_to_run"] = {
-#         "titles": meta_workflow_run_titles,
-#         "uuids": meta_workflow_run_uuids,
-#     }
-#     if not meta_workflow_run_uuids:
-#         check.allow_action = False
-#     return check
-#
-#
-# @action_function()
-# def line_count_test(connection, **kwargs):
-#     start = datetime.utcnow()
-#     action = ActionResult(connection, "line_count_test")
-#     action_logs = {
-#         "metawfrs_that_passed_linecount_test": [],
-#         "metawfrs_that_failed_linecount_test": [],
-#     }
-#     my_auth = connection.ff_keys
-#     check_result = action.get_associated_check_result(kwargs).get("full_output", {})
-#     action_logs["check_output"] = check_result
-#     action_logs["error"] = []
-#     metawfr_uuids = check_result.get("metawfrs_to_run", {}).get("uuids", [])
-#     for metawfr_uuid in metawfr_uuids:
-#         now = datetime.utcnow()
-#         if (now - start).seconds > lambda_limit:
-#             action.description = "Did not complete action due to time limitations"
-#             break
-#         try:
-#             metawfr_meta = ff_utils.get_metadata(
-#                 metawfr_uuid, add_on="frame=raw", key=my_auth
-#             )
-#             # we have a few different dictionaries of steps to check output from in linecount_dicts.py
-#             # the proband-only and family workflows have the same steps, so we assign the proband_SNV_dict
-#             if (
-#                 "Proband-only" in metawfr_meta["title"]
-#                 or "Family" in metawfr_meta["title"]
-#             ):
-#                 steps_dict = proband_SNV_dict
-#             # trio has novoCaller, so it has a separate dictionary of steps
-#             elif "Trio" in metawfr_meta["title"]:
-#                 steps_dict = trio_SNV_dict
-#             # cnv/sv is a completely different pipeline, so has a many different steps
-#             elif "CNV" in metawfr_meta["title"]:
-#                 steps_dict = CNV_dict
-#             # if this is run on something other than those expected MWFRs, we want an error.
-#             else:
-#                 e = "Unexpected MWF Title: " + metawfr_meta["title"]
-#                 action_logs["error"].append(str(e))
-#                 continue
-#             # this calls check_lines from cgap-pipeline pipeline_utils check_lines.py (might get moved to generic repo in the future)
-#             # will return TRUE or FALSE if all pipeline steps are fine, or if there are any that do not match linecount with their partners, respectively
-#             linecount_result = check_lines(
-#                 metawfr_uuid, my_auth, steps=steps_dict, fastqs=fastqs_dict
-#             )
-#             # want an empty dictionary if no overall_qcs, or a dictionary of tests and results if there are items in the overall_qcs list
-#             overall_qcs_dict = {
-#                 qc["name"]: qc["value"] for qc in metawfr_meta.get("overall_qcs", [])
-#             }
-#             overall_qcs_dict["linecount_test"] = "PASS" if linecount_result else "FAIL"
-#             # turn the dictionary back into a list of dictionaries that is properly structured (e.g., overall_qcs: [{"name": "linecount_test", "value": "PASS"}, {...}, {...}])
-#             updated_overall_qcs = [
-#                 {"name": k, "value": v} for k, v in overall_qcs_dict.items()
-#             ]
-#             try:
-#                 ff_utils.patch_metadata(
-#                     {"overall_qcs": updated_overall_qcs}, metawfr_uuid, key=my_auth
-#                 )
-#                 if linecount_result:
-#                     action_logs["metawfrs_that_passed_linecount_test"].append(
-#                         metawfr_uuid
-#                     )
-#                 else:
-#                     action_logs["metawfrs_that_failed_linecount_test"].append(
-#                         metawfr_uuid
-#                     )
-#             except Exception as e:
-#                 action_logs["error"].append(str(e))
-#                 continue
-#         except Exception as e:
-#             action_logs["error"].append(str(e))
-#             continue
-#     action.output = action_logs
-#     return action
+def get_md5_workflow(connection):
+    """Get up-to-date MD5 workflow on the environment.
+
+    MD5 workflows are expected to have explicit name of "md5" and to
+    possess a version of the form x.x.x (e.g. v12.4.3) or x (e.g. v31),
+    with the former considered the "correct", default form and the
+    latter considered a fall-back.
+    """
+    md5_uuid = ""
+    md5_version = ""
+    three_version_md5s = {}
+    single_version_md5s = {}
+    three_version_pattern = re.compile(r"^(\d+)(\.(\d+)){2}$")
+    single_version_pattern = re.compile(r"^(\d+)$")
+    query = "/search/?type=Workflow&app_name=md5&field=uuid&field=app_version"
+    search_results = ff_utils.search_metadata(query, key=connection.ff_keys)
+    for md5_workflow in search_results:
+        workflow_uuid = md5_workflow.get("uuid")
+        version = md5_workflow.get("app_version", "").lstrip("v")
+        if three_version_pattern.match(version):
+            three_version_md5s[workflow_uuid] = version
+        elif single_version_pattern.match(version):
+            single_version_md5s[workflow_uuid] = version
+    if three_version_md5s:
+        for workflow_uuid, workflow_version in three_version_md5s.items():
+            if workflow_version > md5_version:
+                md5_version = workflow_version
+                md5_uuid = workflow_uuid
+    elif single_version_md5s:
+        for workflow_uuid, workflow_version in single_version_md5s.items():
+            if workflow_version > md5_version:
+                md5_version = workflow_version
+                md5_uuid = workflow_uuid
+    return md5_uuid, md5_version
 
 
 @check_function()
@@ -1270,23 +1214,151 @@ def create_meta_workflow_runs_for_items(connection, **kwargs):
     )
     action.description = "Create MetaWorkflowRuns"
 
-    success = []
-    error = {}
+    sample_success = []
+    sample_error = {}
+    sample_processing_success = []
+    sample_processing_error = {}
     meta_workflow_identifier = check_result.get("meta_workflow")
     sample_processings = check_result.get("sample_processing_for_meta_workflow", [])
-    for sample_processing in sample_processings:
-        try:
-            MetaWorkflowRunFromSampleProcessing(
-                sample_processing, meta_workflow_identifier, connection.ff_keys
-            ).post_and_patch()
-            success.append(sample_processing)
-        except Exception as error_msg:
-            error[sample_processing] = str(error_msg)
-    action.output["sample_processings_with_meta_workflow_runs"] = success
-    action.output["sample_processings_with_errors"] = error
-    if not error:
+    samples = check_result.get("samples_for_meta_workflow", [])
+    if sample_processings:
+        for sample_processing in sample_processings:
+            try:
+                MetaWorkflowRunFromSampleProcessing(
+                    sample_processing, meta_workflow_identifier, connection.ff_keys
+                ).post_and_patch()
+                sample_processing_success.append(sample_processing)
+            except Exception as error_msg:
+                sample_processing_error[sample_processing] = str(error_msg)
+        action.output["sample_processings_with_meta_workflow_runs"] = sample_processing_success
+        action.output["sample_processings_with_errors"] = sample_processing_error
+    if samples:
+        for sample in samples:
+            try:
+                MetaWorkflowRunFromSample(
+                    sample, meta_workflow_identifier, connection.ff_keys
+                ).post_and_patch()
+                sample_success.append(sample)
+            except Exception as error_msg:
+                sample_error[sample] = str(error_msg)
+        action.output["samples_with_meta_workflow_runs"] = sample_success
+        action.output["samples_with_errors"] = sample_error
+    if not sample_error and not sample_processing_error:
         action.status = constants.ACTION_PASS
     return action
+
+
+@check_function(
+    meta_workflow="",
+    cases=None,
+    sample_processings=None,
+    samples=None,
+)
+def find_sample_for_meta_workflow(
+    connection,
+    meta_workflow="",
+    cases=None,
+    sample_processings=None,
+    samples=None,
+    **kwargs,
+):
+    """Find Sample(s) and MetaWorkflow to create new
+    MetaWorkflowRun(s).
+    """
+    check = initialize_check("find_sample_for_meta_workflow", connection)
+    check.description = (
+        "Find Samples and MetaWorkflow to create new MetaWorkflowRuns"
+    )
+    check.action = "create_meta_workflow_runs_for_items"
+
+    samples_for_meta_workflow = set()
+    sample_processings_from_cases = set()
+    samples_from_sample_processings = set()
+    if meta_workflow:
+        meta_workflow_found, _ = validate_items_existence(meta_workflow, connection)
+        if meta_workflow_found:
+            meta_workflow_properties = meta_workflow_found[0]  # Only 1 MWF expected
+            meta_workflow_name = meta_workflow_properties.get("name")
+            meta_workflow_uuid = meta_workflow_properties.get("uuid")
+            msg = "MetaWorkflow found: %s" % meta_workflow_name
+            check.brief_output.append(msg)
+            check.full_output["meta_workflow"] = meta_workflow_uuid
+        else:
+            msg = "MetaWorkflow not found: %s" % meta_workflow
+            check.brief_output.append(msg)
+    if cases:
+        cases_found = []
+        cases_without_sample_processing = []
+        cases = format_kwarg_list(cases)
+        found, cases_not_found = validate_items_existence(cases, connection)
+        for case in found:
+            sample_processing = case.get("sample_processing")
+            case_uuid = case.get("uuid")
+            cases_found.append(case_uuid)
+            if sample_processing:
+                sample_processings_from_cases.add(sample_processing)
+            else:
+                cases_without_sample_processing.append(case_uuid)
+        msg = "%s Case(s) found" % len(cases_found)
+        check.brief_output.append(msg)
+        check.full_output["cases_found"] = cases_found
+        if cases_not_found:
+            msg = "%s Case(s) not found" % len(cases_not_found)
+            check.brief_output.append(msg)
+            check.full_output["cases_not_found"] = cases_not_found
+        if cases_without_sample_processing:
+            msg = "%s Case(s) lacked a SampleProcessing" % len(
+                cases_without_sample_processing
+            )
+            check.brief_output.append(msg)
+            check.full_output[
+                "cases_without_sample_processing"
+            ] = cases_without_sample_processing
+    if sample_processings or sample_processings_from_cases:
+        sample_processings_found = []
+        sample_processings = format_kwarg_list(sample_processings)
+        sample_processings |= sample_processings_from_cases
+        found, not_found = validate_items_existence(sample_processings, connection)
+        for sample_processing in found:
+            sample_processings_found.append(sample_processing.get("uuid"))
+            for sample in sample_processing.get("samples", []):
+                samples_from_sample_processing.add(sample)
+        msg = "%s SampleProcessing(s) were found" % len(sample_processings_found)
+        check.brief_output.append(msg)
+        check.full_output["sample_processings_found"] = sample_processings_found
+        if not_found:
+            msg = "%s SampleProcessing(s) not found" % len(not_found)
+            check.brief_output.append(msg)
+            check.full_output["sample_processings_not_found"] = not_found
+    if samples or samples_from_sample_processing:
+        samples_found = []
+        samples = format_kwarg_list(samples)
+        samples |= samples_from_sample_processing
+        found, not_found = validate_items_existence(samples, connection)
+        for sample in found:
+            samples_for_meta_workflow.add(sample.get("uuid"))
+        if not_found:
+            msg = "%s Sample(s) not found" % len(not_found)
+            check.brief_output.append(msg)
+            check.full_output["samples_not_found"] = not_found
+    msg = "%s Sample(s) found to use for MetaWorkflowRun creation" % len(
+        samples_for_meta_workflow
+    )
+    check.brief_output.append(msg)
+    check.full_output["samples_for_meta_workflow"] = samples_for_meta_workflow
+    if samples_for_meta_workflow and meta_workflow:
+        msg = "Action will create %s MetaWorkflowRun(s) for MetaWorkflow %s" % (
+            len(samples_for_meta_workflow),
+            meta_workflow,
+        )
+        check.brief_output.append(msg)
+        check.summary = msg
+    else:
+        msg = "Could not find information required to create MetaWorkflowRuns"
+        check.brief_output.append(msg)
+        check.summary = msg
+        check.allow_action = False
+    return check
 
 
 @check_function(meta_workflow_runs=None)

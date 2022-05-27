@@ -27,19 +27,19 @@ def initialize_action(action_name, connection, kwargs):
 
 
 def format_kwarg_list(kwarg_input):
-    """Ensure kwarg is a list of strings."""
+    """Ensure kwarg is a set of unique strings."""
     if isinstance(kwarg_input, str):
-        result = []
+        result = set()
         no_space_input = kwarg_input.replace(" ", ",")
         split_input = no_space_input.split(",")
         for input_item in split_input:
             stripped_item = input_item.strip()
             if stripped_item:
-                result.append(stripped_item)
+                result.add(stripped_item)
     elif isinstance(kwarg_input, list):
-        result = kwarg_input
+        result = set(kwarg_input)
     elif kwarg_input is None:
-        result = []
+        result = set()
     else:
         raise Exception("Couldn't format kwarg input: %s" % kwarg_input)
     return result
