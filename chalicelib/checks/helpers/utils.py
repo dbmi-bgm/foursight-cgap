@@ -8,7 +8,11 @@ from .confchecks import CheckResult, ActionResult
 
 
 def initialize_check(check_name, connection):
-    """Create a CheckResult with default attributes."""
+    """Create a CheckResult with default attributes.
+
+    Set default status to error to be updated within check
+    appropriately if all goes well.
+    """
     check = CheckResult(connection, check_name)
     check.brief_output = []
     check.full_output = {}
@@ -18,7 +22,11 @@ def initialize_check(check_name, connection):
 
 
 def initialize_action(action_name, connection, kwargs):
-    """Create an ActionResult with default attributes."""
+    """Create an ActionResult with default attributes.
+
+    Set default status to failure to be updated within action
+    appropriately if all goes well.
+    """
     action = ActionResult(connection, action_name)
     action.status = constants.ACTION_FAIL
     action.output = {}
@@ -86,7 +94,7 @@ def make_embed_request(ids, fields, connection):
         ids = [ids]
     if isinstance(fields, str):
         fields = [fields]
-    id_chunks = chunk_ids(ids)
+    id_chunks = chunk_ids(ids, chunk_size=5)  # Max 5 IDs to /embed as of 20220601 -drr
     for id_chunk in id_chunks:
         post_body = {"ids": ids, "fields": fields}
         endpoint = connection.ff_server + "/embed"
@@ -99,13 +107,9 @@ def make_embed_request(ids, fields, connection):
     return result
 
 
-def chunk_ids(ids):
-    """Split list into list of lists of maximum chunk size length.
-
-    Embed API currently accepts max 5 identifiers, so chunk size is 5.
-    """
+def chunk_ids(ids, chunk_size=5):
+    """Split list into list of lists of maximum chunk size length."""
     result = []
-    chunk_size = 5
     for idx in range(0, len(ids), chunk_size):
         result.append(ids[idx: idx + chunk_size])
     return result
@@ -113,6 +117,7 @@ def chunk_ids(ids):
 
 def get_step_function_name(connection):
     """Create step function environment from given connection"""
+    # XXX Acquire from health page in future?
     return "tibanna_zebra_" + connection.ff_env.replace("fourfront-", "")
 
 

@@ -227,7 +227,7 @@
         ]
     },
     "find_meta_workflow_runs_requiring_output_linktos": {
-        "title": "MetaWorkflowRuns for output file PATCHes",
+        "title": "MetaWorkflowRuns to PATCH output files",
         "group": "Pipeline Checks",
         "schedule": {
             "hourly_checks_2": {
@@ -273,7 +273,7 @@
         ]
     },
     "find_sample_processing_for_meta_workflow": {
-        "title": "Create MetaWorkflowRun For SampleProcessing",
+        "title": "Create MetaWorkflowRun from SampleProcessing",
         "group": "Pipeline Checks",
         "schedule": {
             "manual_checks": {
@@ -289,7 +289,7 @@
         ]
     },
     "find_sample_for_meta_workflow": {
-        "title": "Create MetaWorkflowRun For Sample",
+        "title": "Create MetaWorkflowRun from Sample",
         "group": "Pipeline Checks",
         "schedule": {
             "manual_checks": {

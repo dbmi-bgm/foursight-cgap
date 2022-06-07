@@ -74,8 +74,7 @@ class MetaWorkflowRunsFound:
         """
         query = "/search/?type=MetaWorkflowRun&field=uuid&field=title"
         query += "".join("&final_status=" + status for status in final_status)
-        search_response = ff_utils.search_metadata(query, key=self.key)
-        self.add_items(search_response)
+        self.search_query(query)
 
     def search_query(self, query):
         """Find MetaWorkflowRuns matching the query and update
