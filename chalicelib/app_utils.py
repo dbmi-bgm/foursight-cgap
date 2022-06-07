@@ -4,10 +4,10 @@ from .vars import FOURSIGHT_PREFIX, HOST
 
 
 class AppUtils(AppUtils_from_core):
-    
+
     # overwriting parent class
     prefix = FOURSIGHT_PREFIX
-    FAVICON = 'https://cgap.hms.harvard.edu/static/img/favicon-fs.ico'
+    FAVICON = 'https://cgap-dbmi.hms.harvard.edu/favicon.ico'
     host = HOST
     package_name = 'chalicelib'
     check_setup_dir = dirname(__file__)
