@@ -185,7 +185,7 @@ def check_deleted_file_lifecycle_status(num_files_to_check, first_check_after, m
 
     search_query = (
         "/search/?type=File"
-        "&s3_lifecycle_category=No+value"
+        "&s3_lifecycle_category%21=deleted"
         f"&last_modified.date_modified.to={threshold_date}"
         "&status=deleted"
         f"&limit={num_files_to_check}"
