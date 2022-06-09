@@ -215,7 +215,7 @@
       "s3_lifecycle_category": "short_term_access",
       "s3_lifecycle_status": "standard",
       "date_created": "2022-01-12T17:55:43.217164+00:00",
-      "extra_files":[
+      "extra_files": [
         {
           "uuid": "file_40",
           "upload_key": "file_40_upload_key_extra"
@@ -232,7 +232,7 @@
       "s3_lifecycle_category": "short_term_access_long_term_archive",
       "s3_lifecycle_status": "standard",
       "date_created": "2022-05-12T17:55:43.217164+00:00",
-      "extra_files":[
+      "extra_files": [
         {
           "uuid": "file_41",
           "upload_key": "file_41_upload_key_extra_1"
@@ -306,24 +306,24 @@
         },
         "long_term_access_long_term_archive": {
           "move_to_infrequent_access_after": 12,
-            "move_to_deep_archive_after": 24,
-            "expire_after": 36
+          "move_to_deep_archive_after": 24,
+          "expire_after": 36
         },
         "short_term_access": {
           "move_to_infrequent_access_after": 0,
-            "expire_after": 12
+          "expire_after": 12
         },
         "long_term_access": {
           "move_to_infrequent_access_after": 0,
-            "expire_after": 36
+          "expire_after": 36
         },
         "short_term_archive": {
           "move_to_deep_archive_after": 0,
-            "expire_after": 12
+          "expire_after": 12
         },
         "long_term_archive": {
           "move_to_deep_archive_after": 0,
-            "expire_after": 18
+          "expire_after": 18
         },
         "no_storage": {
           "expire_after": 0

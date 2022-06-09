@@ -548,5 +548,24 @@
         "display": [
             "<env-name>"
         ]
+    },
+    "check_deleted_files_lifecycle_status": {
+        "title": "Check for deleted files that require lifecycle updates",
+        "group": "Metadata checks",
+        "schedule": {
+            "morning_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "files_per_run": 100,
+                        "first_check_after": 14
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
     }
+
 }

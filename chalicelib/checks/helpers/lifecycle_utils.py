@@ -31,7 +31,7 @@ ARCHIVED = "archived"
 
 default_lifecycle_policy = {
     SHORT_TERM_ACCESS_LONG_TERM_ARCHIVE: {
-        MOVE_TO_INFREQUENT_ACCESS_AFTER: 0,
+        MOVE_TO_INFREQUENT_ACCESS_AFTER: 0, # units in months
         MOVE_TO_DEEP_ARCHIVE_AFTER: 3,
         EXPIRE_AFTER: 36,
     },
@@ -61,18 +61,10 @@ default_lifecycle_policy = {
     },
 }
 
-lifecycle_status_to_file_status = {
-    STANDARD: UPLOADED,
-    INFREQUENT_ACCESS: UPLOADED,
-    GLACIER: ARCHIVED,
-    DEEP_ARCHIVE: ARCHIVED,
-    DELETED: DELETED
-}
-
 
 def check_file_lifecycle_status(num_files_to_check, first_check_after, max_checking_frequency, my_auth):
     """
-    This main check function. Factored out for easier testing
+    This main lifecycle check function. Factored out for easier testing
     """
 
     check_result = {
@@ -89,20 +81,18 @@ def check_file_lifecycle_status(num_files_to_check, first_check_after, max_check
     threshold_date_mcf = threshold_date_mcf.strftime("%Y-%m-%d")
 
     search_query_base = (
-        "/search/?type=FileProcessed&type=FileFastq"
+        "/search/?type=File"
         "&s3_lifecycle_category%21=No+value"
         f"&s3_lifecycle_category%21={IGNORE}"
         f"&date_created.to={threshold_date_fca}"
-        "&status=uploaded"
-        "&status=archived"
-        "&status=shared"
+        "&status%21=deleted"
         f"&limit={num_files_to_check // 2}"
         )
     search_query_1 = f"{search_query_base}&s3_lifecycle_last_checked.to={threshold_date_mcf}"
     search_query_2 = f"{search_query_base}&s3_lifecycle_last_checked=No+value"
     
     all_files = ff_utils.search_metadata(search_query_1, key=my_auth)
-    all_files = all_files + ff_utils.search_metadata(search_query_2, key=my_auth)
+    all_files += ff_utils.search_metadata(search_query_2, key=my_auth)
         
     files_to_update = [] # This will contain the files that require lifecycle updates  
     files_without_update = []
@@ -176,6 +166,55 @@ def check_file_lifecycle_status(num_files_to_check, first_check_after, max_check
     check_result["files_without_update"] = files_without_update
     check_result["files_with_issues"] = files_with_issues
     check_result["logs"] = logs
+    return check_result
+
+def check_deleted_file_lifecycle_status(num_files_to_check, first_check_after, my_auth):
+    """
+    This lifecylce check function for deleted files. 
+    """
+
+    check_result = {
+        "status": "PASS",
+        "warning": ""
+    }
+
+    # We only want to get deleted files from the portal that don't have a lifecycle category and have not been
+    # modified for at least {first_check_after} days.
+    threshold_date = datetime.date.today() - datetime.timedelta(first_check_after)
+    threshold_date = threshold_date.strftime("%Y-%m-%d")
+
+    search_query = (
+        "/search/?type=File"
+        "&s3_lifecycle_category=No+value"
+        f"&last_modified.date_modified.to={threshold_date}"
+        "&status=deleted"
+        f"&limit={num_files_to_check}"
+        )
+    
+    all_files = ff_utils.search_metadata(search_query, key=my_auth)
+        
+    files_to_update = [] # This will contain the files that require lifecycle updates  
+
+    for file in all_files:
+        file_uuid = file['uuid']
+
+        update_dict = {
+                "uuid": file_uuid,
+                "upload_key": file["upload_key"],
+                "is_extra_file": False
+            }
+        files_to_update.append(update_dict)
+
+        # Get extra files and update those as well. They will be treated like the original file
+        extra_files = file.get("extra_files", [])
+        for ef in extra_files:
+            ef_update_dict = update_dict.copy()
+            ef_update_dict["upload_key"] = ef["upload_key"]
+            ef_update_dict["is_extra_file"] = True
+            files_to_update.append(ef_update_dict)
+       
+
+    check_result["files_to_update"] = files_to_update
     return check_result
 
 # Factored out, so that it can be mocked in tests. Not pretty, but seemed to be the easiest solution 
@@ -264,15 +303,37 @@ def lifecycle_status_to_int(lifecycle_status):
     Returns:
         an integer
     """
-    mapping = {
-        STANDARD: 1,
-        INFREQUENT_ACCESS: 2,
-        GLACIER: 3,
-        DEEP_ARCHIVE: 4,
-        DELETED: 5
-    }
-    
-    return mapping[lifecycle_status]
+
+    if lifecycle_status == INFREQUENT_ACCESS:
+        return 2
+    elif lifecycle_status == GLACIER:
+        return 3
+    elif lifecycle_status == DEEP_ARCHIVE:
+        return 4
+    elif lifecycle_status == DELETED:
+        return 5
+    else:
+        return 1
+
+
+def lifecycle_status_to_file_status(lifecycle_status):
+    """Converts a lifecycle status to a file status.
+
+    Args:
+        lifecycle_status(string): lifecycle status from portal (e.g. "deep archive")
+
+    Returns:
+        File status
+    """
+   
+    if lifecycle_status == GLACIER:
+        return ARCHIVED
+    elif lifecycle_status == DEEP_ARCHIVE:
+        return ARCHIVED
+    elif lifecycle_status == DELETED:
+        return DELETED
+    else:
+        return False
 
 
 def convert_es_timestamp_to_datetime(raw):
