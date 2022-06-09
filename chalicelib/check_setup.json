@@ -557,7 +557,7 @@
                 "<env-name>": {
                     "kwargs": {
                         "files_per_run": 100,
-                        "first_check_after": 14
+                        "check_after": 14
                     },
                     "dependencies": []
                 }

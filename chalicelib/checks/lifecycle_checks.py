@@ -126,13 +126,13 @@ def patch_file_lifecycle_status(connection, **kwargs):
     return action
 
 
-@check_function(files_per_run=100, first_check_after=14)
+@check_function(files_per_run=100, check_after=14)
 def check_deleted_files_lifecycle_status(connection, **kwargs):
     """
     Find deleted files without lifecycle category and tag them for deleteion from S3.
     Additional arguments:
     files_per_run (int): determines how many files to check at once. Default: 100
-    first_check_after (int): number of days after file has been modified, when lifecycle status starts to be checked. 
+    check_after (int): number of days after file has been modified, when lifecycle status starts to be checked. 
         Default 14 (days). If a files got status deleted in error, we want to to give the user 14 days to potentially
         correct it.
     """
@@ -148,10 +148,10 @@ def check_deleted_files_lifecycle_status(connection, **kwargs):
     check.status = "PASS"
 
     num_files_to_check = kwargs.get("files_per_run", 100)
-    first_check_after = kwargs.get("first_check_after", 14)
+    check_after = kwargs.get("check_after", 14)
 
     # This is the main functionality of the check. Factored out for easier testing.
-    res = lifecycle_utils.check_deleted_file_lifecycle_status(num_files_to_check, first_check_after, my_auth)
+    res = lifecycle_utils.check_deleted_files_lifecycle_status(num_files_to_check, check_after, my_auth)
 
     check.status = res["status"]
     check.summary = f'{len(res["files_to_update"])} files require patching.'

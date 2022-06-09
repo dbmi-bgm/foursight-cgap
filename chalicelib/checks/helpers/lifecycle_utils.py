@@ -168,7 +168,7 @@ def check_file_lifecycle_status(num_files_to_check, first_check_after, max_check
     check_result["logs"] = logs
     return check_result
 
-def check_deleted_file_lifecycle_status(num_files_to_check, first_check_after, my_auth):
+def check_deleted_files_lifecycle_status(num_files_to_check, check_after, my_auth):
     """
     This is the lifecycle check function for deleted files. 
     """
@@ -180,12 +180,12 @@ def check_deleted_file_lifecycle_status(num_files_to_check, first_check_after, m
 
     # We only want to get deleted files from the portal that don't have a lifecycle category and have not been
     # modified for at least {first_check_after} days.
-    threshold_date = datetime.date.today() - datetime.timedelta(first_check_after)
+    threshold_date = datetime.date.today() - datetime.timedelta(check_after)
     threshold_date = threshold_date.strftime("%Y-%m-%d")
 
     search_query = (
         "/search/?type=File"
-        "&s3_lifecycle_category%21=deleted"
+        "&s3_lifecycle_status%21=deleted"
         f"&last_modified.date_modified.to={threshold_date}"
         "&status=deleted"
         f"&limit={num_files_to_check}"
