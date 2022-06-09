@@ -170,7 +170,7 @@ def check_file_lifecycle_status(num_files_to_check, first_check_after, max_check
 
 def check_deleted_file_lifecycle_status(num_files_to_check, first_check_after, my_auth):
     """
-    This lifecylce check function for deleted files. 
+    This is the lifecycle check function for deleted files. 
     """
 
     check_result = {
