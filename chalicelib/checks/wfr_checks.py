@@ -1344,7 +1344,7 @@ def find_sample_for_meta_workflow(
         samples_for_meta_workflow
     )
     check.brief_output.append(msg)
-    check.full_output["samples_for_meta_workflow"] = samples_for_meta_workflow
+    check.full_output["samples_for_meta_workflow"] = list(samples_for_meta_workflow)
     if samples_for_meta_workflow and meta_workflow:
         msg = "Action will create %s MetaWorkflowRun(s) for MetaWorkflow %s" % (
             len(samples_for_meta_workflow),
