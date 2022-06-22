@@ -169,7 +169,7 @@
         "title": "MetaWorkflowRuns to run",
         "group": "Pipeline Checks",
         "schedule": {
-            "fifteen_min_checks_3": {
+            "fifteen_min_checks": {
                 "<env-name>": {
                     "kwargs": {
                         "primary": true,
@@ -184,7 +184,7 @@
         "title": "MetaWorkflowRuns to check status",
         "group": "Pipeline Checks",
         "schedule": {
-            "fifteen_min_checks": {
+            "fifteen_min_checks_3": {
                 "<env-name>": {
                     "kwargs": {
                         "primary": true,
