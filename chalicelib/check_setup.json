@@ -548,5 +548,43 @@
         "display": [
             "<env-name>"
         ]
+    },
+    "check_file_lifecycle_status": {
+        "title": "Check for files that require lifecycle updates",
+        "group": "Metadata checks",
+        "schedule": {
+            "hourly_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "files_per_run": 100, 
+                        "max_checking_frequency": 14,
+                        "first_check_after": 14
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "check_deleted_files_lifecycle_status": {
+        "title": "Check for deleted files that require lifecycle updates",
+        "group": "Metadata checks",
+        "schedule": {
+            "hourly_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "files_per_run": 50,
+                        "check_after": 14
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
     }
+
 }

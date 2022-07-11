@@ -1,0 +1,340 @@
+{
+  "files": [
+    {
+      "uuid": "file_1",
+      "upload_key": "file_1_upload_key",
+      "s3_lifecycle_category": "long_term_archive",
+      "s3_lifecycle_status": "standard",
+      "date_created": "2022-04-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_without_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_2",
+      "upload_key": "file_2_upload_key",
+      "s3_lifecycle_category": "long_term_archive",
+      "s3_lifecycle_status": "standard",
+      "date_created": "2019-04-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_without_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_3",
+      "upload_key": "file_3_upload_key",
+      "s3_lifecycle_category": "long_term_archive",
+      "s3_lifecycle_status": "deep archive",
+      "date_created": "2019-04-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_without_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_4",
+      "upload_key": "file_4_upload_key",
+      "s3_lifecycle_category": "short_term_access_long_term_archive",
+      "s3_lifecycle_status": "standard",
+      "date_created": "2022-04-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_without_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_5",
+      "upload_key": "file_5_upload_key",
+      "s3_lifecycle_category": "short_term_access_long_term_archive",
+      "s3_lifecycle_status": "infrequent access",
+      "date_created": "2022-01-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_without_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_6",
+      "upload_key": "file_6_upload_key",
+      "s3_lifecycle_category": "short_term_access_long_term_archive",
+      "s3_lifecycle_status": "deep archive",
+      "date_created": "2019-01-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_without_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_7",
+      "upload_key": "file_7_upload_key",
+      "s3_lifecycle_category": "long_term_access_long_term_archive",
+      "s3_lifecycle_status": "standard",
+      "date_created": "2021-01-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_without_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_8",
+      "upload_key": "file_8_upload_key",
+      "s3_lifecycle_category": "short_term_access",
+      "s3_lifecycle_status": "standard",
+      "date_created": "2022-01-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_without_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_9",
+      "upload_key": "file_9_upload_key",
+      "s3_lifecycle_category": "short_term_access",
+      "s3_lifecycle_status": "standard",
+      "date_created": "2021-01-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_without_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_10",
+      "upload_key": "file_10_upload_key",
+      "s3_lifecycle_category": "no_storage",
+      "s3_lifecycle_status": "standard",
+      "date_created": "2022-05-22T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_without_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_20",
+      "upload_key": "file_20_upload_key",
+      "s3_lifecycle_category": "long_term_archive",
+      "s3_lifecycle_status": "standard",
+      "date_created": "2022-04-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_with_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_21",
+      "upload_key": "file_21_upload_key",
+      "s3_lifecycle_category": "long_term_archive",
+      "s3_lifecycle_status": "standard",
+      "date_created": "2021-04-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_with_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_22",
+      "upload_key": "file_22_upload_key",
+      "s3_lifecycle_category": "long_term_archive",
+      "s3_lifecycle_status": "deep archive",
+      "date_created": "2019-04-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_with_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_23",
+      "upload_key": "file_23_upload_key",
+      "s3_lifecycle_category": "short_term_access_long_term_archive",
+      "s3_lifecycle_status": "standard",
+      "date_created": "2022-05-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_with_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_24",
+      "upload_key": "file_24_upload_key",
+      "s3_lifecycle_category": "short_term_access_long_term_archive",
+      "s3_lifecycle_status": "infrequent access",
+      "date_created": "2022-04-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_with_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_25",
+      "upload_key": "file_25_upload_key",
+      "s3_lifecycle_category": "short_term_access_long_term_archive",
+      "s3_lifecycle_status": "deep archive",
+      "date_created": "2021-01-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_with_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_26",
+      "upload_key": "file_26_upload_key",
+      "s3_lifecycle_category": "long_term_access_long_term_archive",
+      "s3_lifecycle_status": "standard",
+      "date_created": "2022-01-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_with_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_27",
+      "upload_key": "file_27_upload_key",
+      "s3_lifecycle_category": "short_term_access",
+      "s3_lifecycle_status": "standard",
+      "date_created": "2022-01-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_with_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_28",
+      "upload_key": "file_28_upload_key",
+      "s3_lifecycle_category": "short_term_access",
+      "s3_lifecycle_status": "standard",
+      "date_created": "2021-01-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_with_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_40",
+      "upload_key": "file_40_upload_key",
+      "s3_lifecycle_category": "short_term_access",
+      "s3_lifecycle_status": "standard",
+      "date_created": "2022-01-12T17:55:43.217164+00:00",
+      "extra_files": [
+        {
+          "uuid": "file_40",
+          "upload_key": "file_40_upload_key_extra"
+        }
+      ],
+      "project": {
+        "uuid": "project_without_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_41",
+      "upload_key": "file_41_upload_key",
+      "s3_lifecycle_category": "short_term_access_long_term_archive",
+      "s3_lifecycle_status": "standard",
+      "date_created": "2022-05-12T17:55:43.217164+00:00",
+      "extra_files": [
+        {
+          "uuid": "file_41",
+          "upload_key": "file_41_upload_key_extra_1"
+        },
+        {
+          "uuid": "file_41",
+          "upload_key": "file_41_upload_key_extra_2"
+        }
+      ],
+      "project": {
+        "uuid": "project_with_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_50",
+      "upload_key": "file_50_upload_key",
+      "s3_lifecycle_category": "custom_policy",
+      "s3_lifecycle_status": "standard",
+      "date_created": "2022-05-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_with_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_51",
+      "upload_key": "file_51_upload_key",
+      "s3_lifecycle_category": "custom_policy",
+      "s3_lifecycle_status": "infrequent access",
+      "date_created": "2022-04-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_with_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_52",
+      "upload_key": "file_52_upload_key",
+      "s3_lifecycle_category": "custom_policy",
+      "s3_lifecycle_status": "glacier",
+      "date_created": "2022-03-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_with_lifecycle_policy"
+      },
+      "status": "uploaded"
+    },
+    {
+      "uuid": "file_53",
+      "upload_key": "file_53_upload_key",
+      "s3_lifecycle_category": "custom_policy",
+      "s3_lifecycle_status": "deep archive",
+      "date_created": "2022-02-12T17:55:43.217164+00:00",
+      "project": {
+        "uuid": "project_with_lifecycle_policy"
+      },
+      "status": "uploaded"
+    }
+  ],
+  "projects": [
+    {
+      "uuid": "project_without_lifecycle_policy"
+    },
+    {
+      "uuid": "project_with_lifecycle_policy",
+      "lifecycle_policy": {
+        "short_term_access_long_term_archive": {
+          "move_to_infrequent_access_after": 0,
+          "move_to_deep_archive_after": 1,
+          "expire_after": 18
+        },
+        "long_term_access_long_term_archive": {
+          "move_to_infrequent_access_after": 12,
+          "move_to_deep_archive_after": 24,
+          "expire_after": 36
+        },
+        "short_term_access": {
+          "move_to_infrequent_access_after": 0,
+          "expire_after": 12
+        },
+        "long_term_access": {
+          "move_to_infrequent_access_after": 0,
+          "expire_after": 36
+        },
+        "short_term_archive": {
+          "move_to_deep_archive_after": 0,
+          "expire_after": 12
+        },
+        "long_term_archive": {
+          "move_to_deep_archive_after": 0,
+          "expire_after": 18
+        },
+        "no_storage": {
+          "expire_after": 0
+        },
+        "custom_policy": {
+          "move_to_infrequent_access_after": 0,
+          "move_to_glacier_after": 1,
+          "move_to_deep_archive_after": 2,
+          "expire_after": 3
+        }
+      }
+    }
+  ]
+}
