@@ -1051,10 +1051,12 @@ def find_meta_workflow_runs_to_kill(
         meta_workflow_runs_not_found += not_found
     if meta_workflows is not None:
         meta_workflows = format_kwarg_list(meta_workflows)
-        for meta_workflow in meta_workflows:
+        found, not_found = validate_items_existence(meta_workflows, connection)
+        for meta_workflow in found:
+            meta_workflow_uuid = meta_workflow.get("uuid")
             query = (
                 "search/?type=MetaWorkflowRun&field=uuid&meta_workflow.uuid="
-                + meta_workflow
+                + meta_workflow_uuid
                 + "".join(
                     ["&final_status=" + status for status in FINAL_STATUS_TO_KILL]
                 )
