@@ -638,7 +638,7 @@ def ingest_vcf_status(connection, start_date=None, file_accessions=None, **kwarg
         "&status!=uploading&status!=to be uploaded by workflow&status!=upload failed"
     )
     new_style_query = (
-        "/search/?vcf_to_be_ingested=true&type=FileProcessed"
+        "/search/?vcf_to_ingest=true&type=FileProcessed"
         "&file_ingestion_status=No value&file_ingestion_status=N/A"
         "&status!=uploading&status!=to be uploaded by workflow&status!=upload failed"
     )
