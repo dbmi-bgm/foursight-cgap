@@ -2,7 +2,7 @@ import datetime
 from dcicutils import ff_utils
 from dcicutils.s3_utils import s3Utils
 from .helpers import lifecycle_utils
-from .helpers.wfrset_utils import lambda_limit
+from .helpers.wfrset_utils import LAMBDA_LIMIT
 
 # Use confchecks to import decorators object and its methods for each check module
 # rather than importing check_function, action_function, CheckResult, ActionResult
@@ -73,7 +73,7 @@ def patch_file_lifecycle_status(connection, **kwargs):
 
     for file in files:
         now = lifecycle_utils.get_datetime_utcnow()
-        if (now-start).seconds > lambda_limit:
+        if (now-start).seconds > LAMBDA_LIMIT:
             action_logs["logs"].append('Did not complete action due to time limitations')
             break
 
