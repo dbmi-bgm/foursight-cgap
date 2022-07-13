@@ -166,22 +166,7 @@
         ]
     },
     "metawfrs_to_run": {
-        "title": "Metawfrs to run",
-        "group": "Pipeline Checks",
-        "schedule": {
-            "fifteen_min_checks_3": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true,
-                        "queue_action": "prod"
-                    },
-                    "dependencies": []
-                }
-            }
-        }
-    },
-    "metawfrs_to_checkstatus": {
-        "title": "Metawfrs to check status",
+        "title": "MetaWorkflowRuns to run",
         "group": "Pipeline Checks",
         "schedule": {
             "fifteen_min_checks": {
@@ -195,8 +180,23 @@
             }
         }
     },
+    "metawfrs_to_checkstatus": {
+        "title": "MetaWorkflowRuns to check status",
+        "group": "Pipeline Checks",
+        "schedule": {
+            "fifteen_min_checks_3": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true,
+                        "queue_action": "prod"
+                    },
+                    "dependencies": []
+                }
+            }
+        }
+    },
     "spot_failed_metawfrs": {
-        "title": "Spot-failed Metawfrs",
+        "title": "Spot-failed MetaWorkflowRuns",
         "group": "Pipeline Checks",
         "schedule": {
             "fifteen_min_checks_2": {
@@ -211,21 +211,23 @@
         }
     },
     "failed_metawfrs": {
-        "title": "Failed Metawfrs",
+        "title": "Failed MetaWorkflowRuns",
         "group": "Pipeline Checks",
         "schedule": {
             "manual_checks": {
                 "<env-name>": {
                     "kwargs": {
                         "primary": true
-                    },
-                    "dependencies": []
+                    }
                 }
             }
-        }
+        },
+        "display": [
+            "<env-name>"
+        ]
     },
-    "metawfrs_to_patch_samples": {
-        "title": "Metawfrs to patch samples with processed files",
+    "find_meta_workflow_runs_requiring_output_linktos": {
+        "title": "MetaWorkflowRuns to PATCH output files",
         "group": "Pipeline Checks",
         "schedule": {
             "hourly_checks_2": {
@@ -233,56 +235,74 @@
                     "kwargs": {
                         "primary": true,
                         "queue_action": "prod"
-                    },
-                    "dependencies": []
+                    }
                 }
             }
         }
     },
-    "SNV_metawfrs_to_patch_sample_processing": {
-        "title": "SNV metawfrs to patch sample processing with processed files",
+    "find_meta_workflow_runs_with_linkto_errors": {
+        "title": "MetaWorkflowRuns with output file PATCH errors",
         "group": "Pipeline Checks",
         "schedule": {
-            "hourly_checks_2": {
+            "manual_checks": {
                 "<env-name>": {
                     "kwargs": {
-                        "primary": true,
-                        "queue_action": "prod"
-                    },
-                    "dependencies": []
+                        "primary": true
+                    }
                 }
             }
-        }
+        },
+        "display": [
+            "<env-name>"
+        ]
     },
-    "SV_metawfrs_to_patch_sample_processing": {
-        "title": "SV metawfrs to patch sample processing with processed files",
+    "find_meta_workflow_runs_to_kill": {
+        "title": "MetaWorkflowRuns to stop",
         "group": "Pipeline Checks",
         "schedule": {
-            "hourly_checks_2": {
+            "manual_checks": {
                 "<env-name>": {
                     "kwargs": {
-                        "primary": true,
-                        "queue_action": "prod"
-                    },
-                    "dependencies": []
+                        "primary": true
+                    }
                 }
             }
-        }
+        },
+        "display": [
+            "<env-name>"
+        ]
     },
-    "metawfrs_to_check_linecount": {
-        "title": "Metawfrs to run line count qc",
+    "find_sample_processing_for_meta_workflow": {
+        "title": "Create MetaWorkflowRun from SampleProcessing",
         "group": "Pipeline Checks",
         "schedule": {
-            "hourly_checks": {
+            "manual_checks": {
                 "<env-name>": {
                     "kwargs": {
-                        "primary": true,
-                        "queue_action": "prod"
-                    },
-                    "dependencies": []
+                        "primary": true
+                    }
                 }
             }
-        }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "find_sample_for_meta_workflow": {
+        "title": "Create MetaWorkflowRun from Sample",
+        "group": "Pipeline Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
     },
     "md5runCGAP_status": {
         "title": "MD5 runs",
@@ -298,6 +318,22 @@
                 }
             }
         }
+    },
+    "find_meta_workflow_runs_with_quality_metric_failure": {
+        "title": "MetaWorkflowRuns with QC failure(s)",
+        "group": "Pipeline Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
     },
     "ingest_vcf_status": {
         "title": "Trigger VCF ingestion",
@@ -318,23 +354,6 @@
     },
     "check_vcf_ingestion_errors": {
         "title": "Check VCFs for ingestion errors",
-        "group": "Pipeline Checks",
-        "schedule": {
-            "manual_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true
-                    },
-                    "dependencies": []
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
-    "long_running_wfrs_status": {
-        "title": "Long Running Runs",
         "group": "Pipeline Checks",
         "schedule": {
             "manual_checks": {

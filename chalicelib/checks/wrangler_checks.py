@@ -137,7 +137,7 @@ def item_counts_by_type(connection, **kwargs):
     # run the check
     item_counts = {}
     warn_item_counts = {}
-    req_location = ''.join([connection.ff_server, 'counts?format=json'])
+    req_location = ''.join([connection.ff_server, '/counts?format=json'])
     counts_res = ff_utils.authorized_request(req_location, auth=connection.ff_keys)
     if counts_res.status_code >= 400:
         check.status = 'ERROR'
