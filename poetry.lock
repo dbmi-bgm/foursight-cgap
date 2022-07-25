@@ -317,8 +317,10 @@ PyJWT = "1.5.3"
 pytz = "^2020.1"
 
 [package.source]
-type = "directory"
-url = "../foursight-core"
+type = "git"
+url = "https://github.com/4dn-dcic/foursight-core.git"
+reference = "C4-826-indentity-ize"
+resolved_reference = "d37898c28e1c13f55f0de1536e987ab979d816e0"
 
 [[package]]
 name = "future"
@@ -1011,7 +1013,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.8"
-content-hash = "886a8b8689ba08e10a6e5cebb85cdd37e5c26387d7a13368fbc6aea18db07654"
+content-hash = "7b66506a154b55c56c406536a5e568419b2738f1fe10292270ec9cd7fd4421b4"
 
 [metadata.files]
 ansicon = [
