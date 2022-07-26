@@ -556,7 +556,7 @@
             "hourly_checks": {
                 "<env-name>": {
                     "kwargs": {
-                        "files_per_run": 100, 
+                        "files_per_run": 100,
                         "max_checking_frequency": 14,
                         "first_check_after": 14
                     },
@@ -585,6 +585,35 @@
         "display": [
             "<env-name>"
         ]
+    },
+    "rollback_application_version": {
+        "title": "Rollback Application Version",
+        "group": "ECS Checks",
+        "schedule": {
+            "fifteen_min_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true,
+                        "env_name": "<env-name>"
+                    },
+                    "dependencies": []
+                }
+            }
+        }
+    },
+    "rollback_es_to_snapshot": {
+        "title": "Recovery ES Indices",
+        "group": "Elasticsearch Checks",
+        "schedule": {
+            "fifteen_min_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true,
+                        "env_name": "<env-name>"
+                    },
+                    "dependencies": []
+                }
+            }
+        }
     }
-
 }
