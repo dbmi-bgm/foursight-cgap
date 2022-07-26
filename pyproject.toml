@@ -23,9 +23,8 @@ pytz = "^2020.1"
 magma-suite = "1.0.0"
 tibanna-ff = "^1.0.0"
 MarkupSafe = "1.1.1"
-#foursight-core = "^0.7.4"
+foursight-core = "0.7.4.2b0"
 # use below for tests but not for deployment
-foursight-core = { git = "https://github.com/4dn-dcic/foursight-core.git", branch="C4-826-indentity-ize" }
 #foursight-core = { git = "https://github.com/4dn-dcic/foursight-core.git", branch="core2" }
 cgap-pipeline-utils = "23.0"
 pytest = "5.1.2"
