@@ -3,6 +3,7 @@ import json
 import os
 from chalicelib.app_utils import AppUtils
 from chalicelib.deploy import Deploy
+from dcicutils.obfuscation_utils import obfuscate_dict
 
 
 # Chalice metadata
@@ -299,7 +300,6 @@ def put_check_route(environ, check):
     else:
         return app_utils_obj.forbidden_response()
 
-
 @app.route('/environments/{environ}', methods=['PUT'])
 def put_environment(environ):
     """
@@ -368,3 +368,8 @@ def set_stage(stage):
 
 def set_timeout(timeout):
     app_utils_obj.set_timeout(timeout)
+
+# For testing/debugging/troubleshooting, dump the os.environ (with senstive data obfuscated).
+@app.route('/osenviron', methods=['GET'])
+def get_osenviron():
+    return obfuscate_dict(dict(os.environ))

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "foursight-cgap"
-version = "1.8.2.1b0"
+version = "1.8.2.1b1"
 description = "Serverless Chalice Application for Monitoring"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -10,7 +10,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.7,<3.8"
-dcicutils = "^4.0.1"
+dcicutils = "^4.0.1.1b0"
 click = "^7.1.2"
 PyJWT = "1.5.3"
 Jinja2 = "2.10.1"
@@ -23,7 +23,9 @@ pytz = "^2020.1"
 magma-suite = "1.0.0"
 tibanna-ff = "^1.0.0"
 MarkupSafe = "1.1.1"
-foursight-core = "0.7.4.2b0"
+# For some reason referencing 0.7.4.2b1 (which IS in PyPi) is not working,
+# but the "^0.7.4.2b0" specifier DOES put in 0.7.4.2b1. dmichaels/2022-07-27.
+foursight-core = "^0.7.4.2b0"
 # use below for tests but not for deployment
 #foursight-core = { git = "https://github.com/4dn-dcic/foursight-core.git", branch="core2" }
 cgap-pipeline-utils = "23.0"

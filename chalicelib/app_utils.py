@@ -1,3 +1,4 @@
+import os
 from os.path import dirname
 from foursight_core.app_utils import AppUtils as AppUtils_from_core
 from .vars import FOURSIGHT_PREFIX, HOST
@@ -13,13 +14,12 @@ class AppUtils(AppUtils_from_core):
     check_setup_dir = dirname(__file__)
     html_main_title = 'Foursight-CGAP'
 
-    # dmichaels/2022-07-20:
+    # dmichaels/2022-07-20/C4-826:
     # Added this to get the ES_HOST value from via IDENTITY (from GAC).
     # which was applied globally (to os.environ) in foursight-core,
     # via AppUtils_from_core; to override the default self.host
-    # value set above to the correct value (C4-826).
+    # value set above to the correct value.
     def __init__(self):
-        import os
         super().__init__()
         es_host_from_foursight_core_apply_identity = os.environ.get("ES_HOST")
         if es_host_from_foursight_core_apply_identity:
