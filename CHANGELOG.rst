@@ -8,6 +8,11 @@ Change Log
 ----------
 
 
+1.8.2.1b5
+=========
+* New version of foursight-core (0.7.4.2b4).
+
+
 1.8.2.1b4
 =========
 * Backed out constructor for AppUtils as apply_identity_globally
