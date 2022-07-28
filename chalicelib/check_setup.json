@@ -603,7 +603,7 @@
     },
     "rollback_es_to_snapshot": {
         "title": "Recovery ES Indices",
-        "group": "Elasticsearch Checks",
+        "group": "Elasticsearch checks",
         "schedule": {
             "fifteen_min_checks": {
                 "<env-name>": {
