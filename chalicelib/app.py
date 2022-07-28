@@ -375,8 +375,3 @@ def set_stage(stage):
 
 def set_timeout(timeout):
     app_utils_obj.set_timeout(timeout)
-
-# For testing/debugging/troubleshooting, dump the os.environ (with senstive data obfuscated).
-@app.route('/debug/environ', methods=['GET'])
-def get_osenviron():
-    return obfuscate_dict(dict(os.environ))
