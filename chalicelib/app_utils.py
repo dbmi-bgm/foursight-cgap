@@ -13,7 +13,6 @@ class AppUtils(AppUtils_from_core):
     # overwriting parent class
     prefix = FOURSIGHT_PREFIX
     FAVICON = 'https://cgap-dbmi.hms.harvard.edu/favicon.ico'
-    es_host_from_foursight_core_apply_identity
     host = HOST
     package_name = 'chalicelib'
     check_setup_dir = dirname(__file__)
