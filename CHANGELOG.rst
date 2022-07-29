@@ -7,6 +7,17 @@ foursight-cgap
 Change Log
 ----------
 
+
+1.8.2.1b8
+=========
+* New version of foursight-core (0.7.4.2b6). Forgot to actually do it! Grr.
+
+
+1.8.2.1b7
+=========
+* New version of foursight-core (0.7.4.2b5). Forgot to actually do it! Grr.
+
+
 1.8.2.1b6
 =========
 * New version of foursight-core (0.7.4.2b4). Forgot to actually do it! Grr.
