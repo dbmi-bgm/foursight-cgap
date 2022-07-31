@@ -344,11 +344,11 @@ def delete_environment(environ):
         return app_utils_obj.forbidden_response()
 
 
-# dmichaels/2022-07-27:
+# dmichaels/2022-07-31:
 # For testing/debugging/troubleshooting, dump the os.environ (with senstive data obfuscated).
-@app.route('/debug/environ', methods=['GET'])
-def get_debug_environ():
-    return obfuscate_dict(dict(os.environ))
+@app.route('/debug/info', methods=['GET'])
+def get_debug_info_route():
+    return app_utils_obj.view_info()
 
 
 ######### PURE LAMBDA FUNCTIONS #########
