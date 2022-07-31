@@ -8,6 +8,11 @@ Change Log
 ----------
 
 
+1.8.2.1b9
+=========
+* Added /debug/info route with sundry debugging/troubleshooting info.
+
+
 1.8.2.1b8
 =========
 * New version of foursight-core (0.7.4.2b6). Forgot to actually do it! Grr.
