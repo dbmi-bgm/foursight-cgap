@@ -8,6 +8,11 @@ Change Log
 ----------
 
 
+1.8.2.1b11
+=========-
+* Forgot to obfuscate_dict on os.environ for /debug/info view/route.
+
+
 1.8.2.1b10
 =========-
 * Forgot to update foursight-core to 0.7.4.2b7.
