@@ -3,7 +3,6 @@ import json
 import os
 from chalicelib.app_utils import AppUtils
 from chalicelib.deploy import Deploy
-from dcicutils.obfuscation_utils import obfuscate_dict
 
 
 # Chalice metadata
@@ -300,6 +299,7 @@ def put_check_route(environ, check):
     else:
         return app_utils_obj.forbidden_response()
 
+
 @app.route('/environments/{environ}', methods=['PUT'])
 def put_environment(environ):
     """
@@ -342,13 +342,6 @@ def delete_environment(environ):
         return app_utils_obj.run_delete_environment(environ)
     else:
         return app_utils_obj.forbidden_response()
-
-
-# dmichaels/2022-07-31:
-# For testing/debugging/troubleshooting, dump the os.environ (with senstive data obfuscated).
-@app.route('/debug/info', methods=['GET'])
-def get_debug_info_route():
-    return app_utils_obj.view_info()
 
 
 ######### PURE LAMBDA FUNCTIONS #########
