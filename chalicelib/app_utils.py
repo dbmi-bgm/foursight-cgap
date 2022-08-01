@@ -6,9 +6,12 @@ from .vars import FOURSIGHT_PREFIX, HOST
 
 class AppUtils(AppUtils_from_core):
 
-    es_host_from_foursight_core_apply_identity = os.environ.get("ES_HOST")
-    if es_host_from_foursight_core_apply_identity:
-        HOST = es_host_from_foursight_core_apply_identity
+    # Note that this is set in the new (as of August 2022) apply_identity code;
+    # see foursight-core/foursight_core/{app_utils.py,identity.py}.
+    es_host = os.environ.get("ES_HOST")
+    if not es_host:
+        raise Exception("Foursight ES_HOST environment variable not set!")
+    HOST = es_host
 
     # overwriting parent class
     prefix = FOURSIGHT_PREFIX

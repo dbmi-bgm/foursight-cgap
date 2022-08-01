@@ -345,7 +345,7 @@ def delete_environment(environ):
 
 
 # dmichaels/2022-07-31:
-# For testing/debugging/troubleshooting, dump the os.environ (with senstive data obfuscated).
+# For testing/debugging/troubleshooting.
 @app.route('/view/info', methods=['GET'])
 def get_view_info_route():
     return app_utils_obj.view_info()
