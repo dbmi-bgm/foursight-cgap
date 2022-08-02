@@ -348,7 +348,10 @@ def delete_environment(environ):
 # For testing/debugging/troubleshooting.
 @app.route('/view/info', methods=['GET'])
 def get_view_info_route():
-    return app_utils_obj.view_info()
+    if app_utils_obj.check_authorization(app.current_request.to_dict()):
+        return app_utils_obj.view_info()
+    else:
+        return app_utils_obj.forbidden_response()
 
 
 ######### PURE LAMBDA FUNCTIONS #########
