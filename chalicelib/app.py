@@ -228,7 +228,7 @@ def view_route(environ):
     """
     req_dict = app.current_request.to_dict()
     domain, context = app_utils_obj.get_domain_and_context(req_dict)
-    return app_utils_obj.view_foursight(environ, app_utils_obj.check_authorization(req_dict, environ), domain, context)
+    return app_utils_obj.view_foursight(app.current_request, environ, app_utils_obj.check_authorization(req_dict, environ), domain, context)
 
 
 @app.route('/view/{environ}/{check}/{uuid}', methods=['GET'])
@@ -239,7 +239,7 @@ def view_check_route(environ, check, uuid):
     req_dict = app.current_request.to_dict()
     domain, context = app_utils_obj.get_domain_and_context(req_dict)
     if app_utils_obj.check_authorization(req_dict, environ):
-        return app_utils_obj.view_foursight_check(environ, check, uuid, True, domain, context)
+        return app_utils_obj.view_foursight_check(app.current_request, environ, check, uuid, True, domain, context)
     else:
         return app_utils_obj.forbidden_response()
 
@@ -255,7 +255,7 @@ def history_route(environ, check):
     start = int(query_params.get('start', '0')) if query_params else 0
     limit = int(query_params.get('limit', '25')) if query_params else 25
     domain, context = app_utils_obj.get_domain_and_context(req_dict)
-    return app_utils_obj.view_foursight_history(environ, check, start, limit,
+    return app_utils_obj.view_foursight_history(app.current_request, environ, check, start, limit,
                                   app_utils_obj.check_authorization(req_dict, environ), domain, context)
 
 
@@ -349,7 +349,7 @@ def delete_environment(environ):
 @app.route('/view/info', methods=['GET'])
 def get_view_info_route():
     if app_utils_obj.check_authorization(app.current_request.to_dict()):
-        return app_utils_obj.view_info()
+        return app_utils_obj.view_info(request=app.current_request)
     else:
         return app_utils_obj.forbidden_response()
 
