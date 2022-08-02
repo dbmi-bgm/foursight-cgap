@@ -1,6 +1,6 @@
 import os
 from os.path import dirname
-from foursight_core.app_utils import AppUtils as AppUtils_from_core
+from foursight_core.app_utils import AppUtilsCore as AppUtils_from_core
 from .vars import FOURSIGHT_PREFIX, HOST
 
 
