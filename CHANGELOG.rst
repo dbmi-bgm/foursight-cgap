@@ -8,8 +8,8 @@ Change Log
 ----------
 
 
-1.8.2.1b20
+1.8.2.1b21
 ==========
 * Created this CHANGELOG.rst file.
-* New version of foursight-core (0.7.4.2b15) for C4-826.
+* New version of foursight-core (0.7.4.2b16) for C4-826.
 * New /debug/environ endpoint for troubleshooting (sensitive values obfuscated).
