@@ -9,7 +9,7 @@ from chalicelib.deploy import Deploy
 app = Chalice(app_name='foursight-cgap')
 app.debug = True
 STAGE = os.environ.get('chalice_stage', 'dev')
-DEFAULT_ENV = 'cgap'
+DEFAULT_ENV = os.environ.get("ENV_NAME", "cgap-uninitialized")
 app_utils_obj = AppUtils()
 
 

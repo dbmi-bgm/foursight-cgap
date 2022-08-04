@@ -19,4 +19,5 @@ class AppUtils(AppUtils_from_core):
     host = HOST
     package_name = 'chalicelib'
     check_setup_dir = dirname(__file__)
-    html_main_title = 'Foursight-CGAP'
+    DEFAULT_ENV = os.environ.get("ENV_NAME", "cgap-uninitialized")
+    html_main_title = f'Foursight-{DEFAULT_ENV}'.title().replace("Cgap", "CGAP")
