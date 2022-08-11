@@ -77,14 +77,14 @@ wcwidth = ">=0.1.4"
 
 [[package]]
 name = "boto3"
-version = "1.24.49"
+version = "1.24.50"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 
 [package.dependencies]
-botocore = ">=1.27.49,<1.28.0"
+botocore = ">=1.27.50,<1.28.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -93,7 +93,7 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.27.49"
+version = "1.27.50"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -296,7 +296,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "1.0.1.1b12"
+version = "1.0.1.1b13"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -313,6 +313,7 @@ google-api-python-client = ">=1.12.5,<2.0.0"
 Jinja2 = "2.10.1"
 MarkupSafe = "1.1.1"
 PyJWT = "1.5.3"
+PyMySQL = ">=1.0.2,<2.0.0"
 pytz = ">=2020.1,<2021.0"
 
 [[package]]
@@ -631,6 +632,18 @@ python-versions = "*"
 crypto = ["cryptography (>=1.4)"]
 flake8 = ["flake8", "flake8-import-order", "pep8-naming"]
 test = ["pytest (>3,<4)", "pytest-cov", "pytest-runner"]
+
+[[package]]
+name = "pymysql"
+version = "1.0.2"
+description = "Pure Python MySQL Driver"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.extras]
+rsa = ["cryptography"]
+ed25519 = ["PyNaCl (>=1.4.0)"]
 
 [[package]]
 name = "pyparsing"
@@ -1006,7 +1019,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.8"
-content-hash = "472ac2feff325c7d51c32b1ea1d442f231a06bf77507e8ab8f543df831afcc58"
+content-hash = "82ab03e8ccb372e056323a59d263a8505ab1123bbb990abd8cc67c4b574f36e3"
 
 [metadata.files]
 ansicon = [
@@ -1038,12 +1051,12 @@ blessed = [
     {file = "blessed-1.19.1.tar.gz", hash = "sha256:9a0d099695bf621d4680dd6c73f6ad547f6a3442fbdbe80c4b1daa1edbc492fc"},
 ]
 boto3 = [
-    {file = "boto3-1.24.49-py3-none-any.whl", hash = "sha256:c960712b3a833d321a997a9fb59f3da21b026d5a23727c9cb49866d3794cdb67"},
-    {file = "boto3-1.24.49.tar.gz", hash = "sha256:19ce58ed29d8b9dc892c06978c0097e7149641511c6b41142ecfee0a5ed19b5b"},
+    {file = "boto3-1.24.50-py3-none-any.whl", hash = "sha256:c312c6ffb0c4eb94c6be2ab4471ca18ebcadc4a3abe048d1c9b437b7c6f1af10"},
+    {file = "boto3-1.24.50.tar.gz", hash = "sha256:28fefb77fb85b521a87ffd932621b14aabf4bb65ec4f9d9ce7399d093b2ad8bd"},
 ]
 botocore = [
-    {file = "botocore-1.27.49-py3-none-any.whl", hash = "sha256:8e9556ef9f7f492e0755437a1430e32f63ddaf6df61c105957805067b5e22dbb"},
-    {file = "botocore-1.27.49.tar.gz", hash = "sha256:ac491c54cdf4126c98a999c5d473d734dc91c5b1e003d0fdafd5007d1408d046"},
+    {file = "botocore-1.27.50-py3-none-any.whl", hash = "sha256:697b76a58cfafa8ccbadcbf003efc693cf52170e562a8e2cfda9162d7d5aed20"},
+    {file = "botocore-1.27.50.tar.gz", hash = "sha256:0a3e2eef7a60c20e46be47eaf45cf5ea7a946aecdb68d829886d4f2506ac657c"},
 ]
 cachetools = [
     {file = "cachetools-5.2.0-py3-none-any.whl", hash = "sha256:f9f17d2aec496a9aa6b76f53e3b614c965223c061982d434d160f930c698a9db"},
@@ -1146,8 +1159,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight-core-1.0.1.1b12.tar.gz", hash = "sha256:78603b3f894a23e907ae25f1b015095fa285b7ced5056ea47abfebbc7b932428"},
-    {file = "foursight_core-1.0.1.1b12-py3-none-any.whl", hash = "sha256:f42bb7cb59f938619395e5a2024dad4002042dd9981568990648cc057f264dd6"},
+    {file = "foursight-core-1.0.1.1b13.tar.gz", hash = "sha256:2d36390468423ef09908e7bcd4b673ed22d09e5f5b6397a6f7a0a9edd69bd047"},
+    {file = "foursight_core-1.0.1.1b13-py3-none-any.whl", hash = "sha256:28319c32292affd0b281883c2f20e34eada6cb68d4a28180081db4646a90d9e8"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
@@ -1339,6 +1352,10 @@ pyasn1-modules = [
 pyjwt = [
     {file = "PyJWT-1.5.3-py2.py3-none-any.whl", hash = "sha256:a4e5f1441e3ca7b382fd0c0b416777ced1f97c64ef0c33bfa39daf38505cfd2f"},
     {file = "PyJWT-1.5.3.tar.gz", hash = "sha256:500be75b17a63f70072416843dc80c8821109030be824f4d14758f114978bae7"},
+]
+pymysql = [
+    {file = "PyMySQL-1.0.2-py3-none-any.whl", hash = "sha256:41fc3a0c5013d5f039639442321185532e3e2c8924687abe6537de157d403641"},
+    {file = "PyMySQL-1.0.2.tar.gz", hash = "sha256:816927a350f38d56072aeca5dfb10221fe1dc653745853d30a216637f5d7ad36"},
 ]
 pyparsing = [
     {file = "pyparsing-3.0.9-py3-none-any.whl", hash = "sha256:5026bae9a10eeaefb61dab2f09052b9f4307d44aee4eda64b309723d8d206bbc"},
