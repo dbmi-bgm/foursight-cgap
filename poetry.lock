@@ -296,7 +296,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "1.0.1.1b17"
+version = "1.0.1.1b18"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -988,8 +988,8 @@ waitress = ">=0.8.5"
 WebOb = ">=1.2"
 
 [package.extras]
-docs = ["Sphinx (>=1.8.1)", "docutils", "pylons-sphinx-themes (>=1.0.8)"]
-tests = ["nose (<1.3.0)", "coverage", "mock", "pastedeploy", "wsgiproxy2", "pyquery"]
+tests = ["pyquery", "wsgiproxy2", "pastedeploy", "mock", "coverage", "nose (<1.3.0)"]
+docs = ["pylons-sphinx-themes (>=1.0.8)", "docutils", "Sphinx (>=1.8.1)"]
 
 [[package]]
 name = "zipp"
@@ -1006,7 +1006,7 @@ docs = ["jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "jaraco.packaging (>=9)
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.8"
-content-hash = "ae87e4b7ff87b12180d2a42fb78a530e000e2648d188e702c733d3520354a19d"
+content-hash = "7c0ce2c5d16c8a422b0182598e9241926fbbd3760ef880982b85b2eff15e4e52"
 
 [metadata.files]
 ansicon = [
@@ -1146,8 +1146,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight-core-1.0.1.1b17.tar.gz", hash = "sha256:369b3516a029a76e31f818e7c10160ddf48a55a1fa89e6dd026e0057a3438eed"},
-    {file = "foursight_core-1.0.1.1b17-py3-none-any.whl", hash = "sha256:c6b81da71a2b75db608e27934086cd8be6c363c8bb4cf5d677a2dfb4e96c2d5b"},
+    {file = "foursight-core-1.0.1.1b18.tar.gz", hash = "sha256:03189d9d8bb57735f31dfa206c9ae11baea627983ccf1678a40a18c731bc3e88"},
+    {file = "foursight_core-1.0.1.1b18-py3-none-any.whl", hash = "sha256:228c4c4b8ba4a3007c568179c6378a604439e12fcb2754e228d9d55c2c1e7b7a"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
