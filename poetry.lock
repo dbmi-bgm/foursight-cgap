@@ -296,7 +296,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "1.0.1.1b16"
+version = "1.0.1.1b17"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -1006,7 +1006,7 @@ docs = ["jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "jaraco.packaging (>=9)
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.8"
-content-hash = "e3d546687b685d229a6a08662c0a9aecf479578aa0a1e8ea9a2498e835daa4e6"
+content-hash = "ae87e4b7ff87b12180d2a42fb78a530e000e2648d188e702c733d3520354a19d"
 
 [metadata.files]
 ansicon = [
@@ -1146,8 +1146,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight-core-1.0.1.1b16.tar.gz", hash = "sha256:7bd5847de01ca2598c80d170b7ef8a2d137431a76f0ef9ad667b5c4def245cd7"},
-    {file = "foursight_core-1.0.1.1b16-py3-none-any.whl", hash = "sha256:609def7f2b70a4715c734a3af4db42550f590dc4a0275280e85037167d685798"},
+    {file = "foursight-core-1.0.1.1b17.tar.gz", hash = "sha256:369b3516a029a76e31f818e7c10160ddf48a55a1fa89e6dd026e0057a3438eed"},
+    {file = "foursight_core-1.0.1.1b17-py3-none-any.whl", hash = "sha256:c6b81da71a2b75db608e27934086cd8be6c363c8bb4cf5d677a2dfb4e96c2d5b"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
