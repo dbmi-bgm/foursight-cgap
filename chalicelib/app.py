@@ -346,22 +346,22 @@ def delete_environment(environ):
 
 # dmichaels/2022-07-31:
 # For testing/debugging/troubleshooting.
-@app.route('/view/info', methods=['GET'])
+@app.route('/info', methods=['GET'])
 def get_view_info_route():
     req_dict = app.current_request.to_dict()
     domain, context = app_utils_obj.get_domain_and_context(req_dict)
     environ = os.environ.get("ENV_NAME")
-    return app_utils_obj.view_info(request=app.current_request, is_admin=app_utils_obj.check_authorization(req_dict, environ))
+    return app_utils_obj.view_info(request=app.current_request, is_admin=app_utils_obj.check_authorization(req_dict, environ), domain=domain, context=context)
 
 
 # dmichaels/2022-07-31:
 # For testing/debugging/troubleshooting.
-@app.route('/view/reload_lambda/{lambda_name}', methods=['GET'])
+@app.route('/reload_lambda/{lambda_name}', methods=['GET'])
 def get_view_reload_lambda_route(lambda_name):
     req_dict = app.current_request.to_dict()
     domain, context = app_utils_obj.get_domain_and_context(req_dict)
     environ = os.environ.get("ENV_NAME")
-    return app_utils_obj.view_reload_lambda(request=app.current_request, is_admin=app_utils_obj.check_authorization(req_dict, environ), lambda_name=lambda_name)
+    return app_utils_obj.view_reload_lambda(request=app.current_request, is_admin=app_utils_obj.check_authorization(req_dict, environ), lambda_name=lambda_name, domain=domain, context=context)
 
 
 ######### PURE LAMBDA FUNCTIONS #########
