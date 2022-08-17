@@ -346,12 +346,11 @@ def delete_environment(environ):
 
 # dmichaels/2022-07-31:
 # For testing/debugging/troubleshooting.
-@app.route('/info', methods=['GET'])
-def get_view_info_route():
+@app.route('/info/{environ}', methods=['GET'])
+def get_view_info_route(environ):
     req_dict = app.current_request.to_dict()
     domain, context = app_utils_obj.get_domain_and_context(req_dict)
-    environ = os.environ.get("ENV_NAME")
-    return app_utils_obj.view_info(request=app.current_request, is_admin=app_utils_obj.check_authorization(req_dict, environ), domain=domain, context=context)
+    return app_utils_obj.view_info(request=app.current_request, environ=environ, is_admin=app_utils_obj.check_authorization(req_dict, environ), domain=domain, context=context)
 
 
 # dmichaels/2022-07-31:
