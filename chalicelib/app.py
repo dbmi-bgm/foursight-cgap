@@ -353,6 +353,13 @@ def get_view_info_route(environ):
     return app_utils_obj.view_info(request=app.current_request, environ=environ, is_admin=app_utils_obj.check_authorization(req_dict, environ), domain=domain, context=context)
 
 
+@app.route('/view/{environ}/user/{email}')
+def view_user(environ):
+    req_dict = app.current_request.to_dict()
+    domain, context = app_utils_obj.get_domain_and_context(req_dict)
+    return app_utils_obj.view_info(request=app.current_request, environ=environ, is_admin=app_utils_obj.check_authorization(req_dict, environ), domain=domain, context=context, email=email)
+
+
 # dmichaels/2022-07-31:
 # For testing/debugging/troubleshooting.
 @app.route('/reload_lambda/{lambda_name}', methods=['GET'])
