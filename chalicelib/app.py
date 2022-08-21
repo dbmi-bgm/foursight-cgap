@@ -4,7 +4,6 @@ import os
 from chalicelib.app_utils import AppUtils
 from chalicelib.deploy import Deploy
 
-
 # Chalice metadata
 app = Chalice(app_name='foursight-cgap')
 app.debug = True
@@ -168,7 +167,6 @@ def monday_autoscaling_checks(event):
 
 
 '''######### END SCHEDULED FXNS #########'''
-
 
 @app.route('/callback')
 def auth0_callback():
@@ -374,6 +372,39 @@ def get_view_reload_lambda_route(environ, lambda_name):
     req_dict = app.current_request.to_dict()
     domain, context = app_utils_obj.get_domain_and_context(req_dict)
     return app_utils_obj.view_reload_lambda(request=app.current_request, environ=environ, is_admin=app_utils_obj.check_authorization(req_dict, environ), lambda_name=lambda_name, domain=domain, context=context)
+
+
+# Experimental React UI.
+def serve_react_file(environ, **kwargs):
+    req_dict = app.current_request.to_dict()
+    domain, context = app_utils_obj.get_domain_and_context(req_dict)
+    is_admin = app_utils_obj.check_authorization(req_dict, environ)
+    return app_utils_obj.serve_react_file(environ, **kwargs)
+
+
+@app.route('/react/{environ}')
+def get_react_0(environ):
+    return serve_react_file(environ, **{})
+
+
+@app.route('/react/{environ}/{path1}')
+def get_react_1(environ, path1):
+    return serve_react_file(environ, **{"path1": path1})
+
+
+@app.route('/react/{environ}/{path1}/{path2}')
+def get_react_2(environ, path1, path2):
+    return serve_react_file(environ, **{"path1": path1, "path2": path2})
+
+
+@app.route('/react/{environ}/{path1}/{path2}/{path3}')
+def get_react_3(environ, path1, path2, path3):
+    return serve_react_file(environ, **{"path1": path1, "path2": path2, "path3": path3})
+
+
+@app.route('/react/{environ}/{path1}/{path2}/{path3}/{path4}')
+def get_react_4(environ, path1, path2, path3, path4):
+    return serve_react_file(environ, **{"path1": path1, "path2": path2, "path3": path3, "path4": path4})
 
 
 ######### PURE LAMBDA FUNCTIONS #########
