@@ -296,7 +296,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "1.0.1.1b41"
+version = "1.0.1.1b42"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -678,7 +678,7 @@ coverage = ">=4.4"
 pytest = ">=3.6"
 
 [package.extras]
-testing = ["virtualenv", "six", "process-tests (==2.0.2)", "hunter", "fields"]
+testing = ["fields", "hunter", "process-tests (==2.0.2)", "six", "virtualenv"]
 
 [[package]]
 name = "python-dateutil"
@@ -1006,7 +1006,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.8"
-content-hash = "2c93dd78cbe8d0e20dc987a1a8d0cabc1a2392dd0de37875b4fb14b02cc26d8d"
+content-hash = "eda94b2f3d69fe1d7cb127ebb982c67f584bb843666974a9ae09a086a4731ab1"
 
 [metadata.files]
 ansicon = [
@@ -1146,8 +1146,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight-core-1.0.1.1b41.tar.gz", hash = "sha256:78ec9c18e811db05302ca3e75cb34eb520ffe5e21021d1e03def76eca7eeda5f"},
-    {file = "foursight_core-1.0.1.1b41-py3-none-any.whl", hash = "sha256:ac9bb27821c2bb0bd5a67f66ea37ca1cf0993496e39c005fcdc90399aa9303cb"},
+    {file = "foursight-core-1.0.1.1b42.tar.gz", hash = "sha256:c0e8558a78160b675905c5b5f9337bc5d874aa36e4a48c2d0bf3edf4d6b8f5df"},
+    {file = "foursight_core-1.0.1.1b42-py3-none-any.whl", hash = "sha256:be20505d1ffe7888fc9ba2187082f104b9db7e7989ff79539b86edbfb5f69a63"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
