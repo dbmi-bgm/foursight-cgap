@@ -51,8 +51,8 @@ python-versions = ">=3.6.0"
 soupsieve = ">1.2"
 
 [package.extras]
-lxml = ["lxml"]
 html5lib = ["html5lib"]
+lxml = ["lxml"]
 
 [[package]]
 name = "benchmark-4dn"
@@ -296,7 +296,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "1.0.1.1b37"
+version = "1.0.1.1b38"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -937,8 +937,8 @@ optional = false
 python-versions = ">=3.7.0"
 
 [package.extras]
-testing = ["coverage (>=5.0)", "pytest-cover", "pytest"]
-docs = ["pylons-sphinx-themes (>=1.0.9)", "docutils", "Sphinx (>=1.8.1)"]
+docs = ["Sphinx (>=1.8.1)", "docutils", "pylons-sphinx-themes (>=1.0.9)"]
+testing = ["pytest", "pytest-cover", "coverage (>=5.0)"]
 
 [[package]]
 name = "wcwidth"
@@ -957,8 +957,8 @@ optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*"
 
 [package.extras]
-testing = ["pytest-xdist", "pytest-cov", "coverage", "pytest (>=3.1.0)"]
-docs = ["pylons-sphinx-themes", "Sphinx (>=1.7.5)"]
+docs = ["Sphinx (>=1.7.5)", "pylons-sphinx-themes"]
+testing = ["pytest (>=3.1.0)", "coverage", "pytest-cov", "pytest-xdist"]
 
 [[package]]
 name = "websocket-client"
@@ -1006,7 +1006,7 @@ docs = ["jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "jaraco.packaging (>=9)
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.8"
-content-hash = "38ff19d48a76199a3f6a3b82bf95418a05fe83c5be603a92419c3eead0373fdc"
+content-hash = "f68578073afae9fe151b1e9344c251526c0b2f65c506ed4b81dbd7f0ca9876d5"
 
 [metadata.files]
 ansicon = [
@@ -1146,8 +1146,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight-core-1.0.1.1b37.tar.gz", hash = "sha256:fa62054f0be74f8e25327862839515f7806aa5ecc0b480f240842358dab456fe"},
-    {file = "foursight_core-1.0.1.1b37-py3-none-any.whl", hash = "sha256:28301bf2667ff4048ba32f27660317281505e85b0c0ece128d99c0f0c93571b0"},
+    {file = "foursight-core-1.0.1.1b38.tar.gz", hash = "sha256:e502615618f53e3995179c9c91a606fbb2be57073c10081d8b21ec470fc03e3b"},
+    {file = "foursight_core-1.0.1.1b38-py3-none-any.whl", hash = "sha256:2052eba8edd6111d554ea18fb088d48746375acd80beab07becc63fb2a6c3c70"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
