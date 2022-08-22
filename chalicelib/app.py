@@ -204,7 +204,9 @@ if CHALICE_LOCAL:
         Non-protected route
         """
         domain, context = app_utils_obj.get_domain_and_context(app.current_request.to_dict())
-        resp_headers = {'Location': ROUTE_PREFIX + 'view/' + DEFAULT_ENV}
+        redirect_path = ROUTE_PREFIX + 'view/' + DEFAULT_ENV
+        print(f'foursight-cgap: Redirecting to: {redirect_path}')
+        resp_headers = {'Location': redirect_path}
         return Response(status_code=302, body=json.dumps(resp_headers), headers=resp_headers)
 
 
@@ -216,9 +218,11 @@ def index():
     """
     domain, context = app_utils_obj.get_domain_and_context(app.current_request.to_dict())
     if CHALICE_LOCAL:
-        resp_headers = {'Location': ROUTE_PREFIX + 'view/' + DEFAULT_ENV}
+        redirect_path = ROUTE_PREFIX + 'view/' + DEFAULT_ENV
     else:
-        resp_headers = {'Location': context + 'view/' + DEFAULT_ENV}
+        redirect_path = context + 'view/' + DEFAULT_ENV
+    print(f'foursight-cgap: Redirecting to: {redirect_path}')
+    resp_headers = {'Location': redirect_path}
     return Response(status_code=302, body=json.dumps(resp_headers), headers=resp_headers)
 
 
