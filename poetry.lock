@@ -296,7 +296,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "1.0.1.1b35"
+version = "1.0.1.1b36"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -409,10 +409,10 @@ rsa = {version = ">=3.1.4,<5", markers = "python_version >= \"3.6\""}
 six = ">=1.9.0"
 
 [package.extras]
-reauth = ["pyu2f (>=0.1.5)"]
+aiohttp = ["requests (>=2.20.0,<3.0.0dev)", "aiohttp (>=3.6.2,<4.0.0dev)"]
+enterprise_cert = ["cryptography (==36.0.2)", "pyopenssl (==22.0.0)"]
 pyopenssl = ["pyopenssl (>=20.0.0)"]
-enterprise_cert = ["pyopenssl (==22.0.0)", "cryptography (==36.0.2)"]
-aiohttp = ["aiohttp (>=3.6.2,<4.0.0dev)", "requests (>=2.20.0,<3.0.0dev)"]
+reauth = ["pyu2f (>=0.1.5)"]
 
 [[package]]
 name = "google-auth-httplib2"
@@ -1006,7 +1006,7 @@ docs = ["jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "jaraco.packaging (>=9)
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.8"
-content-hash = "e3152d7837b16dbbe1f2b99e5b447fe93f0b4bb2e35b91c3477ff546b4608955"
+content-hash = "bc53d8a302b146ef81d8ae65a776d4f04755adbbb47f767630014060d6461c76"
 
 [metadata.files]
 ansicon = [
@@ -1146,8 +1146,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight-core-1.0.1.1b35.tar.gz", hash = "sha256:1959eb3b81128d284dff973ac4cec8c21b97f10c7d3647acb575405b4b16face"},
-    {file = "foursight_core-1.0.1.1b35-py3-none-any.whl", hash = "sha256:1e663ccea219a2844bba20fcfe63a847d16cbc7565523938f3138265838a7029"},
+    {file = "foursight-core-1.0.1.1b36.tar.gz", hash = "sha256:81b3ca9e5f89795c22345b17c19dc30aac12b769491ba6fb2480835e5413ad6b"},
+    {file = "foursight_core-1.0.1.1b36-py3-none-any.whl", hash = "sha256:0cf21aa25f9aee4c1bb3c9a2176308c5f0e29e40ed3314e465f1518b1847b6ca"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
