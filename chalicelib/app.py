@@ -15,7 +15,8 @@ app_utils_obj = AppUtils()
 # So we set it explicitly here if your CHALICE_LOCAL environment variable is set.
 # Seems to be a known issue: https://github.com/aws/chalice/issues/838
 #
-# Also set CORS to True if CHALICE_LOCAL; not needed if running React from Foursight directly,
+# Also set CORS to True if CHALICE_LOCAL; not needed if running React (nascent support of
+# which is experimental and under development in distinct branch) from Foursight directly,
 # but useful if/when running React React separately (npm start in foursight-core/react) to
 # facilitate easy/quick development/changes directly to React code.
 CHALICE_LOCAL = (os.environ.get("CHALICE_LOCAL") == "1")
@@ -203,7 +204,9 @@ if CHALICE_LOCAL:
         Non-protected route
         """
         domain, context = app_utils_obj.get_domain_and_context(app.current_request.to_dict())
-        resp_headers = {'Location': ROUTE_PREFIX + 'view/' + DEFAULT_ENV}
+        redirect_path = ROUTE_PREFIX + 'view/' + DEFAULT_ENV
+        print(f'foursight-cgap: Redirecting to: {redirect_path}')
+        resp_headers = {'Location': redirect_path}
         return Response(status_code=302, body=json.dumps(resp_headers), headers=resp_headers)
 
 
@@ -215,9 +218,11 @@ def index():
     """
     domain, context = app_utils_obj.get_domain_and_context(app.current_request.to_dict())
     if CHALICE_LOCAL:
-        resp_headers = {'Location': ROUTE_PREFIX + 'view/' + DEFAULT_ENV}
+        redirect_path = ROUTE_PREFIX + 'view/' + DEFAULT_ENV
     else:
-        resp_headers = {'Location': context + 'view/' + DEFAULT_ENV}
+        redirect_path = context + 'view/' + DEFAULT_ENV
+    print(f'foursight-cgap: Redirecting to: {redirect_path}')
+    resp_headers = {'Location': redirect_path}
     return Response(status_code=302, body=json.dumps(resp_headers), headers=resp_headers)
 
 
