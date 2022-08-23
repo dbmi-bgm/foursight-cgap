@@ -462,6 +462,15 @@ def react_get_user_route(environ, email):
     return app_utils_obj.react_get_user(request=request, environ=environ, is_admin=is_admin, domain=domain, context=context, email=email)
 
 
+@app.route(ROUTE_PREFIX + 'reactapi/{environ}/info', cors=CORS)
+def react_get_info(environ):
+    request = app.current_request
+    request_dict = request.to_dict()
+    domain, context = app_utils_obj.get_domain_and_context(request_dict)
+    is_admin = app_utils_obj.check_authorization(request_dict, environ)
+    return app_utils_obj.react_get_info(request=request, environ=environ, is_admin=is_admin, domain=domain, context=context)
+
+
 ######### PURE LAMBDA FUNCTIONS #########
 
 @app.lambda_function()
