@@ -411,36 +411,55 @@ def get_view_reload_lambda_route(environ, lambda_name):
 
 
 # Experimental React UI.
-def serve_react_file(environ, **kwargs):
+def react_serve_file(environ, **kwargs):
     req_dict = app.current_request.to_dict()
     domain, context = app_utils_obj.get_domain_and_context(req_dict)
     is_admin = app_utils_obj.check_authorization(req_dict, environ)
-    return app_utils_obj.serve_react_file(environ, **kwargs)
+    return app_utils_obj.react_serve_file(environ, **kwargs)
 
 
 @app.route(ROUTE_PREFIX + 'react/{environ}', cors=CORS)
 def get_react_0(environ):
-    return serve_react_file(environ, **{})
+    return react_serve_file(environ, **{})
 
 
 @app.route(ROUTE_PREFIX + 'react/{environ}/{path1}', cors=CORS)
 def get_react_1(environ, path1):
-    return serve_react_file(environ, **{"path1": path1})
+    return react_serve_file(environ, **{"path1": path1})
 
 
 @app.route(ROUTE_PREFIX + 'react/{environ}/{path1}/{path2}', cors=CORS)
 def get_react_2(environ, path1, path2):
-    return serve_react_file(environ, **{"path1": path1, "path2": path2})
+    return react_serve_file(environ, **{"path1": path1, "path2": path2})
 
 
 @app.route(ROUTE_PREFIX + 'react/{environ}/{path1}/{path2}/{path3}', cors=CORS)
 def get_react_3(environ, path1, path2, path3):
-    return serve_react_file(environ, **{"path1": path1, "path2": path2, "path3": path3})
+    return react_serve_file(environ, **{"path1": path1, "path2": path2, "path3": path3})
 
 
 @app.route(ROUTE_PREFIX + 'react/{environ}/{path1}/{path2}/{path3}/{path4}', cors=CORS)
 def get_react_4(environ, path1, path2, path3, path4):
-    return serve_react_file(environ, **{"path1": path1, "path2": path2, "path3": path3, "path4": path4})
+    return react_serve_file(environ, **{"path1": path1, "path2": path2, "path3": path3, "path4": path4})
+
+
+# Experimental React UI (API).
+@app.route(ROUTE_PREFIX + 'reactapi/{environ}/users', cors=CORS)
+def react_get_users_route(environ):
+    request = app.current_request
+    request_dict = request.to_dict()
+    domain, context = app_utils_obj.get_domain_and_context(request_dict)
+    is_admin = app_utils_obj.check_authorization(request_dict, environ)
+    return app_utils_obj.react_get_users(request=request, environ=environ, is_admin=is_admin, domain=domain, context=context)
+
+
+@app.route(ROUTE_PREFIX + 'reactapi/{environ}/users/{email}', cors=CORS)
+def react_get_user_route(environ, email):
+    request = app.current_request
+    request_dict = request.to_dict()
+    domain, context = app_utils_obj.get_domain_and_context(request_dict)
+    is_admin = app_utils_obj.check_authorization(request_dict, environ)
+    return app_utils_obj.react_get_user(request=request, environ=environ, is_admin=is_admin, domain=domain, context=context, email=email)
 
 
 ######### PURE LAMBDA FUNCTIONS #########
