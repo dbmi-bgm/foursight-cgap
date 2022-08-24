@@ -8,11 +8,13 @@ from chalicelib.deploy import Deploy
 app = Chalice(app_name='foursight-cgap')
 app.debug = True
 STAGE = os.environ.get('chalice_stage', 'dev')
-DEFAULT_ENV = os.environ.get("ENV_NAME", "cgap-uninitialized")
+DEFAULT_ENV = os.environ.get("ENV_NAME", "cgap-unknown")
 app_utils_obj = AppUtils()
 
 # When running 'chalice local' we do not get the same "/api" prefix as we see when deployed to AWS (Lambda).
-# So we set it explicitly here if your CHALICE_LOCAL environment variable is set.
+# So we set it explicitly here if your CHALICE_LOCAL environment variable is set; the point is to make
+# running locally as much as possible like running in AWS, at least as far is behavior is concerned;
+# but this does of course mean we're going through a slightly different code path for local and AWS.
 # Seems to be a known issue: https://github.com/aws/chalice/issues/838
 #
 # Also set CORS to True if CHALICE_LOCAL; not needed if running React (nascent support of
@@ -196,6 +198,7 @@ def auth0_callback():
     return app_utils_obj.auth0_callback(request, DEFAULT_ENV)
 
 
+# TODO: Could have a decorator for this kind of thing.
 if CHALICE_LOCAL:
     @app.route("/", methods=['GET'], cors=CORS)
     def index():
