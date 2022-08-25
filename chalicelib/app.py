@@ -8,7 +8,7 @@ from chalicelib.deploy import Deploy
 app = Chalice(app_name='foursight-cgap')
 app.debug = True
 STAGE = os.environ.get('chalice_stage', 'dev')
-DEFAULT_ENV = os.environ.get("ENV_NAME", "cgap-uninitialized")
+DEFAULT_ENV = os.environ.get("ENV_NAME", "cgap-unknown")
 app_utils_obj = AppUtils()
 
 # When running 'chalice local' we do not get the same "/api" prefix as we see when deployed to AWS (Lambda).
