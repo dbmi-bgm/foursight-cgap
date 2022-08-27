@@ -403,13 +403,14 @@ def get_view_users_route(environ):
 
 # dmichaels/2022-07-31:
 # For testing/debugging/troubleshooting.
-@app.route(ROUTE_PREFIX + 'reload_lambda/{environ}/{lambda_name}', methods=['GET'], cors=CORS)
+@app.route(ROUTE_PREFIX + '__reload_lambda__/{environ}/{lambda_name}', methods=['GET'], cors=CORS)
 def get_view_reload_lambda_route(environ, lambda_name):
     req_dict = app.current_request.to_dict()
     domain, context = app_utils_obj.get_domain_and_context(req_dict)
     return app_utils_obj.view_reload_lambda(request=app.current_request, environ=environ, is_admin=app_utils_obj.check_authorization(req_dict, environ), lambda_name=lambda_name, domain=domain, context=context)
 
 
+######### EXPERIMENTAL REACT API FUNCTIONS #########
 # Experimental React UI.
 def react_serve_file(environ, **kwargs):
     req_dict = app.current_request.to_dict()
@@ -443,7 +444,6 @@ def get_react_4(environ, path1, path2, path3, path4):
     return react_serve_file(environ, **{"path1": path1, "path2": path2, "path3": path3, "path4": path4})
 
 
-# Experimental React UI (API).
 @app.route(ROUTE_PREFIX + 'reactapi/{environ}/users', cors=CORS)
 def react_get_users_route(environ):
     request = app.current_request
@@ -469,6 +469,15 @@ def react_get_info(environ):
     domain, context = app_utils_obj.get_domain_and_context(request_dict)
     is_admin = app_utils_obj.check_authorization(request_dict, environ)
     return app_utils_obj.react_get_info(request=request, environ=environ, is_admin=is_admin, domain=domain, context=context)
+
+
+@app.route(ROUTE_PREFIX + 'reactapi/__clearcache__', cors=CORS)
+def react_get_info(environ):
+    request = app.current_request
+    request_dict = request.to_dict()
+    domain, context = app_utils_obj.get_domain_and_context(request_dict)
+    is_admin = app_utils_obj.check_authorization(request_dict, environ)
+    return app_utils_obj.react_clear_cache(request=request, environ=environ, is_admin=is_admin, domain=domain, context=context)
 
 
 ######### PURE LAMBDA FUNCTIONS #########
