@@ -471,6 +471,15 @@ def react_get_info(environ):
     return app_utils_obj.react_get_info(request=request, environ=environ, is_admin=is_admin, domain=domain, context=context)
 
 
+@app.route(ROUTE_PREFIX + 'reactapi/info', cors=CORS)
+def react_get_info_noenv():
+    request = app.current_request
+    request_dict = request.to_dict()
+    domain, context = app_utils_obj.get_domain_and_context(request_dict)
+    is_admin = app_utils_obj.check_authorization(request_dict, DEFAULT_ENV)
+    return app_utils_obj.react_get_info(request=request, environ=DEFAULT_ENV, is_admin=is_admin, domain=domain, context=context)
+
+
 @app.route(ROUTE_PREFIX + 'reactapi/__clearcache__', cors=CORS)
 def react_get_info(environ):
     request = app.current_request
