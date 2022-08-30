@@ -21,6 +21,7 @@ app_utils_obj = AppUtils()
 # facilitate easy/quick development/changes directly to React code.
 CHALICE_LOCAL = (os.environ.get("CHALICE_LOCAL") == "1")
 if CHALICE_LOCAL:
+    print("CHALICE_LOCAL!!!")
     ROUTE_PREFIX = "/api/"
     ROUTE_EMPTY_PREFIX = "/api"
     CORS = True
@@ -478,6 +479,23 @@ def react_get_info_noenv():
     domain, context = app_utils_obj.get_domain_and_context(request_dict)
     is_admin = app_utils_obj.check_authorization(request_dict, DEFAULT_ENV)
     return app_utils_obj.react_get_info(request=request, environ=DEFAULT_ENV, is_admin=is_admin, domain=domain, context=context)
+
+
+@app.route(ROUTE_PREFIX + 'reactapi/{environ}/header', methods=["GET"], cors=CORS)
+def react_get_header(environ):
+    request = app.current_request
+    request_dict = request.to_dict()
+    domain, context = app_utils_obj.get_domain_and_context(request_dict)
+    print('XYZZY:/REACTAPI/ENV/HEADER')
+    return app_utils_obj.react_get_header_info(request=request, environ=environ, domain=domain, context=context)
+
+
+@app.route(ROUTE_PREFIX + 'reactapi/header', methods=["GET"], cors=CORS)
+def react_get_header_noenv():
+    request = app.current_request
+    request_dict = request.to_dict()
+    domain, context = app_utils_obj.get_domain_and_context(request_dict)
+    return app_utils_obj.react_get_header_info(request=request, environ=DEFAULT_ENV, domain=domain, context=context)
 
 
 @app.route(ROUTE_PREFIX + 'reactapi/__clearcache__', cors=CORS)
