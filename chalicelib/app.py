@@ -499,12 +499,21 @@ def react_get_header_noenv():
 
 
 @app.route(ROUTE_PREFIX + 'reactapi/__clearcache__', cors=CORS)
-def react_get_info(environ):
+def react_clear_cach(environ):
     request = app.current_request
     request_dict = request.to_dict()
     domain, context = app_utils_obj.get_domain_and_context(request_dict)
     is_admin = app_utils_obj.check_authorization(request_dict, environ)
     return app_utils_obj.react_clear_cache(request=request, environ=environ, is_admin=is_admin, domain=domain, context=context)
+
+
+@app.route(ROUTE_PREFIX + 'reactapi/{environ}/gac/{environ_compare}', cors=CORS)
+def react_compare_gacs(environ, environ_compare):
+    request = app.current_request
+    request_dict = request.to_dict()
+    domain, context = app_utils_obj.get_domain_and_context(request_dict)
+    is_admin = app_utils_obj.check_authorization(request_dict, environ)
+    return app_utils_obj.react_compare_gacs(request=request, environ=environ, environ_compare=environ_compare, is_admin=is_admin, domain=domain, context=context)
 
 
 ######### PURE LAMBDA FUNCTIONS #########
