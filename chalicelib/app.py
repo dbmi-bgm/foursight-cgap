@@ -404,11 +404,12 @@ def get_view_users_route(environ):
 
 # dmichaels/2022-07-31:
 # For testing/debugging/troubleshooting.
-@app.route(ROUTE_PREFIX + '__reload_lambda__/{environ}/{lambda_name}', methods=['GET'], cors=CORS)
-def get_view_reload_lambda_route(environ, lambda_name):
+@app.route(ROUTE_PREFIX + 'reactapi/reloadlambda', methods=['GET'], cors=CORS)
+def get_view_reload_lambda_route():
+    print("XYZZY:/REACTAPI/RELOADLAMBDA!!!!")
     req_dict = app.current_request.to_dict()
     domain, context = app_utils_obj.get_domain_and_context(req_dict)
-    return app_utils_obj.view_reload_lambda(request=app.current_request, environ=environ, is_admin=app_utils_obj.check_authorization(req_dict, environ), lambda_name=lambda_name, domain=domain, context=context)
+    return app_utils_obj.view_reload_lambda(request=app.current_request, environ=DEFAULT_ENV, is_admin=True, lambda_name='default', domain=domain, context=context)
 
 
 ######### EXPERIMENTAL REACT API FUNCTIONS #########
@@ -483,10 +484,10 @@ def react_get_info_noenv():
 
 @app.route(ROUTE_PREFIX + 'reactapi/{environ}/header', methods=["GET"], cors=CORS)
 def react_get_header(environ):
+    print('XYZZY:/REACTAPI/ENV/HEADER')
     request = app.current_request
     request_dict = request.to_dict()
     domain, context = app_utils_obj.get_domain_and_context(request_dict)
-    print('XYZZY:/REACTAPI/ENV/HEADER')
     return app_utils_obj.react_get_header_info(request=request, environ=environ, domain=domain, context=context)
 
 
