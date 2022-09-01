@@ -3,9 +3,10 @@ import json
 import os
 from chalicelib.app_utils import AppUtils
 from chalicelib.deploy import Deploy
+from foursight_core.app_routes import app, XYZZY2
 
 # Chalice metadata
-app = Chalice(app_name='foursight-cgap')
+#app = Chalice(app_name='foursight-cgap')
 app.debug = True
 STAGE = os.environ.get('chalice_stage', 'dev')
 DEFAULT_ENV = os.environ.get("ENV_NAME", "cgap-unknown")
@@ -404,12 +405,12 @@ def get_view_users_route(environ):
 
 # dmichaels/2022-07-31:
 # For testing/debugging/troubleshooting.
-@app.route(ROUTE_PREFIX + 'reactapi/reloadlambda', methods=['GET'], cors=CORS)
-def get_view_reload_lambda_route():
-    print("XYZZY:/REACTAPI/RELOADLAMBDA!!!!")
-    req_dict = app.current_request.to_dict()
-    domain, context = app_utils_obj.get_domain_and_context(req_dict)
-    return app_utils_obj.view_reload_lambda(request=app.current_request, environ=DEFAULT_ENV, is_admin=True, lambda_name='default', domain=domain, context=context)
+#@app.route(ROUTE_PREFIX + 'reactapi/reloadlambda', methods=['GET'], cors=CORS)
+#def get_view_reload_lambda_route():
+#    print("XYZZY:/REACTAPI/RELOADLAMBDA!!!!")
+#    req_dict = app.current_request.to_dict()
+#    domain, context = app_utils_obj.get_domain_and_context(req_dict)
+#    return app_utils_obj.view_reload_lambda(request=app.current_request, environ=DEFAULT_ENV, is_admin=True, lambda_name='default', domain=domain, context=context)
 
 
 ######### EXPERIMENTAL REACT API FUNCTIONS #########
@@ -515,6 +516,22 @@ def react_compare_gacs(environ, environ_compare):
     domain, context = app_utils_obj.get_domain_and_context(request_dict)
     is_admin = app_utils_obj.check_authorization(request_dict, environ)
     return app_utils_obj.react_compare_gacs(request=request, environ=environ, environ_compare=environ_compare, is_admin=is_admin, domain=domain, context=context)
+
+#class XYZZY:
+#    print('XYZZY:UNIFY-EXPERIMENT:CLASS')
+#    def __init__(self, app, app_utils_obj):
+#        XYZZY.app = app
+#        XYZZY.app_utils_obj = app_utils_obj
+#        print('XYZZY:UNIFY-EXPERIMENT:XYZZY/CTOR')
+#
+#    @app.route(ROUTE_PREFIX + 'reactapi/{environ}/xyzzy', methods=["GET"], cors=CORS)
+#    def react_get_header(self, environ):
+#        print(f"XYZZY:UNIFY-EXPERIMENT:/reactapi/{environ}/xyzzy")
+#        request = self.app.current_request
+#        request_dict = request.to_dict()
+#        domain, context = XYZZY.app_utils_obj.get_domain_and_context(request_dict)
+#        return self.app_utils_obj.react_get_header_info(request=request, environ=environ, domain=domain, context=context)
+#xyzzy = XYZZY(app, app_utils_obj)
 
 
 ######### PURE LAMBDA FUNCTIONS #########
