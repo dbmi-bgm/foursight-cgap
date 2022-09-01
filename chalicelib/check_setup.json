@@ -551,7 +551,7 @@
     },
     "check_file_lifecycle_status": {
         "title": "Check for files that require lifecycle updates",
-        "group": "Metadata checks",
+        "group": "Lifecycle Checks",
         "schedule": {
             "hourly_checks": {
                 "<env-name>": {
@@ -570,7 +570,7 @@
     },
     "check_deleted_files_lifecycle_status": {
         "title": "Check for deleted files that require lifecycle updates",
-        "group": "Metadata checks",
+        "group": "Lifecycle Checks",
         "schedule": {
             "hourly_checks": {
                 "<env-name>": {
