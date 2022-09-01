@@ -1,41 +1,15 @@
-from chalice import Chalice, Cron, Rate, Response
-import json
+from chalice import Cron
 import os
 from chalicelib.app_utils import AppUtils
 from foursight_core.app_utils import app
 from chalicelib.deploy import Deploy
-#from foursight_core.app_routes import app, XYZZY2, react_route_xyzzyabc
-
-# Chalice metadata
-#app = Chalice(app_name='foursight-cgap')
 app.debug = True
 STAGE = os.environ.get('chalice_stage', 'dev')
 DEFAULT_ENV = os.environ.get("ENV_NAME", "cgap-unknown")
-#app_utils_obj = AppUtils()
 app_utils_obj = AppUtils.singleton(AppUtils)
 
-# When running 'chalice local' we do not get the same "/api" prefix as we see when deployed to AWS (Lambda).
-# So we set it explicitly here if your CHALICE_LOCAL environment variable is set.
-# Seems to be a known issue: https://github.com/aws/chalice/issues/838
-#
-# Also set CORS to True if CHALICE_LOCAL; not needed if running React (nascent support of
-# which is experimental and under development in distinct branch) from Foursight directly,
-# but useful if/when running React React separately (npm start in foursight-core/react) to
-# facilitate easy/quick development/changes directly to React code.
-CHALICE_LOCAL = (os.environ.get("CHALICE_LOCAL") == "1")
-if CHALICE_LOCAL:
-    print("CHALICE_LOCAL!!!")
-    ROUTE_PREFIX = "/api/"
-    ROUTE_EMPTY_PREFIX = "/api"
-    CORS = True
-else:
-    ROUTE_PREFIX = "/"
-    ROUTE_EMPTY_PREFIX = "/"
-    CORS = False
 
-
-'''######### SCHEDULED FXNS #########'''
-
+######### SCHEDULED FUNCTIONS #########
 
 def effectively_never():
     """Every February 31st, a.k.a. 'never'."""
@@ -188,40 +162,7 @@ def monday_autoscaling_checks(event):
     app_utils_obj.queue_scheduled_checks('all', 'monday_autoscaling_checks')
 
 
-'''######### END SCHEDULED FXNS #########'''
-
-#class XYZZY:
-#    print('XYZZY:UNIFY-EXPERIMENT:CLASS')
-#    def __init__(self, app, app_utils_obj):
-#        XYZZY.app = app
-#        XYZZY.app_utils_obj = app_utils_obj
-#        print('XYZZY:UNIFY-EXPERIMENT:XYZZY/CTOR')
-#
-#    @app.route(ROUTE_PREFIX + 'reactapi/{environ}/xyzzy', methods=["GET"], cors=CORS)
-#    def react_get_header(self, environ):
-#        print(f"XYZZY:UNIFY-EXPERIMENT:/reactapi/{environ}/xyzzy")
-#        request = self.app.current_request
-#        request_dict = request.to_dict()
-#        domain, context = XYZZY.app_utils_obj.get_domain_and_context(request_dict)
-#        return self.app_utils_obj.react_get_header_info(request=request, environ=environ, domain=domain, context=context)
-#xyzzy = XYZZY(app, app_utils_obj)
-
-
-######### PURE LAMBDA FUNCTIONS #########
-
-@app.lambda_function()
-def check_runner(event, context):
-    """
-    Pure lambda function to pull run and check information from SQS and run
-    the checks. Self propogates. event is a dict of information passed into
-    the lambda at invocation time.
-    """
-    if not event:
-        return
-    app_utils_obj.run_check_runner(event)
-
 ######### MISC UTILITY FUNCTIONS #########
-
 
 def set_stage(stage):
     if stage != 'test' and stage not in Deploy.CONFIG_BASE['stages']:
