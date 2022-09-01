@@ -7,6 +7,9 @@ foursight-cgap
 Change Log
 ----------
 
+2.0.1
+=====
+* Move lifecycle checks to separate group in UI
 
 2.0.0
 =====
