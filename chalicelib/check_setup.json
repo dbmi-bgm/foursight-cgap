@@ -558,7 +558,8 @@
                     "kwargs": {
                         "files_per_run": 100, 
                         "max_checking_frequency": 14,
-                        "first_check_after": 14
+                        "first_check_after": 14,
+                        "queue_action": "prod"
                     },
                     "dependencies": []
                 }
@@ -576,7 +577,8 @@
                 "<env-name>": {
                     "kwargs": {
                         "files_per_run": 50,
-                        "check_after": 14
+                        "check_after": 14,
+                        "queue_action": "prod"
                     },
                     "dependencies": []
                 }

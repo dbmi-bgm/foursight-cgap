@@ -28,6 +28,7 @@ def check_file_lifecycle_status(connection, **kwargs):
     check.summary = ""
     check.full_output = {}
     check.status = "PASS"
+    check.allow_action = True
 
     num_files_to_check = kwargs.get("files_per_run", 100)
     first_check_after = kwargs.get("first_check_after", 14)
@@ -166,6 +167,7 @@ def check_deleted_files_lifecycle_status(connection, **kwargs):
     check.summary = ""
     check.full_output = {}
     check.status = "PASS"
+    check.allow_action = True
 
     num_files_to_check = kwargs.get("files_per_run", 100)
     check_after = kwargs.get("check_after", 14)
