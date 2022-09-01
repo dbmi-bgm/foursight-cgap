@@ -3,7 +3,7 @@ import json
 import os
 from chalicelib.app_utils import AppUtils
 from chalicelib.deploy import Deploy
-from foursight_core.app_routes import app, XYZZY2
+from foursight_core.app_routes import app, XYZZY2, react_route_xyzzyabc
 
 # Chalice metadata
 #app = Chalice(app_name='foursight-cgap')
