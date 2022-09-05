@@ -197,6 +197,14 @@ python-versions = ">=3.7"
 toml = ["tomli"]
 
 [[package]]
+name = "cron-descriptor"
+version = "1.2.31"
+description = "A Python library that converts cron expressions into human readable strings."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "dcicutils"
 version = "4.5.0"
 description = "Utility package for interacting with the 4DN Data Portal and other 4DN resources"
@@ -296,7 +304,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "1.0.2.1b22"
+version = "1.0.2.1b24"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -304,6 +312,7 @@ python-versions = ">=3.7,<3.9"
 
 [package.dependencies]
 click = ">=7.1.2,<8.0.0"
+cron-descriptor = ">=1.2.31,<2.0.0"
 dcicutils = ">=4.0.2,<5.0.0"
 elasticsearch = ">=6.8.1,<7.0.0"
 elasticsearch-dsl = ">=6.4.0,<7.0.0"
@@ -1015,7 +1024,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.8"
-content-hash = "79be0f10443e50898e372754283979dbf9b12c9e3f543d72d2a8fa96cea9570c"
+content-hash = "50aafa5c6443f0e07750525b34fbd9ca36cc3545be7ead3a8d12166a709df34a"
 
 [metadata.files]
 ansicon = [
@@ -1135,6 +1144,9 @@ coverage = [
     {file = "coverage-6.4.4-pp36.pp37.pp38-none-any.whl", hash = "sha256:f67cf9f406cf0d2f08a3515ce2db5b82625a7257f88aad87904674def6ddaec1"},
     {file = "coverage-6.4.4.tar.gz", hash = "sha256:e16c45b726acb780e1e6f88b286d3c10b3914ab03438f32117c4aa52d7f30d58"},
 ]
+cron-descriptor = [
+    {file = "cron_descriptor-1.2.31.tar.gz", hash = "sha256:8e83f08dbd76657a0b6ce1168b293bc27fa68be573ef8cb086ef0d9896340876"},
+]
 dcicutils = [
     {file = "dcicutils-4.5.0-py3-none-any.whl", hash = "sha256:db298890c528435883dea9ca901e2203831492dc40a8716f2dfa2f043774ed90"},
     {file = "dcicutils-4.5.0.tar.gz", hash = "sha256:df180dcfe78630cbd32b6172b483fb81b8019a5e553341af3529ce9776cb4078"},
@@ -1164,8 +1176,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight-core-1.0.2.1b22.tar.gz", hash = "sha256:57ab379f7be7f9b8d9a1e56c434967d5770ecd382ce29ee766169b58698371e5"},
-    {file = "foursight_core-1.0.2.1b22-py3-none-any.whl", hash = "sha256:d34a820923751fb4dae7dc1a9b533a73ee8fcc0f879c5cf160dccdf24cbffbd9"},
+    {file = "foursight-core-1.0.2.1b24.tar.gz", hash = "sha256:ded7c232227d2b4feca9053ba9aa449e90fd2211afa0b027ff9b8857eb8fd0a0"},
+    {file = "foursight_core-1.0.2.1b24-py3-none-any.whl", hash = "sha256:760b392e4e0b7caff6da1edc47e3a4f73dd40de9adfc6ea42e6edbf1c1941e71"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
