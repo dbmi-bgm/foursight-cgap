@@ -7,6 +7,11 @@ foursight-cgap
 Change Log
 ----------
 
+2.2.0
+=====
+* In progress ...
+  * React-ifying Foursight (experiment).
+
 2.1.0
 =====
 * Spruced up Foursight UI a bit (virtually all in foursight-core but mentioning here).
