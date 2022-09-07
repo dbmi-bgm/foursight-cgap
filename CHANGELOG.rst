@@ -7,6 +7,9 @@ foursight-cgap
 Change Log
 ----------
 
+2.0.1
+=====
+* Work to spruce up the UI a bit.
 
 2.0.0
 =====
