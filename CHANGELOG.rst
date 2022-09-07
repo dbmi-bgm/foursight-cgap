@@ -7,6 +7,11 @@ foursight-cgap
 Change Log
 ----------
 
+2.1.1
+=====
+* Move lifecycle checks to separate group in UI
+* Automatically run action for lifecycle checks
+
 2.1.0
 =====
 * Spruced up Foursight UI a bit (virtually all in foursight-core but mentioning here).
