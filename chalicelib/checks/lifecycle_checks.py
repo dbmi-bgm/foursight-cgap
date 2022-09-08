@@ -143,7 +143,7 @@ def patch_file_lifecycle_status(connection, **kwargs):
     if action_logs["error"] == []:
         action.status = "DONE"
     else:
-        action.status = "ERROR"
+        action.status = "FAIL"
     return action
 
 

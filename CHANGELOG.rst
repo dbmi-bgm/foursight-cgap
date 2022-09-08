@@ -7,10 +7,14 @@ foursight-cgap
 Change Log
 ----------
 
+2.1.2
+=====
+* Assign correct action status when patch_file_lifecycle_status fails.
+
 2.1.1
 =====
-* Move lifecycle checks to separate group in UI
-* Automatically run action for lifecycle checks
+* Move lifecycle checks to separate group in UI.
+* Automatically run action for lifecycle checks.
 
 2.1.0
 =====
