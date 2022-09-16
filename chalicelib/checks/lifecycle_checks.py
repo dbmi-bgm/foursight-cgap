@@ -95,7 +95,6 @@ def patch_file_lifecycle_status(connection, **kwargs):
         ):
             file_bucket = raw_bucket
 
-
         try:
             s3_tag = lifecycle_utils.lifecycle_status_to_s3_tag(new_lifecycle_status)
 
