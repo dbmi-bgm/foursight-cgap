@@ -94,39 +94,42 @@ def patch_file_lifecycle_status(connection, **kwargs):
             upload_key, bucket=raw_bucket, print_error=False
         ):
             file_bucket = raw_bucket
-        if not file_bucket:
-            action_logs["error"].append(f"Cannot patch file {uuid}: not found on S3")
-            continue
 
         try:
             s3_tag = lifecycle_utils.lifecycle_status_to_s3_tag(new_lifecycle_status)
-            if s3_tag:
+
+            if not s3_tag:
+                raise Exception(f"Could not determine S3 tag for file {uuid}")
+
+            if file_bucket:
                 my_s3_util.set_object_tags(
                     key=upload_key,
                     bucket=file_bucket,
                     tags=s3_tag,
                     merge_existing_tags=True,
                 )
-
-                if not is_extra_file:
-                    today = datetime.date.today().strftime("%Y-%m-%d")
-                    patch_dict = {
-                        "s3_lifecycle_status": new_lifecycle_status,
-                        "s3_lifecycle_last_checked": today,
-                    }
-
-                    file_status = lifecycle_utils.lifecycle_status_to_file_status(
-                        new_lifecycle_status
-                    )
-                    if (
-                        file_status == lifecycle_utils.ARCHIVED
-                        or file_status == lifecycle_utils.DELETED
-                    ):
-                        patch_dict["status"] = file_status
-
-                    ff_utils.patch_metadata(patch_dict, uuid, key=my_auth)
             else:
-                raise Exception(f"Could not determine S3 tag for file {uuid}")
+                action_logs["logs"].append(f"Cannot tag file {uuid}: not found on S3")
+                # In this case, set everything to 'deleted' in the metadata
+                new_lifecycle_status = lifecycle_utils.DELETED
+
+            if not is_extra_file:
+                today = datetime.date.today().strftime("%Y-%m-%d")
+                patch_dict = {
+                    "s3_lifecycle_status": new_lifecycle_status,
+                    "s3_lifecycle_last_checked": today,
+                }
+
+                file_status = lifecycle_utils.lifecycle_status_to_file_status(
+                    new_lifecycle_status
+                )
+                if (
+                    file_status == lifecycle_utils.ARCHIVED
+                    or file_status == lifecycle_utils.DELETED
+                ):
+                    patch_dict["status"] = file_status
+
+                ff_utils.patch_metadata(patch_dict, uuid, key=my_auth)
 
             log_message = f"Lifecycle status of file {uuid} ({upload_key}) changed from {old_lifecycle_status} to {new_lifecycle_status}"
             action_logs["logs"].append(log_message)
