@@ -7,6 +7,11 @@ foursight-cgap
 Change Log
 ----------
 
+2.1.3
+=====
+* Lifecycle management: If a file cannot be found on S3 (e.g. has the status ``to_be_uploaded_by_workflow``), set its status to ``deleted``.
+* Lifecycle management: Only check files with ``project.lifecycle_management_active=true``.
+
 2.1.2
 =====
 * Assign correct action status when patch_file_lifecycle_status fails.
