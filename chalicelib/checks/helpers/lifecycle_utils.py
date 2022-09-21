@@ -83,6 +83,7 @@ def check_file_lifecycle_status(
 
     search_query_base = (
         "/search/?type=File"
+        "&project.lifecycle_management_active=true"
         "&s3_lifecycle_category%21=No+value"
         f"&s3_lifecycle_category%21={IGNORE}"
         f"&date_created.to={threshold_date_fca}"
@@ -190,6 +191,7 @@ def check_deleted_files_lifecycle_status(num_files_to_check, check_after, my_aut
 
     search_query = (
         "/search/?type=File"
+        "&project.lifecycle_management_active=true"
         f"&s3_lifecycle_status%21={DELETED}"
         f"&last_modified.date_modified.to={threshold_date}"
         f"&status={DELETED}"
