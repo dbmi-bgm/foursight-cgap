@@ -9,8 +9,7 @@ Change Log
 
 2.1.3
 =====
-* Lifecycle management: If a file cannot be found on S3 (e.g. has the status ``to_be_uploaded_by_workflow``), set its status to ``deleted``.
-* Lifecycle management: Only check files with ``project.lifecycle_management_active=true``.
+* Lifecycle management: Only check files with ``project.lifecycle_management_active=true``. Furthermore, exclude files with status ``uploading`` and ``to be uploaded by workflow`` from the check.
 
 2.1.2
 =====

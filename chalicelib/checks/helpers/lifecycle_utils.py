@@ -84,6 +84,8 @@ def check_file_lifecycle_status(
     search_query_base = (
         "/search/?type=File"
         "&project.lifecycle_management_active=true"
+        "&status%21=uploading"
+        "&status%21=to+be+uploaded+by+workflow"
         "&s3_lifecycle_category%21=No+value"
         f"&s3_lifecycle_category%21={IGNORE}"
         f"&date_created.to={threshold_date_fca}"

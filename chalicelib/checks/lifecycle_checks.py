@@ -110,8 +110,8 @@ def patch_file_lifecycle_status(connection, **kwargs):
                 )
             else:
                 action_logs["logs"].append(f"Cannot tag file {uuid}: not found on S3")
-                # In this case, set everything to 'deleted' in the metadata
-                new_lifecycle_status = lifecycle_utils.DELETED
+                # In this case, keep the old lifecycle status but update the "last checked" property
+                new_lifecycle_status = old_lifecycle_status
 
             if not is_extra_file:
                 today = datetime.date.today().strftime("%Y-%m-%d")
