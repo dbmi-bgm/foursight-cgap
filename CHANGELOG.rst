@@ -7,6 +7,10 @@ foursight-cgap
 Change Log
 ----------
 
+2.1.3
+=====
+* Lifecycle management: Only check files with ``project.lifecycle_management_active=true``. Furthermore, exclude files with status ``uploading`` and ``to be uploaded by workflow`` from the check.
+
 2.1.2
 =====
 * Assign correct action status when patch_file_lifecycle_status fails.
