@@ -4,13 +4,32 @@ import os
 from chalicelib.app_utils import AppUtils
 from chalicelib.deploy import Deploy
 
-
 # Chalice metadata
 app = Chalice(app_name='foursight-cgap')
 app.debug = True
 STAGE = os.environ.get('chalice_stage', 'dev')
-DEFAULT_ENV = os.environ.get("ENV_NAME", "cgap-uninitialized")
+DEFAULT_ENV = os.environ.get("ENV_NAME", "cgap-unknown")
 app_utils_obj = AppUtils()
+
+# When running 'chalice local' we do not get the same "/api" prefix as we see when deployed to AWS (Lambda).
+# So we set it explicitly here if your CHALICE_LOCAL environment variable is set; the point is to make
+# running locally as much as possible like running in AWS, at least as far is behavior is concerned;
+# but this does of course mean we're going through a slightly different code path for local and AWS.
+# Seems to be a known issue: https://github.com/aws/chalice/issues/838
+#
+# Also set CORS to True if CHALICE_LOCAL; not needed if running React (nascent support of
+# which is experimental and under development in distinct branch) from Foursight directly,
+# but useful if/when running React React separately (npm start in foursight-core/react) to
+# facilitate easy/quick development/changes directly to React code.
+CHALICE_LOCAL = (os.environ.get("CHALICE_LOCAL") == "1")
+if CHALICE_LOCAL:
+    ROUTE_PREFIX = "/api/"
+    ROUTE_EMPTY_PREFIX = "/api"
+    CORS = True
+else:
+    ROUTE_PREFIX = "/"
+    ROUTE_EMPTY_PREFIX = "/"
+    CORS = False
 
 
 '''######### SCHEDULED FXNS #########'''
@@ -169,8 +188,7 @@ def monday_autoscaling_checks(event):
 
 '''######### END SCHEDULED FXNS #########'''
 
-
-@app.route('/callback')
+@app.route(ROUTE_PREFIX + 'callback', cors=CORS)
 def auth0_callback():
     """
     Special callback route, only to be used as a callback from auth0
@@ -180,19 +198,38 @@ def auth0_callback():
     return app_utils_obj.auth0_callback(request, DEFAULT_ENV)
 
 
-@app.route('/', methods=['GET'])
+# TODO: Could have a decorator for this kind of thing.
+if CHALICE_LOCAL:
+    @app.route("/", methods=['GET'], cors=CORS)
+    def index():
+        """
+        Redirect with 302 to view page of DEFAULT_ENV
+        Non-protected route
+        """
+        domain, context = app_utils_obj.get_domain_and_context(app.current_request.to_dict())
+        redirect_path = ROUTE_PREFIX + 'view/' + DEFAULT_ENV
+        print(f'foursight-cgap: Redirecting to: {redirect_path}')
+        resp_headers = {'Location': redirect_path}
+        return Response(status_code=302, body=json.dumps(resp_headers), headers=resp_headers)
+
+
+@app.route(ROUTE_EMPTY_PREFIX, methods=['GET'], cors=CORS)
 def index():
     """
     Redirect with 302 to view page of DEFAULT_ENV
     Non-protected route
     """
     domain, context = app_utils_obj.get_domain_and_context(app.current_request.to_dict())
-    resp_headers = {'Location': context + 'view/' + DEFAULT_ENV}
-    return Response(status_code=302, body=json.dumps(resp_headers),
-                    headers=resp_headers)
+    if CHALICE_LOCAL:
+        redirect_path = ROUTE_PREFIX + 'view/' + DEFAULT_ENV
+    else:
+        redirect_path = context + 'view/' + DEFAULT_ENV
+    print(f'foursight-cgap: Redirecting to: {redirect_path}')
+    resp_headers = {'Location': redirect_path}
+    return Response(status_code=302, body=json.dumps(resp_headers), headers=resp_headers)
 
 
-@app.route('/introspect', methods=['GET'])
+@app.route(ROUTE_PREFIX + 'introspect', methods=['GET'], cors=CORS)
 def introspect(environ):
     """
     Test route
@@ -204,7 +241,7 @@ def introspect(environ):
         return app_utils_obj.forbidden_response()
 
 
-@app.route('/view_run/{environ}/{check}/{method}', methods=['GET'])
+@app.route(ROUTE_PREFIX + 'view_run/{environ}/{check}/{method}', methods=['GET'], cors=CORS)
 def view_run_route(environ, check, method):
     """
     Protected route
@@ -221,7 +258,7 @@ def view_run_route(environ, check, method):
         return app_utils_obj.forbidden_response(context)
 
 
-@app.route('/view/{environ}', methods=['GET'])
+@app.route(ROUTE_PREFIX + 'view/{environ}', methods=['GET'], cors=CORS)
 def view_route(environ):
     """
     Non-protected route
@@ -231,7 +268,7 @@ def view_route(environ):
     return app_utils_obj.view_foursight(app.current_request, environ, app_utils_obj.check_authorization(req_dict, environ), domain, context)
 
 
-@app.route('/view/{environ}/{check}/{uuid}', methods=['GET'])
+@app.route(ROUTE_PREFIX + 'view/{environ}/{check}/{uuid}', methods=['GET'], cors=CORS)
 def view_check_route(environ, check, uuid):
     """
     Protected route
@@ -244,7 +281,7 @@ def view_check_route(environ, check, uuid):
         return app_utils_obj.forbidden_response()
 
 
-@app.route('/history/{environ}/{check}', methods=['GET'])
+@app.route(ROUTE_PREFIX + 'history/{environ}/{check}', methods=['GET'], cors=CORS)
 def history_route(environ, check):
     """
     Non-protected route
@@ -259,7 +296,7 @@ def history_route(environ, check):
                                   app_utils_obj.check_authorization(req_dict, environ), domain, context)
 
 
-@app.route('/checks/{environ}/{check}/{uuid}', methods=['GET'])
+@app.route(ROUTE_PREFIX + 'checks/{environ}/{check}/{uuid}', methods=['GET'], cors=CORS)
 def get_check_with_uuid_route(environ, check, uuid):
     """
     Protected route
@@ -270,7 +307,7 @@ def get_check_with_uuid_route(environ, check, uuid):
         return app_utils_obj.forbidden_response()
 
 
-@app.route('/checks/{environ}/{check}', methods=['GET'])
+@app.route(ROUTE_PREFIX + 'checks/{environ}/{check}', methods=['GET'], cors=CORS)
 def get_check_route(environ, check):
     """
     Protected route
@@ -281,7 +318,7 @@ def get_check_route(environ, check):
         return app_utils_obj.forbidden_response()
 
 
-@app.route('/checks/{environ}/{check}', methods=['PUT'])
+@app.route(ROUTE_PREFIX + 'checks/{environ}/{check}', methods=['PUT'], cors=CORS)
 def put_check_route(environ, check):
     """
     Take a PUT request. Body of the request should be a json object with keys
@@ -300,7 +337,7 @@ def put_check_route(environ, check):
         return app_utils_obj.forbidden_response()
 
 
-@app.route('/environments/{environ}', methods=['PUT'])
+@app.route(ROUTE_PREFIX + 'environments/{environ}', methods=['PUT'], cors=CORS)
 def put_environment(environ):
     """
     Take a PUT request that has a json payload with 'fourfront' (ff server)
@@ -318,7 +355,7 @@ def put_environment(environ):
         return app_utils_obj.forbidden_response()
 
 
-@app.route('/environments/{environ}', methods=['GET'])
+@app.route(ROUTE_PREFIX + 'environments/{environ}', methods=['GET'], cors=CORS)
 def get_environment_route(environ):
     """
     Protected route
@@ -329,7 +366,7 @@ def get_environment_route(environ):
         return app_utils_obj.forbidden_response()
 
 
-@app.route('/environments/{environ}/delete', methods=['DELETE'])
+@app.route(ROUTE_PREFIX + 'environments/{environ}/delete', methods=['DELETE'], cors=CORS)
 def delete_environment(environ):
     """
     Takes a DELETE request and purges the foursight environment specified by 'environ'.
@@ -346,23 +383,30 @@ def delete_environment(environ):
 
 # dmichaels/2022-07-31:
 # For testing/debugging/troubleshooting.
-@app.route('/info/{environ}', methods=['GET'])
+@app.route(ROUTE_PREFIX + 'info/{environ}', methods=['GET'], cors=CORS)
 def get_view_info_route(environ):
     req_dict = app.current_request.to_dict()
     domain, context = app_utils_obj.get_domain_and_context(req_dict)
     return app_utils_obj.view_info(request=app.current_request, environ=environ, is_admin=app_utils_obj.check_authorization(req_dict, environ), domain=domain, context=context)
 
 
-@app.route('/view/{environ}/user/{email}')
+@app.route(ROUTE_PREFIX + 'users/{environ}/{email}', cors=CORS)
 def get_view_user_route(environ, email):
     req_dict = app.current_request.to_dict()
     domain, context = app_utils_obj.get_domain_and_context(req_dict)
     return app_utils_obj.view_user(request=app.current_request, environ=environ, is_admin=app_utils_obj.check_authorization(req_dict, environ), domain=domain, context=context, email=email)
 
 
+@app.route(ROUTE_PREFIX + 'users/{environ}', cors=CORS)
+def get_view_users_route(environ):
+    req_dict = app.current_request.to_dict()
+    domain, context = app_utils_obj.get_domain_and_context(req_dict)
+    return app_utils_obj.view_users(request=app.current_request, environ=environ, is_admin=app_utils_obj.check_authorization(req_dict, environ), domain=domain, context=context)
+
+
 # dmichaels/2022-07-31:
 # For testing/debugging/troubleshooting.
-@app.route('/reload_lambda/{environ}/{lambda_name}', methods=['GET'])
+@app.route(ROUTE_PREFIX + 'reload_lambda/{environ}/{lambda_name}', methods=['GET'], cors=CORS)
 def get_view_reload_lambda_route(environ, lambda_name):
     req_dict = app.current_request.to_dict()
     domain, context = app_utils_obj.get_domain_and_context(req_dict)

@@ -551,14 +551,15 @@
     },
     "check_file_lifecycle_status": {
         "title": "Check for files that require lifecycle updates",
-        "group": "Metadata Checks",
+        "group": "Lifecycle Checks",
         "schedule": {
             "hourly_checks": {
                 "<env-name>": {
                     "kwargs": {
-                        "files_per_run": 100, 
+                        "files_per_run": 100,
                         "max_checking_frequency": 14,
-                        "first_check_after": 14
+                        "first_check_after": 14,
+                        "queue_action": "prod"
                     },
                     "dependencies": []
                 }
@@ -570,13 +571,14 @@
     },
     "check_deleted_files_lifecycle_status": {
         "title": "Check for deleted files that require lifecycle updates",
-        "group": "Metadata Checks",
+        "group": "Lifecycle Checks",
         "schedule": {
             "hourly_checks": {
                 "<env-name>": {
                     "kwargs": {
                         "files_per_run": 50,
-                        "check_after": 14
+                        "check_after": 14,
+                        "queue_action": "prod"
                     },
                     "dependencies": []
                 }
@@ -586,5 +588,4 @@
             "<env-name>"
         ]
     }
-
 }
