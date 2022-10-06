@@ -556,7 +556,7 @@
             "hourly_checks": {
                 "<env-name>": {
                     "kwargs": {
-                        "files_per_run": 100, 
+                        "files_per_run": 100,
                         "max_checking_frequency": 14,
                         "first_check_after": 14,
                         "queue_action": "prod"
@@ -588,5 +588,4 @@
             "<env-name>"
         ]
     }
-
 }
