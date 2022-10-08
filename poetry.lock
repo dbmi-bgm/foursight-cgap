@@ -206,7 +206,7 @@ python-versions = "*"
 
 [[package]]
 name = "dcicutils"
-version = "4.7.0"
+version = "4.8.0"
 description = "Utility package for interacting with the 4DN Data Portal and other 4DN resources"
 category = "main"
 optional = false
@@ -1134,8 +1134,8 @@ cron-descriptor = [
     {file = "cron_descriptor-1.2.31.tar.gz", hash = "sha256:8e83f08dbd76657a0b6ce1168b293bc27fa68be573ef8cb086ef0d9896340876"},
 ]
 dcicutils = [
-    {file = "dcicutils-4.7.0-py3-none-any.whl", hash = "sha256:782589ebf363df250364ba78cd6243411f3a0195981451112a2c73bdd2dccd98"},
-    {file = "dcicutils-4.7.0.tar.gz", hash = "sha256:bcbb451111674d133b0511504f8a4c2cb54afb5f5c1750084d7ed3bce19616f6"},
+    {file = "dcicutils-4.8.0-py3-none-any.whl", hash = "sha256:06707fde9077085abbdfe0577d61be4dd64106906d011b532f90f4379cfb4805"},
+    {file = "dcicutils-4.8.0.tar.gz", hash = "sha256:7095b4109df42bcd45c76e8f4dc96777116e2c8d944b6b3fb4a2ede75f18a737"},
 ]
 decorator = [
     {file = "decorator-5.1.1-py3-none-any.whl", hash = "sha256:b8c3f85900b9dc423225913c5aace94729fe1fa9763b38939a95226f02d37186"},
