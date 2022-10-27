@@ -9,8 +9,24 @@ Change Log
 
 2.2.0
 =====
-* In progress ...
-  * React-ifying Foursight (experiment).
+* Changes related to Foursight React.
+
+2.1.4
+=====
+* Bring in mamga v1.1.0
+
+2.1.3
+=====
+* Lifecycle management: Only check files with ``project.lifecycle_management_active=true``. Furthermore, exclude files with status ``uploading`` and ``to be uploaded by workflow`` from the check.
+
+2.1.2
+=====
+* Assign correct action status when patch_file_lifecycle_status fails.
+
+2.1.1
+=====
+* Move lifecycle checks to separate group in UI.
+* Automatically run action for lifecycle checks.
 
 2.1.0
 =====
