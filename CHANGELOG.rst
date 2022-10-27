@@ -10,6 +10,8 @@ Change Log
 2.2.0
 =====
 * Changes related to Foursight React.
+  * Moved all Chalice routes to foursight-core; same with foursight;
+    and app-cgap and app-fourfront.py in 4dn-cloud-infra.
 
 2.1.4
 =====
