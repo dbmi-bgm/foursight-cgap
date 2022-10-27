@@ -209,7 +209,7 @@ class TestCheckRunner:
 
         check_handler = check_utils.CheckHandler(FOURSIGHT_PREFIX,
                                                  check_setup_dir=os.path.dirname(chalicelib_path),
-                                                 check_package_name='chalicelib')
+                                                 check_package_name='chalicelib_cgap')
         check_schedule = check_handler.get_check_schedule(use_schedule)
         use_checks = [cs[0].split('/')[1] for env in check_schedule for cs in check_schedule[env]]
         # get a reference point for check results

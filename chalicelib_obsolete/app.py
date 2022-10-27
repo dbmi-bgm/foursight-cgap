@@ -1,8 +1,8 @@
 from chalice import Cron
 import os
-from chalicelib.app_utils import AppUtils
+from chalicelib_cgap.app_utils import AppUtils
 from foursight_core.app_utils import app
-from chalicelib.deploy import Deploy
+from chalicelib_cgap.deploy import Deploy
 app.debug = True
 STAGE = os.environ.get('chalice_stage', 'dev')
 DEFAULT_ENV = os.environ.get("ENV_NAME", "cgap-unknown")

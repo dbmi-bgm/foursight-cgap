@@ -6,7 +6,7 @@ import os
 import sys
 import time
 import boto3
-from chalicelib.app import set_stage
+from chalicelib_cgap.app import set_stage
 from foursight_core import (
     fs_connection,
     s3_connection,
@@ -20,12 +20,12 @@ from foursight_core import (
     check_utils,
     decorators,
 )
-from chalicelib import (
+from chalicelib_cgap import (
     app_utils,
 )
-from chalicelib.vars import *
-from chalicelib import __file__ as chalicelib_path
-from chalicelib.checks.helpers.confchecks import *
+from chalicelib_cgap.vars import *
+from chalicelib_cgap import __file__ as chalicelib_path
+from chalicelib_cgap.checks.helpers.confchecks import *
 from dcicutils import s3_utils, ff_utils
 from contextlib import contextmanager
 import pytest
