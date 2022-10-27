@@ -1,0 +1,456 @@
+{
+  "item_counts_by_type": {
+    "title": "Item counts by type",
+    "group": "Metadata Checks",
+    "schedule": {
+      "manual_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          }
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "indexing_progress": {
+    "title": "Indexing progress",
+    "group": "Elasticsearch Checks",
+    "schedule": {
+      "manual_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          }
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "status_of_elasticsearch_indices": {
+    "title": "Status of elasticsearch indices",
+    "group": "Elasticsearch Checks",
+    "conditions": [
+      "put_env"
+    ],
+    "schedule": {
+      "manual_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          }
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "indexing_records": {
+    "title": "Indexing records",
+    "group": "Elasticsearch Checks",
+    "conditions": [
+      "put_env"
+    ],
+    "schedule": {
+      "manual_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          }
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "change_in_item_counts": {
+    "title": "Change in item counts",
+    "group": "Metadata Checks",
+    "schedule": {
+      "manual_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          }
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "page_children_routes": {
+    "title": "Pages with bad routes",
+    "group": "Audit Checks",
+    "schedule": {
+      "monthly_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          }
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "workflow_properties": {
+    "title": "Workflows with missing or duplicate steps properties",
+    "group": "Audit Checks",
+    "schedule": {
+      "manual_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          }
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "check_validation_errors": {
+    "title": "Search for Validation Errors",
+    "group": "Audit Checks",
+    "schedule": {
+      "monthly_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          }
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "workflow_run_has_deleted_input_file": {
+    "title": "WorkflowRun linked to deleted Files",
+    "group": "Metadata Checks",
+    "schedule": {
+      "manual_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          }
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "check_suggested_enum_values": {
+    "title": "Check fields with suggested enum",
+    "group": "Metadata Checks",
+    "schedule": {
+      "manual_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          }
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "metawfrs_to_run": {
+    "title": "Metawfrs to run",
+    "group": "Pipeline Checks",
+    "schedule": {
+      "fifteen_min_checks_3": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true,
+            "queue_action": "prod"
+          },
+          "dependencies": []
+        }
+      }
+    }
+  },
+  "metawfrs_to_checkstatus": {
+    "title": "Metawfrs to check status",
+    "group": "Pipeline Checks",
+    "schedule": {
+      "fifteen_min_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true,
+            "queue_action": "prod"
+          },
+          "dependencies": []
+        }
+      }
+    }
+  },
+  "spot_failed_metawfrs": {
+    "title": "Spot-failed Metawfrs",
+    "group": "Pipeline Checks",
+    "schedule": {
+      "fifteen_min_checks_2": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true,
+            "queue_action": "prod"
+          },
+          "dependencies": []
+        }
+      }
+    }
+  },
+  "failed_metawfrs": {
+    "title": "Failed Metawfrs",
+    "group": "Pipeline Checks",
+    "schedule": {
+      "manual_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          },
+          "dependencies": []
+        }
+      }
+    }
+  },
+  "md5runCGAP_status": {
+    "title": "MD5 runs",
+    "group": "Pipeline Checks",
+    "schedule": {
+      "hourly_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true,
+            "queue_action": "prod"
+          },
+          "dependencies": []
+        }
+      }
+    }
+  },
+  "ingest_vcf_status": {
+    "title": "Trigger VCF ingestion",
+    "group": "Pipeline Checks",
+    "schedule": {
+      "manual_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          },
+          "dependencies": []
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "check_vcf_ingestion_errors": {
+    "title": "Check VCFs for ingestion errors",
+    "group": "Pipeline Checks",
+    "schedule": {
+      "manual_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          },
+          "dependencies": []
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "elastic_search_space": {
+    "title": "ES Disk Space Check",
+    "group": "Elasticsearch Checks",
+    "schedule": {
+      "manual_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          },
+          "dependencies": []
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "elasticsearch_s3_count_diff": {
+    "title": "S3/ES Check Count Differential",
+    "group": "Elasticsearch Checks",
+    "schedule": {
+      "monthly_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          }
+        }
+      }
+    }
+  },
+  "clean_s3_es_checks": {
+    "title": "Wipe Checks Older Than One Month",
+    "group": "System Checks",
+    "schedule": {
+      "manual_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          },
+          "dependencies": []
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "snapshot_rds": {
+    "title": "Snapshot RDS",
+    "group": "System Checks",
+    "schedule": {
+      "monthly_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          },
+          "dependencies": []
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "secondary_queue_deduplication": {
+    "title": "Secondary queue deduplication",
+    "group": "System Checks",
+    "schedule": {
+      "manual_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          },
+          "dependencies": []
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "core_project_status": {
+    "title": "Ensure CGAP Core project items are shared",
+    "group": "Metadata Checks",
+    "schedule": {
+      "morning_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true,
+            "queue_action": "prod",
+            "item_type": [
+              "VariantSample",
+              "Case",
+              "Family",
+              "Individual",
+              "WorkflowRun",
+              "FileFastq",
+              "FileProcessed",
+              "Sample",
+              "SampleProcessing",
+              "Report",
+              "QualityMetric",
+              "FilterSet"
+            ]
+          }
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "update_variant_genelist": {
+    "title": "Add gene lists to variant samples",
+    "group": "Metadata Checks",
+    "schedule": {
+      "morning_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true,
+            "queue_action": "prod"
+          }
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "get_metadata_for_cases_to_clone": {
+    "title": "Get Clone Case Metadata",
+    "group": "Metadata Checks",
+    "schedule": {
+      "manual_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          },
+          "dependencies": []
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "ecs_status": {
+    "title": "ECS Status",
+    "group": "ECS Checks",
+    "schedule": {
+      "manual_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          },
+          "dependencies": []
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  },
+  "update_ecs_application_versions": {
+    "title": "Update ECS Cluster Application Versions",
+    "group": "ECS Checks",
+    "schedule": {
+      "manual_checks": {
+        "cgap-supertest": {
+          "kwargs": {
+            "primary": true
+          },
+          "dependencies": []
+        }
+      }
+    },
+    "display": [
+      "cgap-supertest"
+    ]
+  }
+}

@@ -5,7 +5,7 @@ description = "Serverless Chalice Application for Monitoring"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
 packages = [
-  { include = "chalicelib" }
+  { include = "chalicelib_cgap" }
 ]
 
 [tool.poetry.dependencies]
