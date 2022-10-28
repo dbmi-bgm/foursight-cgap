@@ -1,6 +1,6 @@
+from chalice import Cron
 import os
 from os.path import dirname
-from chalice import Cron
 from dcicutils.exceptions import InvalidParameterError
 from dcicutils.misc_utils import ignored
 from foursight_core.app_utils import app # Chalice object
@@ -96,16 +96,16 @@ foursight_cron_by_schedule = {
     }
 }
 
-@app.lambda_function()
-def check_runner(event, context):
-    """
-    Pure lambda function to pull run and check information from SQS and run
-    the checks. Self propogates. event is a dict of information passed into
-    the lambda at invocation time.
-    """
-    if not event:
-        return
-    app.core.run_check_runner(event)
+#@app.lambda_function()
+#def check_runner(event, context):
+#    """
+#    Pure lambda function to pull run and check information from SQS and run
+#    the checks. Self propogates. event is a dict of information passed into
+#    the lambda at invocation time.
+#    """
+#    if not event:
+#        return
+#    app.core.run_check_runner(event)
 
 
 @app.schedule(foursight_cron_by_schedule[STAGE]['manual_checks'])
@@ -119,10 +119,10 @@ def morning_checks(event):
     app.core.queue_scheduled_checks('all', 'morning_checks')
 
 
-@app.schedule(foursight_cron_by_schedule[STAGE]['fifteen_min_checks'])
-def fifteen_min_checks(event):
-    ignored(event)
-    app.core.queue_scheduled_checks('all', 'fifteen_min_checks')
+#@app.schedule(foursight_cron_by_schedule[STAGE]['fifteen_min_checks'])
+#def fifteen_min_checks(event):
+#    ignored(event)
+#    app.core.queue_scheduled_checks('all', 'fifteen_min_checks')
 
 
 @app.schedule(foursight_cron_by_schedule[STAGE]['fifteen_min_checks_2'])
