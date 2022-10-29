@@ -1,11 +1,8 @@
 from chalice import Cron
 import os
 from os.path import dirname
-from dcicutils.exceptions import InvalidParameterError
-from dcicutils.misc_utils import ignored
-from foursight_core.app_utils import app # Chalice object
+from foursight_core.app_utils import app  # Chalice object
 from foursight_core.app_utils import AppUtilsCore as AppUtils_from_core
-from foursight_core.deploy import Deploy
 from foursight_core.identity import apply_identity_globally
 from .vars import FOURSIGHT_PREFIX, HOST
 
