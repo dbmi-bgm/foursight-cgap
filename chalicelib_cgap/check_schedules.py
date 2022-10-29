@@ -1,14 +1,17 @@
 from chalice import Cron
-from foursight_core.app_utils import app # Chalice object
+import os
+from dcicutils.exceptions import InvalidParameterError
+from foursight_core.app_utils import app  # Chalice object
+from foursight_core.deploy import Deploy
 
 # --------------------------------------------------------------------------------------------------
 # Previously in: 4dn-cloud-infra
-# But note we do not access the main AppUtils object via AppUtils.singleton(AppUtils) but rather
-# via app.core (where app is the Chalice object from foursight_core), which is set in foursight_core
-# constructor; the AppUtils.singleton is invoked from 4dn-cloud-infra/app.py to make sure it gets
-# the AppUtils derivation there (yes that singleton is odd in taking a class argument). We could
-# actually reference AppUtils.singleton here, but not at the file level, only within functions,
-# below, but best not to use it at all here to reduce confusion.
+# But note we do not access the main AppUtils object via AppUtils.singleton(AppUtils) but
+# rather via app.core (where app is the Chalice object from foursight_core), which is set
+# in foursight_core constructor; the AppUtils.singleton is invoked from 4dn-cloud-infra/app.py
+# to make sure it gets the AppUtils derivation there (yes that singleton is odd in taking a
+# class argument). We could actually reference AppUtils.singleton here, but not at the file
+# level, only within functions, below, but best not to use it at all here to reduce confusion.
 # --------------------------------------------------------------------------------------------------
 
 # TODO
