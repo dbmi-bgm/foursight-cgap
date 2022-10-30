@@ -5,7 +5,10 @@ from foursight_core.app_utils import AppUtilsCore as AppUtils_from_core
 from foursight_core.identity import apply_identity_globally
 from .vars import FOURSIGHT_PREFIX, HOST
 
+check_setup_dir = os.environ.get("FOURSIGHT_CHECK_SETUP_DIR")
 
+print('xyzzy;chalicelib_cgap..........................2')
+print(check_setup_dir)
 
 #TODO: Rename back to AppUtils with merged with 4dn-cloud-infra version below after verified working ...
 class AppUtils_from_cgap_or_fourfront(AppUtils_from_core):
@@ -28,6 +31,8 @@ class AppUtils_from_cgap_or_fourfront(AppUtils_from_core):
     FAVICON = 'https://cgap-dbmi.hms.harvard.edu/favicon.ico'
     host = HOST
     package_name = 'chalicelib_cgap'
+    print('xyzzy;chalicelib_cgap..........................3')
+    print(check_setup_dir)
     check_setup_dir = dirname(__file__)
     check_setup_dir_fallback = dirname(__file__)
     DEFAULT_ENV = os.environ.get("ENV_NAME", "foursight-cgap-env-uninitialized")
@@ -60,7 +65,10 @@ class AppUtils(AppUtils_from_cgap_or_fourfront):
     host = HOST
     package_name = 'chalicelib_cgap'
     # check_setup is moved to vendor/ where it will be automatically placed at top level
-    check_setup_dir = os.path.dirname(__file__)
+    print('xyzzy;chalicelib_cgap..........................4')
+    print(check_setup_dir)
+    # check_setup_dir = os.path.dirname(__file__)
+    check_setup_dir = os.environ.get("FOURSIGHT_CHECK_SETUP_DIR") or os.path.dirname(__file__)
     # html_main_title = f'Foursight-{DEFAULT_ENV}-{STAGE}'.title()
     # html_main_title = 'Foursight-Fourfront';
     html_main_title = "Foursight" # Foursight CGAP vs Fourfront difference now conveyed in the upper left icon.
