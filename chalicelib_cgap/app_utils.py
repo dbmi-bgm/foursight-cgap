@@ -1,6 +1,6 @@
 import os
 from foursight_core.app_utils import app  # Chalice object
-from foursight_core.app_utils import AppUtilsCore as AppUtils_from_core
+from foursight_core.app_utils import AppUtils as AppUtils_from_core
 from foursight_core.identity import apply_identity_globally
 from .vars import FOURSIGHT_PREFIX, HOST
 
@@ -25,7 +25,7 @@ class AppUtils(AppUtils_from_core):
     FAVICON = 'https://cgap-dbmi.hms.harvard.edu/favicon.ico'
     host = HOST
     package_name = 'chalicelib_cgap'
-    check_setup_dir_fallback = os.path.dirname(__file__)
+    check_setup_dir_fallback = os.path.abspath(os.path.dirname(__file__))
     if os.environ.get("CHALICE_LOCAL") == "1":
         check_setup_dir = "chalicelib_local"
     else:
