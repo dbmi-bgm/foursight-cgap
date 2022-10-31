@@ -30,6 +30,7 @@ class AppUtils(AppUtils_from_core):
         check_setup_dir = "chalicelib_local"
     else:
         check_setup_dir = os.environ.get("FOURSIGHT_CHECK_SETUP_DIR") or os.path.dirname(__file__)
+    check_setup_dir = os.path.abspath(check_setup_dir)
     DEFAULT_ENV = os.environ.get("ENV_NAME", "foursight-cgap-env-uninitialized")
     html_main_title = "Foursight" # Foursight CGAP vs Fourfront difference now conveyed in the upper left icon.
 
