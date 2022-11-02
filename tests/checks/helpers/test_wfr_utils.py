@@ -1,1 +1,1 @@
-from chalicelib.checks.helpers.wfr_utils import *
+from chalicelib_cgap.checks.helpers.wfr_utils import *
