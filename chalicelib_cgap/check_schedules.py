@@ -87,7 +87,7 @@ def morning_checks(event):
     app.core.queue_scheduled_checks('all', 'morning_checks')
 
 
-@app.schedule(Cron('0/2', '*', '*', '*', '?', '*'))
+@app.schedule(foursight_cron_by_schedule[STAGE]['fifteen_min_checks'])
 def fifteen_min_checks(event):
     app.core.queue_scheduled_checks('all', 'fifteen_min_checks')
 
