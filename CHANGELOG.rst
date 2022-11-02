@@ -17,9 +17,9 @@ Change Log
   * Added chalicelib_local with a sample check_setup.json suitable for local testing.
   * Changed check_setup.json lookup (in chalicelib_cgap/app_utils.py) to look for the
     above local file if CHALICE_LOCAL environment variable set to "1"; and also to look
-    for check_setup.json in the directory specified by FOURSIGHT_CHECK_SETUP_DIR if set,
-    otherwise look in the local chalicelib_cgap directory; and setup a fallback directory
-    for this lookup to this local chalicelib_cgap directory, which foursight-core will
+    for check_setup.json in the directory specified by the FOURSIGHT_CHECK_SETUP_DIR environment
+    variable, if set, otherwise look in the local chalicelib_cgap directory; and setup a fallback
+    directory for this lookup to this local chalicelib_cgap directory, which foursight-core will
     use if there is no (non-empty) check_setup.json in the specified directory.
 
 2.1.4
