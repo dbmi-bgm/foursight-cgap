@@ -299,7 +299,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "2.1.0.1b77"
+version = "2.1.0.1b78"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -1031,7 +1031,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.8"
-content-hash = "86e4fe12a96f610a95284b79044fe59dcf17a73a1ef17a21bda4f7e9a9fbf629"
+content-hash = "a1f2110ed6dba274cc41f0b11e645c95f874e58f627aabfd60835c5ea49a43ac"
 
 [metadata.files]
 ansicon = [
