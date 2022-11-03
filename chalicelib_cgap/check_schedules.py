@@ -23,8 +23,7 @@ DISABLED_STAGES = ["dev"]
 schedules = {
     'prod': {
         'ten_min_checks': Cron('0/10', '*', '*', '*', '?', '*'),
-#       'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
-        'fifteen_min_checks': Cron('0/2', '*', '*', '*', '?', '*'),
+        'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
         'fifteen_min_checks_2': Cron('5/15', '*', '*', '*', '?', '*'),
         'fifteen_min_checks_3': Cron('10/15', '*', '*', '*', '?', '*'),
         'thirty_min_checks': Cron('0/30', '*', '*', '*', '?', '*'),
@@ -40,8 +39,7 @@ schedules = {
     },
     'dev': {
         'ten_min_checks': Cron('5/10', '*', '*', '*', '?', '*'),
-#       'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
-        'fifteen_min_checks': Cron('0/2', '*', '*', '*', '?', '*'),
+        'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
         'fifteen_min_checks_2': Cron('5/15', '*', '*', '*', '?', '*'),
         'fifteen_min_checks_3': Cron('10/15', '*', '*', '*', '?', '*'),
         'thirty_min_checks': Cron('15/30', '*', '*', '*', '?', '*'),
