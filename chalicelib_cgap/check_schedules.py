@@ -1,8 +1,11 @@
 from chalice import Cron
 import os
+from typing import Callable, Tuple
 from dcicutils.exceptions import InvalidParameterError
+from dcicutils.misc_utils import PRINT
 from foursight_core.app_utils import app  # Chalice object
 from foursight_core.deploy import Deploy
+from foursight_core.schedule_decorator import schedule, SCHEDULE_FOR_NEVER
 
 # --------------------------------------------------------------------------------------------------
 # Previously in: 4dn-cloud-infra
@@ -14,23 +17,14 @@ from foursight_core.deploy import Deploy
 # level, only within functions, below, but best not to use it at all here to reduce confusion.
 # --------------------------------------------------------------------------------------------------
 
-STAGE = os.environ.get('chalice_stage', 'dev')
+STAGE = os.environ.get("chalice_stage", "dev")
+DISABLED_STAGES = ["dev"]
 
-
-def effectively_never():
-    """Every February 31st, a.k.a. 'never'."""
-    return Cron('0', '0', '31', '2', '?', '*')
-
-
-def morning_10am_utc():
-    """ Schedule for every morning at 10AM UTC (6AM EST) """
-    return Cron('0', '10', '*', '*', '?', '*')
-
-
-foursight_cron_by_schedule = {
+schedules = {
     'prod': {
         'ten_min_checks': Cron('0/10', '*', '*', '*', '?', '*'),
-        'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
+#       'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
+        'fifteen_min_checks': Cron('0/2', '*', '*', '*', '?', '*'),
         'fifteen_min_checks_2': Cron('5/15', '*', '*', '*', '?', '*'),
         'fifteen_min_checks_3': Cron('10/15', '*', '*', '*', '?', '*'),
         'thirty_min_checks': Cron('0/30', '*', '*', '*', '?', '*'),
@@ -42,11 +36,12 @@ foursight_cron_by_schedule = {
         'evening_checks': Cron('0', '22', '*', '*', '?', '*'),
         'monday_checks': Cron('0', '9', '?', '*', '2', '*'),
         'monthly_checks': Cron('0', '9', '1', '*', '?', '*'),
-        'manual_checks': effectively_never(),
+        'manual_checks': SCHEDULE_FOR_NEVER
     },
     'dev': {
         'ten_min_checks': Cron('5/10', '*', '*', '*', '?', '*'),
-        'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
+#       'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
+        'fifteen_min_checks': Cron('0/2', '*', '*', '*', '?', '*'),
         'fifteen_min_checks_2': Cron('5/15', '*', '*', '*', '?', '*'),
         'fifteen_min_checks_3': Cron('10/15', '*', '*', '*', '?', '*'),
         'thirty_min_checks': Cron('15/30', '*', '*', '*', '?', '*'),
@@ -58,9 +53,49 @@ foursight_cron_by_schedule = {
         'evening_checks': Cron('0', '22', '*', '*', '?', '*'),
         'monday_checks': Cron('30', '9', '?', '*', '2', '*'),
         'monthly_checks': Cron('30', '9', '1', '*', '?', '*'),
-        'manual_checks': effectively_never(),
+        'manual_checks': SCHEDULE_FOR_NEVER
     }
 }
+
+
+@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+def manual_checks():
+    app.core.queue_scheduled_checks('all', 'manual_checks')
+
+
+@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+def morning_checks(event):
+    app.core.queue_scheduled_checks('all', 'morning_checks')
+
+
+@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+def fifteen_min_checks(event):
+    app.core.queue_scheduled_checks('all', 'fifteen_min_checks')
+
+
+@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+def fifteen_min_checks_2(event):
+    app.core.queue_scheduled_checks('all', 'fifteen_min_checks_2')
+
+
+@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+def fifteen_min_checks_3(event):
+    app.core.queue_scheduled_checks('all', 'fifteen_min_checks_3')
+
+
+@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+def hourly_checks(event):
+    app.core.queue_scheduled_checks('all', 'hourly_checks')
+
+
+@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+def hourly_checks_2(event):
+    app.core.queue_scheduled_checks('all', 'hourly_checks_2')
+
+
+@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+def monthly_checks(event):
+    app.core.queue_scheduled_checks('all', 'monthly_checks')
 
 
 @app.lambda_function()
@@ -73,43 +108,3 @@ def check_runner(event, context):
     if not event:
         return
     app.core.run_check_runner(event)
-
-
-@app.schedule(foursight_cron_by_schedule[STAGE]['manual_checks'])
-def manual_checks():
-    app.core.queue_scheduled_checks('all', 'manual_checks')
-
-
-@app.schedule(foursight_cron_by_schedule[STAGE]['morning_checks'])
-def morning_checks(event):
-    app.core.queue_scheduled_checks('all', 'morning_checks')
-
-
-@app.schedule(foursight_cron_by_schedule[STAGE]['fifteen_min_checks'])
-def fifteen_min_checks(event):
-    app.core.queue_scheduled_checks('all', 'fifteen_min_checks')
-
-
-@app.schedule(foursight_cron_by_schedule[STAGE]['fifteen_min_checks_2'])
-def fifteen_min_checks_2(event):
-    app.core.queue_scheduled_checks('all', 'fifteen_min_checks_2')
-
-
-@app.schedule(foursight_cron_by_schedule[STAGE]['fifteen_min_checks_3'])
-def fifteen_min_checks_3(event):
-    app.core.queue_scheduled_checks('all', 'fifteen_min_checks_3')
-
-
-@app.schedule(foursight_cron_by_schedule[STAGE]['hourly_checks'])
-def hourly_checks(event):
-    app.core.queue_scheduled_checks('all', 'hourly_checks')
-
-
-@app.schedule(foursight_cron_by_schedule[STAGE]['hourly_checks_2'])
-def hourly_checks_2(event):
-    app.core.queue_scheduled_checks('all', 'hourly_checks_2')
-
-
-@app.schedule(foursight_cron_by_schedule[STAGE]['monthly_checks'])
-def monthly_checks(event):
-    app.core.queue_scheduled_checks('all', 'monthly_checks')
