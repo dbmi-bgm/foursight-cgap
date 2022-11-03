@@ -117,23 +117,23 @@ def monthly_checks(event):
     app.core.queue_scheduled_checks('all', 'monthly_checks')
 
 
-def compute_valid_deploy_stages():
-    # TODO: Will wants to know why "test" is here. -kmp 17-Aug-2021
-    return list(Deploy.CONFIG_BASE['stages'].keys()) + ['test']
-
-
-class InvalidDeployStage(InvalidParameterError):
-
-    @classmethod
-    def compute_valid_options(cls):
-        return compute_valid_deploy_stages()
-
-
-def set_stage(stage):
-    if stage not in compute_valid_deploy_stages():
-        raise InvalidDeployStage(parameter='stage', value=stage)
-    os.environ['chalice_stage'] = stage
-
-
-def set_timeout(timeout):
-    app.core.set_timeout(timeout)
+#def compute_valid_deploy_stages():
+#    # TODO: Will wants to know why "test" is here. -kmp 17-Aug-2021
+#    return list(Deploy.CONFIG_BASE['stages'].keys()) + ['test']
+#
+#
+#class InvalidDeployStage(InvalidParameterError):
+#
+#    @classmethod
+#    def compute_valid_options(cls):
+#        return compute_valid_deploy_stages()
+#
+#
+#def set_stage(stage):
+#    if stage not in compute_valid_deploy_stages():
+#        raise InvalidDeployStage(parameter='stage', value=stage)
+#    os.environ['chalice_stage'] = stage
+#
+#
+#def set_timeout(timeout):
+#    app.core.set_timeout(timeout)
