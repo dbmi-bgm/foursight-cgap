@@ -57,43 +57,52 @@ schedules = {
     }
 }
 
+# New schedule decorator does not work yet ...
 
-@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+#@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+@app.schedule(schedules[STAGE]['manual_checks'])
 def manual_checks():
     app.core.queue_scheduled_checks('all', 'manual_checks')
 
 
-@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+#@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+@app.schedule(schedules[STAGE]['morning_checks'])
 def morning_checks(event):
     app.core.queue_scheduled_checks('all', 'morning_checks')
 
 
-@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+#@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+@app.schedule(schedules[STAGE]['fifteen_min_checks'])
 def fifteen_min_checks(event):
     app.core.queue_scheduled_checks('all', 'fifteen_min_checks')
 
 
-@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+#@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+@app.schedule(schedules[STAGE]['fifteen_min_checks_2'])
 def fifteen_min_checks_2(event):
     app.core.queue_scheduled_checks('all', 'fifteen_min_checks_2')
 
 
-@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+#@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+@app.schedule(schedules[STAGE]['fifteen_min_checks_3'])
 def fifteen_min_checks_3(event):
     app.core.queue_scheduled_checks('all', 'fifteen_min_checks_3')
 
 
-@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+#@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+@app.schedule(schedules[STAGE]['hourly_checks'])
 def hourly_checks(event):
     app.core.queue_scheduled_checks('all', 'hourly_checks')
 
 
-@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+#@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+@app.schedule(schedules[STAGE]['hourly_checks_2'])
 def hourly_checks_2(event):
     app.core.queue_scheduled_checks('all', 'hourly_checks_2')
 
 
-@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+#@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+@app.schedule(schedules[STAGE]['monthly_checks'])
 def monthly_checks(event):
     app.core.queue_scheduled_checks('all', 'monthly_checks')
 
