@@ -72,11 +72,13 @@ def morning_checks(event):
 
 
 #@app.schedule(schedules[STAGE]['fifteen_min_checks'])
-@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+#@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
 def fifteen_min_checks(event):
     print('xyzzy/fifteen_min_checks')
     print(event)
     app.core.queue_scheduled_checks('all', 'fifteen_min_checks')
+print('xyzzy/manual/schedule')
+app.schedule(schedules[STAGE]['fifteen_min_checks'])(fifteen_min_checks)
 
 
 #@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
