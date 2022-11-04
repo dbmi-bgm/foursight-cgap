@@ -77,12 +77,20 @@ def fifteen_min_checks(event):
     print('xyzzy/fifteen_min_checks')
     print(event)
     app.core.queue_scheduled_checks('all', 'fifteen_min_checks')
+print('xyzzy/check_schedules.py/fifteen_min_checks')
+print(fifteen_min_checks)
+print(type(fifteen_min_checks))
+print(id(fifteen_min_checks))
 
 
 #@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
 @app.schedule(schedules[STAGE]['fifteen_min_checks_2'])
 def fifteen_min_checks_2(event):
     app.core.queue_scheduled_checks('all', 'fifteen_min_checks_2')
+print('xyzzy/check_schedules.py/fifteen_min_checks_2')
+print(fifteen_min_checks_2)
+print(type(fifteen_min_checks_2))
+print(id(fifteen_min_checks_2))
 
 
 #@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
