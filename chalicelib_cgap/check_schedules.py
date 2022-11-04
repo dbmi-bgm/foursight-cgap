@@ -18,11 +18,10 @@ from foursight_core.schedule_decorator import schedule, SCHEDULE_FOR_NEVER
 STAGE = os.environ.get("chalice_stage", "dev")
 DISABLED_STAGES = []
 
-schedules = {
+SCHEDULES = {
     'prod': {
         'ten_min_checks': Cron('0/10', '*', '*', '*', '?', '*'),
-#       'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
-        'fifteen_min_checks': Cron('0/2', '*', '*', '*', '?', '*'),
+        'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
         'fifteen_min_checks_2': Cron('5/15', '*', '*', '*', '?', '*'),
         'fifteen_min_checks_3': Cron('10/15', '*', '*', '*', '?', '*'),
         'thirty_min_checks': Cron('0/30', '*', '*', '*', '?', '*'),
@@ -38,8 +37,7 @@ schedules = {
     },
     'dev': {
         'ten_min_checks': Cron('5/10', '*', '*', '*', '?', '*'),
-#       'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
-        'fifteen_min_checks': Cron('0/2', '*', '*', '*', '?', '*'),
+        'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
         'fifteen_min_checks_2': Cron('5/15', '*', '*', '*', '?', '*'),
         'fifteen_min_checks_3': Cron('10/15', '*', '*', '*', '?', '*'),
         'thirty_min_checks': Cron('15/30', '*', '*', '*', '?', '*'),
@@ -57,50 +55,42 @@ schedules = {
 
 # New schedule decorator does not work yet ...
 
-#@app.schedule(schedules[STAGE]['manual_checks'])
-@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+@schedule(SCHEDULES, stage=STAGE, disabled_stages=DISABLED_STAGES)
 def manual_checks():
     app.core.queue_scheduled_checks('all', 'manual_checks')
 
 
-#@app.schedule(schedules[STAGE]['morning_checks'])
-@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+@schedule(SCHEDULES, stage=STAGE, disabled_stages=DISABLED_STAGES)
 def morning_checks(event):
     app.core.queue_scheduled_checks('all', 'morning_checks')
 
 
-#@app.schedule(schedules[STAGE]['fifteen_min_checks'])
-@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+@schedule(SCHEDULES, stage=STAGE, disabled_stages=DISABLED_STAGES)
 def fifteen_min_checks(event):
     app.core.queue_scheduled_checks('all', 'fifteen_min_checks')
 
 
-#@app.schedule(schedules[STAGE]['fifteen_min_checks_2'])
-@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+@schedule(SCHEDULES, stage=STAGE, disabled_stages=DISABLED_STAGES)
 def fifteen_min_checks_2(event):
     app.core.queue_scheduled_checks('all', 'fifteen_min_checks_2')
 
 
-#@app.schedule(schedules[STAGE]['fifteen_min_checks_3'])
-@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+@schedule(SCHEDULES, stage=STAGE, disabled_stages=DISABLED_STAGES)
 def fifteen_min_checks_3(event):
     app.core.queue_scheduled_checks('all', 'fifteen_min_checks_3')
 
 
-#@app.schedule(schedules[STAGE]['hourly_checks'])
-@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+@schedule(SCHEDULES, stage=STAGE, disabled_stages=DISABLED_STAGES)
 def hourly_checks(event):
     app.core.queue_scheduled_checks('all', 'hourly_checks')
 
 
-#@app.schedule(schedules[STAGE]['hourly_checks_2'])
-@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+@schedule(SCHEDULES, stage=STAGE, disabled_stages=DISABLED_STAGES)
 def hourly_checks_2(event):
     app.core.queue_scheduled_checks('all', 'hourly_checks_2')
 
 
-#@app.schedule(schedules[STAGE]['monthly_checks'])
-@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
+@schedule(SCHEDULES, stage=STAGE, disabled_stages=DISABLED_STAGES)
 def monthly_checks(event):
     app.core.queue_scheduled_checks('all', 'monthly_checks')
 

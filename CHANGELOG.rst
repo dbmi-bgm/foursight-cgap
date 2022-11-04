@@ -14,6 +14,7 @@ Change Log
   * Renamed target package (pyproject.toml) from chalicelib to chalicelib_cgap.
   * Moved all Chalice routes to foursight-core (same with foursight).
   * Moved schedules to chalicelib_cgap/check_schedules.py.
+  * Using new schedule decorator from foursight_core.schedule_decorator.
   * Added chalicelib_local with a sample check_setup.json suitable for local testing.
   * Changed check_setup.json lookup (in chalicelib_cgap/app_utils.py) to look for the
     above local file if CHALICE_LOCAL environment variable set to "1"; and also to look
