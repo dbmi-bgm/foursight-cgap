@@ -23,7 +23,8 @@ DISABLED_STAGES = ["dev"]
 schedules = {
     'prod': {
         'ten_min_checks': Cron('0/10', '*', '*', '*', '?', '*'),
-        'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
+#       'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
+        'fifteen_min_checks': Cron('0/1', '*', '*', '*', '?', '*'),
         'fifteen_min_checks_2': Cron('5/15', '*', '*', '*', '?', '*'),
         'fifteen_min_checks_3': Cron('10/15', '*', '*', '*', '?', '*'),
         'thirty_min_checks': Cron('0/30', '*', '*', '*', '?', '*'),
@@ -39,7 +40,8 @@ schedules = {
     },
     'dev': {
         'ten_min_checks': Cron('5/10', '*', '*', '*', '?', '*'),
-        'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
+#       'fifteen_min_checks': Cron('0/15', '*', '*', '*', '?', '*'),
+        'fifteen_min_checks': Cron('0/1', '*', '*', '*', '?', '*'),
         'fifteen_min_checks_2': Cron('5/15', '*', '*', '*', '?', '*'),
         'fifteen_min_checks_3': Cron('10/15', '*', '*', '*', '?', '*'),
         'thirty_min_checks': Cron('15/30', '*', '*', '*', '?', '*'),
@@ -69,9 +71,11 @@ def morning_checks(event):
     app.core.queue_scheduled_checks('all', 'morning_checks')
 
 
-#@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
-@app.schedule(schedules[STAGE]['fifteen_min_checks'])
+#@app.schedule(schedules[STAGE]['fifteen_min_checks'])
+@schedule(schedules, stage=STAGE, disabled_stages=DISABLED_STAGES)
 def fifteen_min_checks(event):
+    print('xyzzy/fifteen_min_checks')
+    print(event)
     app.core.queue_scheduled_checks('all', 'fifteen_min_checks')
 
 
