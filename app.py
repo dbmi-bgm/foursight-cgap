@@ -1,14 +1,7 @@
-# VERY IMPORTANT:
-# In order to support extension via 4dn-cloud-infra,
-# this app.py is effectively an alias for chalicelib/app.py.
-# In theory, any repository could include foursight-cgap as a
-# dependency and selectively import functionality from
-# chalicelib.app. In the case of 4dn-cloud-infra, we import nothing
-# from this file and rewrite the core application code. In the case
-# of this repository though, this app.py is the "real" one (and
-# notably is not a part of the library). This gives us the best of
-# both worlds in that we can use foursight-cgap as an importable
-# library while maintaining application (functional) isolation
-# and respective differences in environments, check scheduling and
-# the check code itself. -- Will Oct 18 2021
-from chalicelib.app import *  # noQA
+# This app.py is the main Chalice entry point and is used only when running
+# Foursight locally, i.e. via chalice local. This is effectively equivalent
+# to app.py in 4dn-cloud-infra, which is the "real" app.py which is used
+# as the main Chalice entry point when running Foursight deployed in AWS.
+
+from chalicelib_cgap.app_utils import AppUtils
+from chalicelib_cgap.check_schedules import *
