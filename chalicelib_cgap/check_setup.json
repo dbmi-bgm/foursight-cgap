@@ -532,8 +532,42 @@
             "<env-name>"
         ]
     },
+    "ecs_task_listing": {
+        "title": "ECS Task Listing",
+        "group": "ECS Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
     "update_ecs_application_versions": {
         "title": "Update ECS Cluster Application Versions",
+        "group": "ECS Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "scale_ecs_service": {
+        "title": "Scale ECS Service",
         "group": "ECS Checks",
         "schedule": {
             "manual_checks": {
@@ -579,6 +613,84 @@
                         "files_per_run": 50,
                         "check_after": 14,
                         "queue_action": "prod"
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "access_key_status": {
+        "title": "Admin Access Key Status",
+        "group": "Maintenance Checks",
+        "schedule": {
+            "morning_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true,
+                        "queue_action": "prod"
+                    }
+                }
+            }
+        }
+    },
+    "rollback_application_version": {
+        "title": "Application Rollback Check",
+        "group": "Maintenance Checks",
+        "schedule": {
+            "fifteen_min_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    }
+                }
+            }
+        }
+    },
+    "datastore_status": {
+        "title": "Datastore Status",
+        "group": "Maintenance Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "scale_rds": {
+        "title": "Scale RDS",
+        "group": "Maintenance Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "scale_elasticsearch": {
+        "title": "Scale OpenSearch",
+        "group": "Maintenance Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
                     },
                     "dependencies": []
                 }
