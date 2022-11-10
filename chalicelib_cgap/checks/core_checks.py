@@ -1,0 +1,1 @@
+from foursight_core.checks import *  # noQA - needed so checks written in foursight-core are picked up
