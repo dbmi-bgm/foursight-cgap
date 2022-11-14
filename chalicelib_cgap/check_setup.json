@@ -699,5 +699,39 @@
         "display": [
             "<env-name>"
         ]
+    },
+    "trigger_codebuild_run": {
+        "title": "Trigger CodeBuild Run",
+        "group": "ECS Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "invoke_ecs_task": {
+        "title": "Invokes an ECS Task",
+        "group": "ECS Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
     }
 }
