@@ -7,6 +7,10 @@ foursight-cgap
 Change Log
 ----------
 
+2.2.1
+=====
+* Updated foursight-core version.
+
 2.2.0
 =====
 * Changes related to Foursight React.
