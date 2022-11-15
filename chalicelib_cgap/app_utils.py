@@ -24,14 +24,26 @@ class AppUtils(AppUtils_from_core):
     prefix = FOURSIGHT_PREFIX
     FAVICON = 'https://cgap-dbmi.hms.harvard.edu/favicon.ico'
     host = HOST
-    package_name = 'chalicelib_cgap'
+    AppUtils_from_core.package_name = 'chalicelib_cgap'
+    print('foo')
+    print(AppUtils_from_core.package_name)
 
-    check_setup_file = AppUtils_from_core.locate_check_setup_file(os.path.dirname(__file__))
-    if not check_setup_file:
+    AppUtils_from_core.check_setup_file = AppUtils_from_core.locate_check_setup_file(os.path.dirname(__file__))
+    if not AppUtils_from_core.check_setup_file:
         raise Exception("Unable to locate the check setup file!")
-    print(f"Using check setup file: {check_setup_file}")
+    print(f"Using check setup file: {AppUtils_from_core.check_setup_file}")
+    print(AppUtils_from_core.check_setup_file)
+
+    AppUtils_from_core.accounts_file = AppUtils_from_core.locate_accounts_file(os.path.dirname(__file__))
+    if not AppUtils_from_core.accounts_file:
+        print("No accounts file found (no harm).")
+    print(f"Using accounts file: {AppUtils_from_core.accounts_file}")
+    print(AppUtils_from_core.accounts_file)
 
     DEFAULT_ENV = os.environ.get("ENV_NAME", "foursight-cgap-env-uninitialized")
 
 
+print('xyzzy/chalicelib/before/singleton')
 app_utils_obj = AppUtils.singleton(AppUtils)
+print('xyzzy/chalicelib/after/singleton')
+print(app_utils_obj.check_setup_file)
