@@ -26,10 +26,10 @@ class AppUtils(AppUtils_from_core):
     host = HOST
     AppUtils_from_core.package_name = 'chalicelib_cgap'
 
-    check_setup_file = AppUtils_from_core.locate_check_setup_file(os.path.dirname(__file__))
-    if not check_setup_file:
-        raise Exception("Unable to locate the check setup file!")
-    print(f"Using check setup file: {check_setup_file}")
+#   check_setup_file = AppUtils_from_core.locate_check_setup_file(os.path.dirname(__file__))
+#   if not check_setup_file:
+#       raise Exception("Unable to locate the check setup file!")
+#   print(f"Using check setup file: {check_setup_file}")
 
     DEFAULT_ENV = os.environ.get("ENV_NAME", "foursight-cgap-env-uninitialized")
 
