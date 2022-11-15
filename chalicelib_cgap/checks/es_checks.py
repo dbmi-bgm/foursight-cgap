@@ -80,7 +80,7 @@ def clean_s3_es_checks(connection, **kwargs):
     """
     check_to_clean = kwargs.get('to_clean')
     time_limit = kwargs.get('timeout')
-    days_back = kwargs.get('days')
+    days_back = int(kwargs.get('days'))
     check = CheckResult(connection, 'clean_s3_es_checks')
     full_output = {}
     if check_to_clean is None:
