@@ -9,7 +9,10 @@ Change Log
 
 2.2.1
 =====
-* Updated foursight-core version.
+* Updated foursight-core version; changes there related to /accounts page.
+  Not actually used currently here, only in foursight.
+* Moved lookup of check_setup.json (and accounts.json) to foursight-core,
+  from foursight-cgap/chalicelib_cap/app_utils.py.
 
 2.2.0
 =====
