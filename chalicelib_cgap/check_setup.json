@@ -1,20 +1,4 @@
 {
-    "item_counts_by_type": {
-        "title": "Item counts by type",
-        "group": "Metadata Checks",
-        "schedule": {
-            "manual_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true
-                    }
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
     "indexing_progress": {
         "title": "Indexing progress",
         "group": "Elasticsearch Checks",
@@ -69,22 +53,6 @@
             "<env-name>"
         ]
     },
-    "change_in_item_counts": {
-        "title": "Change in item counts",
-        "group": "Metadata Checks",
-        "schedule": {
-            "manual_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true
-                    }
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
     "page_children_routes": {
         "title": "Pages with bad routes",
         "group": "Audit Checks",
@@ -101,59 +69,11 @@
             "<env-name>"
         ]
     },
-    "workflow_properties": {
-        "title": "Workflows with missing or duplicate steps properties",
-        "group": "Audit Checks",
-        "schedule": {
-            "manual_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true
-                    }
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
     "check_validation_errors": {
         "title": "Search for Validation Errors",
         "group": "Audit Checks",
         "schedule": {
             "monthly_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true
-                    }
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
-    "workflow_run_has_deleted_input_file": {
-        "title": "WorkflowRun linked to deleted Files",
-        "group": "Metadata Checks",
-        "schedule": {
-            "manual_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true
-                    }
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
-    "check_suggested_enum_values": {
-        "title": "Check fields with suggested enum",
-        "group": "Metadata Checks",
-        "schedule": {
-            "manual_checks": {
                 "<env-name>": {
                     "kwargs": {
                         "primary": true
@@ -433,23 +353,6 @@
             "<env-name>"
         ]
     },
-    "secondary_queue_deduplication": {
-        "title": "Secondary queue deduplication",
-        "group": "System Checks",
-        "schedule": {
-            "manual_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true
-                    },
-                    "dependencies": []
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
     "core_project_status": {
         "title": "Ensure CGAP Core project items are shared",
         "group": "Metadata Checks",
@@ -534,6 +437,23 @@
     },
     "ecs_task_listing": {
         "title": "ECS Task Listing",
+        "group": "ECS Checks",
+        "schedule": {
+            "manual_checks": {
+                "<env-name>": {
+                    "kwargs": {
+                        "primary": true
+                    },
+                    "dependencies": []
+                }
+            }
+        },
+        "display": [
+            "<env-name>"
+        ]
+    },
+    "trigger_codebuild_run": {
+        "title": "Trigger CodeBuild Run",
         "group": "ECS Checks",
         "schedule": {
             "manual_checks": {
@@ -700,25 +620,8 @@
             "<env-name>"
         ]
     },
-    "trigger_codebuild_run": {
-        "title": "Trigger CodeBuild Run",
-        "group": "ECS Checks",
-        "schedule": {
-            "manual_checks": {
-                "<env-name>": {
-                    "kwargs": {
-                        "primary": true
-                    },
-                    "dependencies": []
-                }
-            }
-        },
-        "display": [
-            "<env-name>"
-        ]
-    },
     "invoke_ecs_task": {
-        "title": "Invokes an ECS Task",
+        "title": "Invoke an ECS Task",
         "group": "ECS Checks",
         "schedule": {
             "manual_checks": {
