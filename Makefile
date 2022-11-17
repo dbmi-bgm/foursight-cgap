@@ -14,7 +14,7 @@ update:
 	poetry update
 
 test:
-	pytest -vv --cov chalicelib tests
+	pytest -vv chalicelib tests
 
 publish:
 	scripts/publish
