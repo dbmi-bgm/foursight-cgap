@@ -94,6 +94,6 @@ def clean_s3_es_checks(connection, **kwargs):
     full_output['check_cleared'] = check_to_clean
     full_output['n_deleted_s3'] = n_deleted_s3
     full_output['n_deleted_es'] = n_deleted_es
-    check.status = 'DONE'
+    check.status = 'PASS'
     check.full_output = full_output
     return check
