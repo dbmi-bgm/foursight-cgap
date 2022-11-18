@@ -574,7 +574,7 @@ def snapshot_rds(connection, **kwargs):
         snap_time = datetime.datetime.strptime(kwargs['uuid'], "%Y-%m-%dT%H:%M:%S.%f").strftime("%Y-%m-%dT%H-%M-%S")
         # snapshot ID can only have letters, numbers, and hyphens
         snapshot_name = 'foursight-snapshot-%s-%s' % (rds_name, snap_time)
-        client = boto3.client('rds', region_name=ecs_utils.CGAP_ECS_REGION)  # TODO: make configurable
+        client = boto3.client('rds', region_name=ecs_utils.COMMON_REGION)
         res = client.create_db_snapshot(
                  DBSnapshotIdentifier=snapshot_name,
                  DBInstanceIdentifier=rds_name

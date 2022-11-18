@@ -1,26 +1,28 @@
-from chalicelib_cgap.checks.helpers.lifecycle_utils import get_file_lifecycle_status, \
+from chalicelib_cgap.checks.helpers.lifecycle_utils import (
     check_file_lifecycle_status, STANDARD, INFREQUENT_ACCESS, GLACIER, DEEP_ARCHIVE, DELETED
+)
 import json, datetime
 from unittest.mock import patch
 
 # TO RUN THESE TESTS LOCALLY USE: pytest --noconftest
 
-class TestLifecycleChecks():
+
+class TestLifecycleChecks:
 
     files = []
     projects = []
 
     # Pytest does not discover classes with __init__. Therefore this workaround to load the data
-    def load_metadata(self):  
+    def load_metadata(self):
         # load it only once
         if len(self.files) > 0:
             return
 
-        with open('lifecycle_testdata.json', 'r') as f:
+        with open('tests/checks/lifecycle_testdata.json', 'r') as f:
             data = json.load(f)
             self.files = data["files"]
             self.projects = data["projects"]
-            
+
     def search_metadata_mock_func(self, path, key):
         # The check calls this function twice. Just return [] the second time
         if "s3_lifecycle_last_checked=No+value" in path:
@@ -40,12 +42,12 @@ class TestLifecycleChecks():
     @patch('dcicutils.ff_utils.search_metadata')
     def test_check_file_lifecycle_status(self, mock_search_metadata, mock_get_metadata, mock_datetime_utcnow):
         self.load_metadata()
-        mock_search_metadata.side_effect = self.search_metadata_mock_func 
-        mock_get_metadata.side_effect = self.get_metadata_mock_func 
-        mock_datetime_utcnow.side_effect = self.get_datetime_utcnow_mock_func 
+        mock_search_metadata.side_effect = self.search_metadata_mock_func
+        mock_get_metadata.side_effect = self.get_metadata_mock_func
+        mock_datetime_utcnow.side_effect = self.get_datetime_utcnow_mock_func
         # None of the input arguments have actually any effect, as they all go into the search_metadata query, which is mocked
         check_result = check_file_lifecycle_status(1, 1, 1, None)
- 
+
         assert check_result['status'] == "PASS"
 
         expected_lifecycle_statuses = {
@@ -104,7 +106,7 @@ class TestLifecycleChecks():
         assert check_result["files_with_issues"][0] == "file_1"
         assert len(check_result["files_to_update"]) > 1
 
-        # new lifecycle status of the followng case would be infrequent access, but it is already in deep archive
+        # new lifecycle status of the following case would be infrequent access, but it is already in deep archive
         self.files[0]["s3_lifecycle_category"] = "short_term_access_long_term_archive"
         self.files[0]["s3_lifecycle_status"] = "deep archive"
         check_result = check_file_lifecycle_status(1, 1, 1, None)
@@ -112,5 +114,4 @@ class TestLifecycleChecks():
         assert check_result["files_with_issues"][0] == "file_1"
         assert "Unsupported storage class transition" in check_result["warning"]
         assert len(check_result["files_to_update"]) > 1
-        #assert 1==2
 
