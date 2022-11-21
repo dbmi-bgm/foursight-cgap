@@ -80,7 +80,7 @@ def clean_s3_es_checks(connection, **kwargs):
     """
     check_to_clean = kwargs.get('to_clean')
     time_limit = kwargs.get('timeout')
-    days_back = kwargs.get('days')
+    days_back = int(kwargs.get('days'))
     check = CheckResult(connection, 'clean_s3_es_checks')
     full_output = {}
     if check_to_clean is None:
@@ -94,6 +94,6 @@ def clean_s3_es_checks(connection, **kwargs):
     full_output['check_cleared'] = check_to_clean
     full_output['n_deleted_s3'] = n_deleted_s3
     full_output['n_deleted_es'] = n_deleted_es
-    check.status = 'DONE'
+    check.status = 'PASS'
     check.full_output = full_output
     return check
