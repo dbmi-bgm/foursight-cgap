@@ -7,6 +7,10 @@ foursight-cgap
 Change Log
 ----------
 
+2.4.0
+=====
+* Changes related to support for running actions in Foursight React.
+
 2.3.0
 =====
 * Updated foursight-core version; changes there related to /accounts page.
