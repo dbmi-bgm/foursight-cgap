@@ -24,7 +24,7 @@ class AppUtils(AppUtils_from_core):
     prefix = FOURSIGHT_PREFIX
     FAVICON = 'https://cgap-dbmi.hms.harvard.edu/favicon.ico'
     host = HOST
-    AppUtils_from_core.package_name = 'chalicelib_cgap'
+    package_name = 'chalicelib_cgap'
 
     DEFAULT_ENV = os.environ.get("ENV_NAME", "foursight-cgap-env-uninitialized")
 
