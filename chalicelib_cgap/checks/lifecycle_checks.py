@@ -11,7 +11,7 @@ from .helpers.wfrset_utils import LAMBDA_LIMIT
 from .helpers.confchecks import *
 
 
-@check_function(files_per_run=100, first_check_after=14, max_checking_frequency=14)
+@check_function(files_per_run=100, first_check_after=14, max_checking_frequency=14, action="patch_file_lifecycle_status")
 def check_file_lifecycle_status(connection, **kwargs):
     """
     Inspect and find files whose lifecycle status need patching.
@@ -150,7 +150,7 @@ def patch_file_lifecycle_status(connection, **kwargs):
     return action
 
 
-@check_function(files_per_run=50, check_after=14)
+@check_function(files_per_run=50, check_after=14, action="patch_file_lifecycle_status")
 def check_deleted_files_lifecycle_status(connection, **kwargs):
     """
     Find deleted files without lifecycle category and tag them for deleteion from S3.

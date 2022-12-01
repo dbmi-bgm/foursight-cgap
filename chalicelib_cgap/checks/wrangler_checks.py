@@ -23,7 +23,7 @@ from .helpers import clone_utils
 random_wait = 20
 
 
-@check_function(cmp_to_last=False)
+@check_function(cmp_to_last=False, action="patch_workflow_run_to_deleted")
 def workflow_run_has_deleted_input_file(connection, **kwargs):
     """Checks all wfrs that are not deleted, and have deleted input files
     There is an option to compare to the last, and only report new cases (cmp_to_last)
@@ -254,7 +254,7 @@ def change_in_item_counts(connection, **kwargs):
     return check
 
 
-@check_function(file_type=None, status=None, file_format=None, search_add_on=None)
+@check_function(file_type=None, status=None, file_format=None, search_add_on=None, action="patch_file_size")
 def identify_files_without_filesize(connection, **kwargs):
     check = CheckResult(connection, 'identify_files_without_filesize')
     # add random wait
@@ -500,7 +500,7 @@ def check_for_ontology_updates(connection, **kwargs):
     return check
 
 
-@check_function()
+@check_function(action="patch_states_files_higlass_defaults")
 def states_files_without_higlass_defaults(connection, **kwargs):
     check = CheckResult(connection, 'states_files_without_higlass_defaults')
     check.action = 'patch_states_files_higlass_defaults'
@@ -579,7 +579,7 @@ def patch_states_files_higlass_defaults(connection, **kwargs):
     return action
 
 
-@check_function()
+@check_function(action="add_suggested_enum_values")
 def check_suggested_enum_values(connection, **kwargs):
     """On our schemas we have have a list of suggested fields for
     suggested_enum tagged fields. A value that is not listed in this list
@@ -934,7 +934,7 @@ def check_opf_lab_different_than_experiment(connection, **kwargs):
     return check
 
 
-@check_function()
+@check_function(action="add_grouped_with_file_relation")
 def grouped_with_file_relation_consistency(connection, **kwargs):
     ''' Check if "grouped with" file relationships are reciprocal and complete.
         While other types of file relationships are automatically updated on
@@ -1026,7 +1026,7 @@ def add_grouped_with_file_relation(connection, **kwargs):
     return action
 
 
-@check_function(item_type=['VariantSample'])
+@check_function(item_type=['VariantSample'], action="share_core_project")
 def core_project_status(connection, **kwargs):
     """
     Ensure CGAP Core projects have their objects shared.
@@ -1105,7 +1105,7 @@ def share_core_project(connection, **kwargs):
     return action
 
 
-@check_function(days_back=1.02)
+@check_function(days_back=1.02, action="queue_variants_to_update_genelist")
 def update_variant_genelist(connection, **kwargs):
     """
     Searches for variant samples with genes in gene lists that are not
@@ -1223,7 +1223,7 @@ def queue_variants_to_update_genelist(connection, **kwargs):
     return action
 
 
-@check_function(accessions=[], version='', keep_SV_mwfr=False, create_SNV_mwfr=True, steps_to_rerun=['all'])
+@check_function(accessions=[], version='', keep_SV_mwfr=False, create_SNV_mwfr=True, steps_to_rerun=['all'], action="clone_cases")
 def get_metadata_for_cases_to_clone(connection, **kwargs):
     """
     """

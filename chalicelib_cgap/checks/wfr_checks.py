@@ -87,7 +87,7 @@ class MetaWorkflowRunsFound:
         self.add_items(search_response)
 
 
-@check_function(file_type="File", start_date=None)
+@check_function(file_type="File", start_date=None, action="md5runCGAP_start")
 def md5runCGAP_status(connection, file_type="", start_date=None, **kwargs):
     """Find files uploaded to S3 without MD5 checksum
 
@@ -300,7 +300,7 @@ def get_md5_workflow(connection):
     return md5_uuid, md5_version
 
 
-@check_function()
+@check_function(action="run_metawfrs")
 def metawfrs_to_run(connection, **kwargs):
     """Find MetaWorkflowRuns that may have WorkflowRuns to kick."""
     check = initialize_check("metawfrs_to_run", connection)
@@ -360,7 +360,7 @@ def run_metawfrs(connection, **kwargs):
     return action
 
 
-@check_function()
+@check_function(action="checkstatus_metawfrs")
 def metawfrs_to_checkstatus(connection, **kwargs):
     """Find MetaWorkflowRuns that may require a status check."""
     check = initialize_check("metawfrs_to_checkstatus", connection)
@@ -417,7 +417,7 @@ def checkstatus_metawfrs(connection, **kwargs):
     return action
 
 
-@check_function()
+@check_function(action="reset_spot_failed_metawfrs")
 def spot_failed_metawfrs(connection, **kwargs):
     """Find MetaWorkflowRuns with failed WorkflowRuns from spot
     interruptions.
@@ -535,7 +535,7 @@ def reset_spot_failed_metawfrs(connection, **kwargs):
     return action
 
 
-@check_function(meta_workflow_runs=None)
+@check_function(meta_workflow_runs=None, action="reset_failed_metawfrs")
 def failed_metawfrs(connection, meta_workflow_runs=None, **kwargs):
     """Find failed MetaWorkflowRuns and reset failed WorkflowRuns."""
     check = initialize_check("failed_metawfrs", connection)
@@ -607,7 +607,7 @@ def reset_failed_metawfrs(connection, **kwargs):
     return action
 
 
-@check_function(start_date=None, file_accessions=None)
+@check_function(start_date=None, file_accessions=None, action="ingest_vcf_start")
 def ingest_vcf_status(connection, start_date=None, file_accessions=None, **kwargs):
     """Search for full annotated VCF files that need to be ingested.
 
@@ -691,7 +691,7 @@ def ingest_vcf_start(connection, **kwargs):
     return action
 
 
-@check_function(file_accessions=None)
+@check_function(file_accessions=None, action="reset_vcf_ingestion_errors")
 def check_vcf_ingestion_errors(connection, file_accessions=None, **kwargs):
     """
     Check for finding full annotated VCFs that have failed ingestion, so that they
@@ -761,7 +761,7 @@ def reset_vcf_ingestion_errors(connection, **kwargs):
     return action
 
 
-@check_function()
+@check_function(action="link_meta_workflow_run_output_files")
 def find_meta_workflow_runs_requiring_output_linktos(connection, **kwargs):
     """Find completed MetaWorkflowRuns to PATCH output files to desired
     locations.
@@ -955,7 +955,7 @@ def update_meta_workflow_run_files_linked(
         )
 
 
-@check_function(meta_workflow_runs=None)
+@check_function(meta_workflow_runs=None, action="link_meta_workflow_run_output_files_after_error")
 def find_meta_workflow_runs_with_linkto_errors(
     connection, meta_workflow_runs=None, **kwargs
 ):
@@ -1031,7 +1031,7 @@ def link_meta_workflow_run_output_files_after_error(connection, **kwargs):
     return action
 
 
-@check_function(meta_workflow_runs=None, meta_workflows=None)
+@check_function(meta_workflow_runs=None, meta_workflows=None, action="kill_meta_workflow_runs")
 def find_meta_workflow_runs_to_kill(
     connection, meta_workflow_runs=None, meta_workflows=None, **kwargs
 ):
@@ -1111,6 +1111,7 @@ def kill_meta_workflow_runs(connection, **kwargs):
     meta_workflow="",
     cases=None,
     sample_processings=None,
+    action="create_meta_workflow_runs_for_items"
 )
 def find_sample_processing_for_meta_workflow(
     connection,
@@ -1257,6 +1258,7 @@ def create_meta_workflow_runs_for_items(connection, **kwargs):
     cases=None,
     sample_processings=None,
     samples=None,
+    action="create_meta_workflow_runs_for_items"
 )
 def find_sample_for_meta_workflow(
     connection,
@@ -1362,7 +1364,7 @@ def find_sample_for_meta_workflow(
     return check
 
 
-@check_function(meta_workflow_runs=None)
+@check_function(meta_workflow_runs=None, action="ignore_quality_metric_failure_for_meta_workflow_run")
 def find_meta_workflow_runs_with_quality_metric_failure(
     connection, meta_workflow_runs=None, **kwargs
 ):
