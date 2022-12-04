@@ -7,7 +7,7 @@ foursight-cgap
 Change Log
 ----------
 
-2.3.0
+3.1.0
 =====
 * Updated foursight-core version; changes there related to /accounts page.
   Not actually used currently here, only in foursight.
