@@ -5,3 +5,4 @@
 
 from chalicelib_cgap.app_utils import AppUtils
 from chalicelib_cgap.check_schedules import *
+from foursight_core.app_utils import set_stage, set_timeout
