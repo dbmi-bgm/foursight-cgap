@@ -10,6 +10,7 @@ Change Log
 3.3.0
 =====
 * Changes related editing user projects/institutions.
+* Removed the trigger_codebuild_run check (in foursight-core now).
 
 3.2.0
 =====
