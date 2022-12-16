@@ -7,6 +7,10 @@ foursight-cgap
 Change Log
 ----------
 
+3.3.0
+=====
+* Changes related editing user projects/institutions.
+
 3.2.0
 =====
 * Changes related to support for running actions in Foursight React.
