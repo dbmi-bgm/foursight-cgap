@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "foursight-cgap"
-version = "3.3.0.1b8"
+version = "3.3.0.1b9"
 description = "Serverless Chalice Application for Monitoring"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -27,7 +27,7 @@ magma-suite = "^1.2.0"
 # Update to tibanna-ff "^1.3.0" only when  updated version of Tibanna is deployed all around
 # Otherwise the jobs will run on instances without the HMS security software installed.
 # tibanna-ff = "^1.3.0"
-tibanna-ff = "^1.0.0"
+tibanna-ff = "1.2.3"
 MarkupSafe = "1.1.1"
 foursight-core = "3.3.0.1b8"
 # use below for tests but not for deployment
