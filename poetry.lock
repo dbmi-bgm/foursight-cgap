@@ -1011,7 +1011,7 @@ tests = ["coverage", "freezegun (>=0.2.8)", "pretend", "pytest (>=3.3.0)", "pyth
 
 [[package]]
 name = "tibanna"
-version = "3.1.0"
+version = "2.2.6"
 description = "Tibanna runs portable pipelines (in CWL/WDL) on the AWS Cloud."
 category = "main"
 optional = false
@@ -1027,7 +1027,7 @@ tomlkit = ">=0.11.0,<0.12.0"
 
 [[package]]
 name = "tibanna-ff"
-version = "1.3.0"
+version = "1.2.3"
 description = "Tibanna runs portable pipelines (in CWL/WDL) on the AWS Cloud."
 category = "main"
 optional = false
@@ -1038,7 +1038,7 @@ boto3 = ">=1.9.0,<2.0.0"
 botocore = ">=1.12.1,<2.0.0"
 dcicutils = ">=6.0.0,<7.0.0"
 requests = "2.27.1"
-tibanna = "3.1.0"
+tibanna = ">=2.2.6,<3.0.0"
 tomlkit = ">=0.11.0,<0.12.0"
 
 [[package]]
@@ -1175,7 +1175,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7.1,<3.8"
-content-hash = "b12d8b540105cdae56bc241524d32ae6817665c9680aa475527289c63e4472c1"
+content-hash = "d07d2b41a3f458cc7243432930de9de37c37dea3e844a3b7768744448c01c4eb"
 
 [metadata.files]
 ansicon = [
@@ -1734,12 +1734,12 @@ structlog = [
     {file = "structlog-19.2.0.tar.gz", hash = "sha256:4287058cf4ce1a59bc5dea290d6386d37f29a37529c9a51cdf7387e51710152b"},
 ]
 tibanna = [
-    {file = "tibanna-3.1.0-py3-none-any.whl", hash = "sha256:4d3a8cd40acd9cd59290f2088ce8ca2aef2e99341dcfde0300a7b70182f4cbae"},
-    {file = "tibanna-3.1.0.tar.gz", hash = "sha256:4978bd118e966d34bbee270b6b37e8532fe56c98d0fbcf7275ed961000b48658"},
+    {file = "tibanna-2.2.6-py3-none-any.whl", hash = "sha256:1ef6c8e59e23d9eec3c798b483e628b5819d923dbc792fc4267aa2ebc2d8fcf9"},
+    {file = "tibanna-2.2.6.tar.gz", hash = "sha256:12a08b30c90b6f258c3e7715c113a6eee0b2a0495b88125ba1be7032994fa691"},
 ]
 tibanna-ff = [
-    {file = "tibanna_ff-1.3.0-py3-none-any.whl", hash = "sha256:09762ee08834fb0c96038674d8aec5168dadec4dc2e4d4f72b55cf1c6b8b36be"},
-    {file = "tibanna_ff-1.3.0.tar.gz", hash = "sha256:030462de7f1be3283616393f0f33318e58d0ca3b4b4c70e7eeb796ded9abcbbc"},
+    {file = "tibanna_ff-1.2.3-py3-none-any.whl", hash = "sha256:9772aee45dea3c1420fec8639160c793fcba333f5d011a08f6e0ade1fdbbe83d"},
+    {file = "tibanna_ff-1.2.3.tar.gz", hash = "sha256:0a9184b78b2142970dfde57fd7bc6def06a874b9cd1e616052141a4822b6e1e0"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
