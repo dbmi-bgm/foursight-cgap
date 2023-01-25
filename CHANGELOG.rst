@@ -7,6 +7,11 @@ foursight-cgap
 Change Log
 ----------
 
+3.3.0
+=====
+* Changes related editing user projects/institutions.
+* Removed the trigger_codebuild_run check (in foursight-core now).
+
 3.2.0
 =====
 * Changes related to support for running actions in Foursight React.
