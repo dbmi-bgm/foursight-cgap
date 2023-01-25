@@ -344,7 +344,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "foursight-core"
-version = "3.3.0.1b8"
+version = "3.3.0"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -354,7 +354,7 @@ python-versions = ">=3.7,<3.10"
 click = ">=7.1.2,<8.0.0"
 cron-descriptor = ">=1.2.31,<2.0.0"
 cryptography = "39.0.0"
-dcicutils = ">=6.3.0,<7.0.0"
+dcicutils = ">=6.5.0,<7.0.0"
 elasticsearch = "7.13.4"
 elasticsearch-dsl = ">=7.0.0,<8.0.0"
 geocoder = "1.38.1"
@@ -1011,7 +1011,7 @@ tests = ["coverage", "freezegun (>=0.2.8)", "pretend", "pytest (>=3.3.0)", "pyth
 
 [[package]]
 name = "tibanna"
-version = "2.2.6"
+version = "3.1.0"
 description = "Tibanna runs portable pipelines (in CWL/WDL) on the AWS Cloud."
 category = "main"
 optional = false
@@ -1027,7 +1027,7 @@ tomlkit = ">=0.11.0,<0.12.0"
 
 [[package]]
 name = "tibanna-ff"
-version = "1.2.3"
+version = "1.3.0"
 description = "Tibanna runs portable pipelines (in CWL/WDL) on the AWS Cloud."
 category = "main"
 optional = false
@@ -1038,7 +1038,7 @@ boto3 = ">=1.9.0,<2.0.0"
 botocore = ">=1.12.1,<2.0.0"
 dcicutils = ">=6.0.0,<7.0.0"
 requests = "2.27.1"
-tibanna = ">=2.2.6,<3.0.0"
+tibanna = "3.1.0"
 tomlkit = ">=0.11.0,<0.12.0"
 
 [[package]]
@@ -1175,7 +1175,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7.1,<3.8"
-content-hash = "d07d2b41a3f458cc7243432930de9de37c37dea3e844a3b7768744448c01c4eb"
+content-hash = "436a9dd465a299b1972128a84b78127a89ae23c68d51fa93d2e7e90e281e544e"
 
 [metadata.files]
 ansicon = [
@@ -1416,8 +1416,8 @@ flaky = [
     {file = "flaky-3.6.1.tar.gz", hash = "sha256:8cd5455bb00c677f787da424eaf8c4a58a922d0e97126d3085db5b279a98b698"},
 ]
 foursight-core = [
-    {file = "foursight_core-3.3.0.1b8-py3-none-any.whl", hash = "sha256:9e90807fbb3ab68c7335275c84dfad66a7813f96024c470e9f7b5aceb2364ab0"},
-    {file = "foursight_core-3.3.0.1b8.tar.gz", hash = "sha256:0e7b895d11a03f6139d8270dbe48dc15779891fc35da34b052c4365baab88591"},
+    {file = "foursight_core-3.3.0-py3-none-any.whl", hash = "sha256:9fba0294a447d7d46a3b8d2a9199c788cb15cb175f7f1399832209c098f8280c"},
+    {file = "foursight_core-3.3.0.tar.gz", hash = "sha256:2c5a3b2e089b6577d670edb50a08a693de813d4510ed2420c3ffcdc33b2a9c08"},
 ]
 future = [
     {file = "future-0.18.3.tar.gz", hash = "sha256:34a17436ed1e96697a86f9de3d15a3b0be01d8bc8de9c1dffd59fb8234ed5307"},
@@ -1734,12 +1734,12 @@ structlog = [
     {file = "structlog-19.2.0.tar.gz", hash = "sha256:4287058cf4ce1a59bc5dea290d6386d37f29a37529c9a51cdf7387e51710152b"},
 ]
 tibanna = [
-    {file = "tibanna-2.2.6-py3-none-any.whl", hash = "sha256:1ef6c8e59e23d9eec3c798b483e628b5819d923dbc792fc4267aa2ebc2d8fcf9"},
-    {file = "tibanna-2.2.6.tar.gz", hash = "sha256:12a08b30c90b6f258c3e7715c113a6eee0b2a0495b88125ba1be7032994fa691"},
+    {file = "tibanna-3.1.0-py3-none-any.whl", hash = "sha256:4d3a8cd40acd9cd59290f2088ce8ca2aef2e99341dcfde0300a7b70182f4cbae"},
+    {file = "tibanna-3.1.0.tar.gz", hash = "sha256:4978bd118e966d34bbee270b6b37e8532fe56c98d0fbcf7275ed961000b48658"},
 ]
 tibanna-ff = [
-    {file = "tibanna_ff-1.2.3-py3-none-any.whl", hash = "sha256:9772aee45dea3c1420fec8639160c793fcba333f5d011a08f6e0ade1fdbbe83d"},
-    {file = "tibanna_ff-1.2.3.tar.gz", hash = "sha256:0a9184b78b2142970dfde57fd7bc6def06a874b9cd1e616052141a4822b6e1e0"},
+    {file = "tibanna_ff-1.3.0-py3-none-any.whl", hash = "sha256:09762ee08834fb0c96038674d8aec5168dadec4dc2e4d4f72b55cf1c6b8b36be"},
+    {file = "tibanna_ff-1.3.0.tar.gz", hash = "sha256:030462de7f1be3283616393f0f33318e58d0ca3b4b4c70e7eeb796ded9abcbbc"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
