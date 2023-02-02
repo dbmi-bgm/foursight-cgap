@@ -7,6 +7,10 @@ foursight-cgap
 Change Log
 ----------
 
+3.3.1
+=====
+* Update to foursight-core 3.3.1 (and dcicutils 6.7.0).
+
 3.3.0
 =====
 * Changes related editing user projects/institutions.
