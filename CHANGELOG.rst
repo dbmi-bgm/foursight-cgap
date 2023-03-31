@@ -7,6 +7,12 @@ foursight-cgap
 Change Log
 ----------
 
+3.3.3
+=====
+* Pin poetry 1.3.2
+* Use at least poetry_core 1.0
+
+
 3.3.2
 =====
 * Update to foursight-core 3.3.2 (and dcicutils 6.8.0).
