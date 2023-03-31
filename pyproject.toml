@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "foursight-cgap"
-version = "3.3.2"
+version = "3.3.3"
 description = "Serverless Chalice Application for Monitoring"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -36,5 +36,5 @@ pytest-cov = "2.7.1"
 flaky = "3.6.1"
 
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry_core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

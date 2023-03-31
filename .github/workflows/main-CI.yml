@@ -29,7 +29,7 @@ jobs:
           python-version: '3.7'
 
       - name: Install Deps
-        run: pip install poetry
+        run: make configure
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
