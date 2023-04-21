@@ -377,7 +377,7 @@ files = [
 
 [[package]]
 name = "foursight-core"
-version = "4.1.0.1b6"
+version = "4.1.0.1b7"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
@@ -665,7 +665,7 @@ files = [
 
 [[package]]
 name = "magma-suite"
-version = "1.3.0"
+version = "1.2.2.1b2"
 description = "Collection of tools to manage meta-workflows automation."
 category = "main"
 optional = false
@@ -1295,4 +1295,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7.1,<3.8"
-content-hash = "061f7c652b723daa07210e9ebd4024f4be436c6f6be1d23b71285fd9e414580f"
+content-hash = "3325d8d402a7d517e4618534bdcf287bcc66546ac3d6b5aa9a374bf2ca596ef4"
