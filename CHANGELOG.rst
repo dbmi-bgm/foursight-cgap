@@ -7,6 +7,13 @@ foursight-cgap
 Change Log
 ----------
 
+3.4.0
+=====
+* Dependency updates to update magma + tibanna_ff to fix cost updates on MWFRs
+* Lifecycle policy tweaks
+  * Remove default deletion of "long term" storage options
+  * Remove archived files from search
+
 3.3.2
 =====
 * Update to foursight-core 3.3.2 (and dcicutils 6.8.0).
