@@ -17,10 +17,13 @@ test:
 	pytest -vv tests
 
 publish:
-	scripts/publish
+	# New Python based publish script in dcicutils (2023-04-25).
+	python -m dcicutils.scripts.publish_to_pypi
 
 publish-for-ga:
-	scripts/publish --noconfirm
+	# New Python based publish script in dcicutils (2023-04-25).
+	pip install dcicutils==7.3.0.1b17
+	python -m dcicutils.scripts.publish_to_pypi --noconfirm
 
 deploy-dev:
 	python -m chalicelib.deploy dev
