@@ -125,18 +125,18 @@ wcwidth = ">=0.1.4"
 
 [[package]]
 name = "boto3"
-version = "1.26.117"
+version = "1.26.120"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.26.117-py3-none-any.whl", hash = "sha256:84cc8947560d89581ef693895cb36d8c8c70d567900d86c8f7cc612d037fdd17"},
-    {file = "boto3-1.26.117.tar.gz", hash = "sha256:1e9128b7d8a1b8af789ea6a04a46e641d82446e1e15c022c0fef697d3c9aab97"},
+    {file = "boto3-1.26.120-py3-none-any.whl", hash = "sha256:0f8eeeb259befd6e8c464a05c69b66ba7b1e0c978300b446fc0823020acaf380"},
+    {file = "boto3-1.26.120.tar.gz", hash = "sha256:17b93fdff147577ef506adbcada0ac81dd4be3b8d8b3c7831f9ee9f7ac9615e5"},
 ]
 
 [package.dependencies]
-botocore = ">=1.29.117,<1.30.0"
+botocore = ">=1.29.120,<1.30.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -145,14 +145,14 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.29.117"
+version = "1.29.120"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.29.117-py3-none-any.whl", hash = "sha256:2e6f6c9be770ed5737de093cfe8d592be15f8763f7bf2906afba90f19836d72d"},
-    {file = "botocore-1.29.117.tar.gz", hash = "sha256:1fc4469e80daab657d1254518ee44a82e284320c8b24cbfbaaa60570afc33743"},
+    {file = "botocore-1.29.120-py3-none-any.whl", hash = "sha256:0010b2a654973ab7f8697a9bb69cc0bd92450a7d77dd65c858a717edfe2e40f6"},
+    {file = "botocore-1.29.120.tar.gz", hash = "sha256:82de714c06fcefbcf2f3854b81c51bf0c529ec902c6e927156ff47988aaeeb7a"},
 ]
 
 [package.dependencies]
@@ -860,14 +860,14 @@ files = [
 
 [[package]]
 name = "importlib-metadata"
-version = "6.5.0"
+version = "6.6.0"
 description = "Read metadata from Python packages"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "importlib_metadata-6.5.0-py3-none-any.whl", hash = "sha256:03ba783c3a2c69d751b109fc0c94a62c51f581b3d6acf8ed1331b6d5729321ff"},
-    {file = "importlib_metadata-6.5.0.tar.gz", hash = "sha256:7a8bdf1bc3a726297f5cfbc999e6e7ff6b4fa41b26bba4afc580448624460045"},
+    {file = "importlib_metadata-6.6.0-py3-none-any.whl", hash = "sha256:43dd286a2cd8995d5eaef7fee2066340423b818ed3fd70adf0bad5f1fac53fed"},
+    {file = "importlib_metadata-6.6.0.tar.gz", hash = "sha256:92501cdf9cc66ebd3e612f1b4f0c0765dfa42f0fa38ffb319b6bd84dd675d705"},
 ]
 
 [package.dependencies]
@@ -943,14 +943,14 @@ files = [
 
 [[package]]
 name = "magma-suite"
-version = "1.2.2b1"
+version = "1.2.2"
 description = "Collection of tools to manage meta-workflows automation."
 category = "main"
 optional = false
 python-versions = ">=3.7,<3.9"
 files = [
-    {file = "magma_suite-1.2.2b1-py3-none-any.whl", hash = "sha256:615a3a3d6da022e73aa6de329428bd66fe6e821177f33a9944130a2f1126ca18"},
-    {file = "magma_suite-1.2.2b1.tar.gz", hash = "sha256:01f22f3c1bc641f241362409324c78aee26bb0f4937d219c80fe3195456958f3"},
+    {file = "magma_suite-1.2.2-py3-none-any.whl", hash = "sha256:1d639dc91945bed4d9116f9ebaf22aa4c031bd21937968428d19ae825359ec29"},
+    {file = "magma_suite-1.2.2.tar.gz", hash = "sha256:8b1eb2d2387e83ca736ff817d7b1401c1deee71366740eae179eb951d29933bc"},
 ]
 
 [package.dependencies]
@@ -1538,14 +1538,14 @@ crt = ["botocore[crt] (>=1.20.29,<2.0a.0)"]
 
 [[package]]
 name = "setuptools"
-version = "67.7.0"
+version = "67.7.2"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "setuptools-67.7.0-py3-none-any.whl", hash = "sha256:888be97fde8cc3afd60f7784e678fa29ee13c4e5362daa7104a93bba33646c50"},
-    {file = "setuptools-67.7.0.tar.gz", hash = "sha256:b7e53a01c6c654d26d2999ee033d8c6125e5fa55f03b7b193f937ae7ac999f22"},
+    {file = "setuptools-67.7.2-py3-none-any.whl", hash = "sha256:23aaf86b85ca52ceb801d32703f12d77517b2556af839621c641fca11287952b"},
+    {file = "setuptools-67.7.2.tar.gz", hash = "sha256:f104fa03692a2602fa0fec6c6a9e63b6c8a968de13e17c026957dd1f53d80990"},
 ]
 
 [package.extras]
@@ -1832,4 +1832,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7.1,<3.8"
-content-hash = "0503e60befd707de5b19baa4bc9f193dd6064e491ef050e8a7403ab8aa334438"
+content-hash = "70d9bd3e5c12a7b6dbc75ebe842e29e22b69d18238f314d8546228073b31b093"
