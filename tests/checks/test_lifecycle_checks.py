@@ -1,8 +1,10 @@
+import datetime
+import json
+from unittest.mock import patch
+
 from chalicelib_cgap.checks.helpers.lifecycle_utils import (
     check_file_lifecycle_status, STANDARD, INFREQUENT_ACCESS, GLACIER, DEEP_ARCHIVE, DELETED
 )
-import json, datetime
-from unittest.mock import patch
 
 # TO RUN THESE TESTS LOCALLY USE: pytest --noconftest
 
@@ -52,7 +54,7 @@ class TestLifecycleChecks:
 
         expected_lifecycle_statuses = {
             "file_1": DEEP_ARCHIVE, # Default lifecycle policy
-            "file_2": DELETED,
+            "file_2": DEEP_ARCHIVE,
             "file_3": DELETED,
             "file_4": INFREQUENT_ACCESS,
             "file_5": DEEP_ARCHIVE,
@@ -114,4 +116,3 @@ class TestLifecycleChecks:
         assert check_result["files_with_issues"][0] == "file_1"
         assert "Unsupported storage class transition" in check_result["warning"]
         assert len(check_result["files_to_update"]) > 1
-
