@@ -7,7 +7,7 @@ foursight-cgap
 Change Log
 ----------
 
-3.4.0
+3.3.3
 =====
 * Dependency updates to update magma + tibanna_ff to fix cost updates on MWFRs
 * Lifecycle policy tweaks
