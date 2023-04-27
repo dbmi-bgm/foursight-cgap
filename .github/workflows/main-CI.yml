@@ -42,6 +42,8 @@ jobs:
         env:
           S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
           DEV_SECRET: ${{ secrets.DEV_SECRET }}
+          # GLOBAL_ENV_BUCKET required set by tibanna but not used for anything
+          GLOBAL_ENV_BUCKET: some-bucket
         run: |
           make build
           make test

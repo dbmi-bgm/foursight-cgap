@@ -1,4 +1,5 @@
 import datetime
+
 from dcicutils import ff_utils
 
 ## Schema constants ##
@@ -33,12 +34,10 @@ DEFAULT_LIFECYCLE_POLICY = {
     SHORT_TERM_ACCESS_LONG_TERM_ARCHIVE: {
         MOVE_TO_INFREQUENT_ACCESS_AFTER: 0,  # units in months
         MOVE_TO_DEEP_ARCHIVE_AFTER: 3,
-        EXPIRE_AFTER: 36,
     },
     LONG_TERM_ACCESS_LONG_TERM_ARCHIVE: {
         MOVE_TO_INFREQUENT_ACCESS_AFTER: 0,
         MOVE_TO_DEEP_ARCHIVE_AFTER: 12,
-        EXPIRE_AFTER: 36,
     },
     SHORT_TERM_ACCESS: {
         MOVE_TO_INFREQUENT_ACCESS_AFTER: 0,
@@ -46,7 +45,6 @@ DEFAULT_LIFECYCLE_POLICY = {
     },
     LONG_TERM_ACCESS: {
         MOVE_TO_INFREQUENT_ACCESS_AFTER: 0,
-        EXPIRE_AFTER: 36,
     },
     SHORT_TERM_ARCHIVE: {
         MOVE_TO_DEEP_ARCHIVE_AFTER: 0,
@@ -54,7 +52,6 @@ DEFAULT_LIFECYCLE_POLICY = {
     },
     LONG_TERM_ARCHIVE: {
         MOVE_TO_DEEP_ARCHIVE_AFTER: 0,
-        EXPIRE_AFTER: 36,
     },
     NO_STORAGE: {
         EXPIRE_AFTER: 0,
@@ -84,12 +81,13 @@ def check_file_lifecycle_status(
     search_query_base = (
         "/search/?type=File"
         "&project.lifecycle_management_active=true"
+        "&status%21=deleted"
+        "&status%21=archived"
         "&status%21=uploading"
         "&status%21=to+be+uploaded+by+workflow"
         "&s3_lifecycle_category%21=No+value"
         f"&s3_lifecycle_category%21={IGNORE}"
         f"&date_created.to={threshold_date_fca}"
-        "&status%21=deleted"
         f"&limit={num_files_to_check // 2}"
     )
     search_query_1 = (
