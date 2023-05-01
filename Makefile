@@ -4,7 +4,7 @@ clear-poetry-cache:  # clear poetry/pypi cache. for user to do explicitly, never
 	poetry cache clear pypi --all
 
 configure:  # does any pre-requisite installs
-	pip install poetry
+	pip install poetry==1.3.2
 
 build:  # builds
 	make configure
@@ -17,10 +17,12 @@ test:
 	pytest -vv tests
 
 publish:
-	scripts/publish
+	# New Python based publish script in dcicutils (2023-04-25).
+	poetry run publish-to-pypi
 
 publish-for-ga:
-	scripts/publish --noconfirm
+	# New Python based publish script in dcicutils (2023-04-25).
+	poetry run publish-to-pypi --noconfirm
 
 deploy-dev:
 	python -m chalicelib.deploy dev

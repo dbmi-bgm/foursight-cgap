@@ -7,6 +7,11 @@ foursight-cgap
 Change Log
 ----------
 
+3.4.0
+=====
+* Version changes related to foursight-core changes for SSL certificate and Portal access key checking.
+* Using new dcicutils.scripts.publish_to_pypi for publish.
+
 3.3.3
 =====
 * Dependency updates to update magma + tibanna_ff to fix cost updates on MWFRs
