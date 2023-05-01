@@ -4,6 +4,7 @@ clear-poetry-cache:  # clear poetry/pypi cache. for user to do explicitly, never
 	poetry cache clear pypi --all
 
 configure:  # does any pre-requisite installs
+	pip install --upgrade pip
 	pip install poetry==1.3.2
 
 build:  # builds
