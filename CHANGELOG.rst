@@ -7,6 +7,12 @@ foursight-cgap
 Change Log
 ----------
 
+3.4.4
+=====
+* Update foursight-core 4.1.2.
+  Fixes for check arguments not being converted (from string) to int/float/etc as
+  appropriate in the React version only (was not calling query_params_to_literals).
+
 3.4.2
 =====
 * Version changes related to foursight-core changes for SSL certificate and Portal access key checking.
