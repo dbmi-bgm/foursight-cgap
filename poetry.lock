@@ -265,22 +265,6 @@ files = [
 pycparser = "*"
 
 [[package]]
-name = "cgap-pipeline-utils"
-version = "23.0"
-description = "Collection of utilities for cgap-pipeline"
-category = "main"
-optional = false
-python-versions = ">=3.6, <3.8"
-files = [
-    {file = "cgap-pipeline-utils-23.0.tar.gz", hash = "sha256:a92918b3ef46803ce8cbfa1f7fe07e5bf4221d26618e7b80eeb9d9bff2963d18"},
-    {file = "cgap_pipeline_utils-23.0-py3-none-any.whl", hash = "sha256:fe5bb6b18f081a616b9491cc023b837d1026570b8df948285661521c760ed6d4"},
-]
-
-[package.dependencies]
-dcicutils = ">=1.19.0"
-magma-suite = ">=0.2.1"
-
-[[package]]
 name = "chalice"
 version = "1.28.0"
 description = "Microframework"
