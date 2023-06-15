@@ -7,6 +7,10 @@ foursight-cgap
 Change Log
 ----------
 
+3.5.0
+=====
+* Changes in foursight-core (4.3.0) to fix access key check.
+
 3.4.5
 =====
 * Minor UI fixes for display of status text for checks/actions - in foursight-core.
