@@ -5,8 +5,8 @@ import datetime
 import time
 import itertools
 import random
-import boto3
 from collections import Counter
+from dcicutils.boto_s3 import boto_s3_resource
 from dcicutils import ff_utils
 from dcicutils.env_utils import prod_bucket_env_for_app
 from foursight_core.checks.helpers import wrangler_utils
@@ -539,7 +539,7 @@ def patch_states_files_higlass_defaults(connection, **kwargs):
     action_logs = {'patch_success': [], 'patch_failure': [], 'missing_ref_file': []}
     total_patches = check_res['full_output']['to_add']
 
-    s3 = boto3.resource('s3')
+    s3 = boto_s3_resource()
     # NOTE WELL: Omitting the appname argument in a legacy context will get the prod bucket for 'fourfront'
     #            EVEN FOR CGAP. That's maximally backward-compatible, since this used to unconditionally use
     #            the fourfront prod bucket. In an orchestrated world, the default will be better. -kmp 5-Oct-2021
