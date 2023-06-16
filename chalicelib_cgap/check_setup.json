@@ -546,7 +546,7 @@
         "title": "Admin Access Key Status",
         "group": "Maintenance Checks",
         "schedule": {
-            "ten_min_checks": {
+            "fifteen_min_checks": {
                 "<env-name>": {
                     "kwargs": {
                         "primary": true,
