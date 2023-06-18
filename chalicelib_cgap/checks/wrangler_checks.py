@@ -6,9 +6,9 @@ import time
 import itertools
 import random
 from collections import Counter
-from dcicutils.boto_s3 import boto_s3_resource
 from dcicutils import ff_utils
 from dcicutils.env_utils import prod_bucket_env_for_app
+from foursight_core.boto_s3 import boto_s3_resource
 from foursight_core.checks.helpers import wrangler_utils
 
 # Use confchecks to import decorators object and its methods for each check module
