@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "foursight-cgap"
-version = "3.5.0.1b25"
+version = "3.5.0.1b26"
 description = "Serverless Chalice Application for Monitoring"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -24,7 +24,7 @@ pytz = "^2020.1"
 magma-suite = "^1.2.2"
 tibanna-ff = "^1.3.0"
 MarkupSafe = "1.1.1"
-foursight-core = "4.3.0.1b25"
+foursight-core = "4.3.0.1b26"
 # use below for tests but not for deployment
 #foursight-core = { git = "https://github.com/4dn-dcic/foursight-core.git", branch="core2" }
 cgap-pipeline-utils = "23.0"
