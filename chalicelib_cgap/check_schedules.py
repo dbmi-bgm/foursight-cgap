@@ -107,13 +107,6 @@ def check_runner(event, context):
     the checks. Self propogates. event is a dict of information passed into
     the lambda at invocation time.
     """
-    print('xyzzy/check_runner/enter')
-    print(type(event))
-    print(event)
-    print(type(context))
-    print(context)
     if not event:
         return
-    print('xyzzy/check_runner/a')
     app.core.run_check_runner(event)
-    print('xyzzy/check_runner/b')
