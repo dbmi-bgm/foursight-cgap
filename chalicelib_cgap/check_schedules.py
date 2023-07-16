@@ -66,6 +66,11 @@ def morning_checks(event):
 
 
 @schedule(SCHEDULES, stage=STAGE, disabled_stages=DISABLED_STAGES)
+def ten_min_checks(event):
+    app.core.queue_scheduled_checks('all', 'ten_min_checks')
+
+
+@schedule(SCHEDULES, stage=STAGE, disabled_stages=DISABLED_STAGES)
 def fifteen_min_checks(event):
     app.core.queue_scheduled_checks('all', 'fifteen_min_checks')
 

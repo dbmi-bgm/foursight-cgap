@@ -5,7 +5,6 @@ import datetime
 import time
 import itertools
 import random
-import boto3
 from collections import Counter
 from dcicutils import ff_utils
 from dcicutils.env_utils import prod_bucket_env_for_app
