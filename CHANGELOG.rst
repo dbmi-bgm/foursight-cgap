@@ -7,6 +7,11 @@ foursight-cgap
 Change Log
 ----------
 
+3.6.1
+=====
+* 2023-07-17
+* New local-check-runner script.
+
 3.6.0
 =====
 * Changes (to foursight-core) to the access key check; making sure the action does not run every single day.

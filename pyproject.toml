@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "foursight-cgap"
-version = "3.6.0"
+version = "3.6.0.1b1"  # TODO: To become 3.6.1
 description = "Serverless Chalice Application for Monitoring"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -25,19 +25,20 @@ pytz = "^2020.1"
 magma-suite = "^1.2.2"
 tibanna-ff = "^1.3.0"
 MarkupSafe = "1.1.1"
-foursight-core = "4.4.0"
+foursight-core = "4.4.0.1b1"
 # use below for tests but not for deployment
 #foursight-core = { git = "https://github.com/4dn-dcic/foursight-core.git", branch="core2" }
 cgap-pipeline-utils = "23.0"
 pytest = "5.1.2"
 
 [tool.poetry.dev-dependencies]
-chalice = "^1.21.6"
+chalice = "^1.26.0"
 pytest-cov = "2.7.1"
 flaky = "3.6.1"
 
 [tool.poetry.scripts]
 publish-to-pypi = "dcicutils.scripts.publish_to_pypi:main"
+local-check-runner = "chalicelib_cgap.scripts.local_check_runner:main"
 
 [build-system]
 requires = ["poetry>=0.12"]
