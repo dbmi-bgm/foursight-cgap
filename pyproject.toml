@@ -38,7 +38,7 @@ flaky = "3.6.1"
 
 [tool.poetry.scripts]
 publish-to-pypi = "dcicutils.scripts.publish_to_pypi:main"
-local-check-runner = "chalicelib_cgap.scripts.local_check_runner:main"
+local-check-execution = "chalicelib_cgap.scripts.local_check_execution:main"
 
 [build-system]
 requires = ["poetry>=0.12"]

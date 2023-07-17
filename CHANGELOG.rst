@@ -10,7 +10,7 @@ Change Log
 3.6.1
 =====
 * 2023-07-17
-* New local-check-runner script.
+* New local-check-execution script.
 
 3.6.0
 =====
