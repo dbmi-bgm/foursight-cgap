@@ -7,6 +7,10 @@ foursight-cgap
 Change Log
 ----------
 
+3.6.1
+=====
+* Add ingestion type to POST body for VCF ingestion action
+
 3.6.0
 =====
 * Changes (to foursight-core) to the access key check; making sure the action does not run every single day.
