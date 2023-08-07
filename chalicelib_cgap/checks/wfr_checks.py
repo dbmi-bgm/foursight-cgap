@@ -680,7 +680,7 @@ def ingest_vcf_start(connection, **kwargs):
 
     my_auth = connection.ff_keys
     targets = check_result["files"]
-    post_body = {"uuids": targets}
+    post_body = {"uuids": targets, "ingestion_type": "vcf"}
     try:
         ff_utils.post_metadata(post_body, "/queue_ingestion", key=my_auth)
         action.output["queued for ingestion"] = targets
