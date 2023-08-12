@@ -7,6 +7,10 @@ foursight-cgap
 Change Log
 ----------
 
+3.6.2
+=====
+* Change dcicutils to 7.7.0 (from 7.6.0.1b4).
+
 3.6.1
 =====
 * Add ingestion type to POST body for VCF ingestion action
