@@ -2,7 +2,6 @@
 foursight-cgap
 ==============
 
-
 ----------
 Change Log
 ----------
