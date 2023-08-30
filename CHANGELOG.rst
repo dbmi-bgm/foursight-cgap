@@ -9,11 +9,11 @@ Change Log
 
 3.7.0
 =====
-* 2023-07-17
+* 2023-08-07
 * New local-check-execution script.
 
 3.6.1
-=======
+=====
 * Add ingestion type to POST body for VCF ingestion action
 
 3.6.0
