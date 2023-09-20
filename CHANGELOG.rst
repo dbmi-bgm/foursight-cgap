@@ -7,6 +7,10 @@ foursight-cgap
 Change Log
 ----------
 
+4.0.0
+=====
+* Update to Python 3.11.
+
 3.6.1
 =====
 * Add ingestion type to POST body for VCF ingestion action
