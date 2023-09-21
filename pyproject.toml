@@ -13,16 +13,19 @@ python = ">=3.7.1,<3.12"
 dcicutils = "7.12.0.1b1"
 click = "^7.1.2"
 PyJWT = "^2.5.0"
-Jinja2 = "2.10.1"
+Jinja2 = "^3.1.2"
 google-api-python-client = "^1.12.5"
 geocoder = "1.38.1"
-elasticsearch = "^7.13.4"
+# elasticsearch 7.17.9 (at least) has a problem:
+# Error: "The client noticed that the server is not Elasticsearch and we do not support this unknown product"
+# https://stackoverflow.com/questions/68802324/elasticsearch-in-go-err-the-client-noticed-that-the-server-is-not-elasticsear
+elasticsearch = "7.13.4"
 elasticsearch-dsl = "^7.0.0"
 gitpython = "^3.1.2"
 pytz = "^2020.1"
 magma-suite = "1.5.0.1b2"
 tibanna-ff = "2.0.1.1b1"
-MarkupSafe = "1.1.1"
+MarkupSafe = "^2.1.3"
 foursight-core = "4.5.0.1b1"
 # use below for tests but not for deployment
 #foursight-core = { git = "https://github.com/4dn-dcic/foursight-core.git", branch="core2" }
