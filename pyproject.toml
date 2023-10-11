@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "foursight-cgap"
-version = "3.6.1"
+version = "4.0.0"
 description = "Serverless Chalice Application for Monitoring"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -9,34 +9,40 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-# Cannot go to Python 3.8 because cgap-pipeilne is stuck on Python 3.7.
-python = ">=3.7.1,<3.8"
-#dcicutils = "^7.5.1"
-dcicutils = "7.6.0.1b4"
+python = ">=3.8,<3.12"
+cron-descriptor = "^1.4.0"
+dcicutils = "^8.0.0"
 click = "^7.1.2"
 PyJWT = "^2.5.0"
-Jinja2 = "2.10.1"
+Jinja2 = "^3.1.2"
 google-api-python-client = "^1.12.5"
 geocoder = "1.38.1"
-elasticsearch = "^7.13.4"
+# elasticsearch 7.17.9 (at least) has a problem:
+# Error: "The client noticed that the server is not Elasticsearch and we do not support this unknown product"
+# https://stackoverflow.com/questions/68802324/elasticsearch-in-go-err-the-client-noticed-that-the-server-is-not-elasticsear
+elasticsearch = "7.13.4"
 elasticsearch-dsl = "^7.0.0"
 gitpython = "^3.1.2"
 pytz = "^2020.1"
-magma-suite = "^1.2.2"
-tibanna-ff = "^1.3.0"
-MarkupSafe = "1.1.1"
-foursight-core = "4.4.0"
+magma-suite = "^2.0.0"
+tibanna-ff = "^3.1.1"
+MarkupSafe = "^2.1.3"
+foursight-core = "^5.0.0"
 # use below for tests but not for deployment
 #foursight-core = { git = "https://github.com/4dn-dcic/foursight-core.git", branch="core2" }
-cgap-pipeline-utils = "23.0"
-pytest = "5.1.2"
+#portal-pipeline-utils = "2.1.0.1b1"
+# Need pytest-redis 3.0.2 or higher for pytest 7.4.2 (or higher).
+pytest = "^7.4.2"
+pytest-redis = "^3.0.2"
+tzlocal = "^5.1"
 
 [tool.poetry.dev-dependencies]
 chalice = "^1.21.6"
-pytest-cov = "2.7.1"
+pytest-cov = "^4.1.0"
 flaky = "3.6.1"
 
 [tool.poetry.scripts]
+local-check-execution = "chalicelib_cgap.scripts.local_check_execution:main"
 publish-to-pypi = "dcicutils.scripts.publish_to_pypi:main"
 
 [build-system]
