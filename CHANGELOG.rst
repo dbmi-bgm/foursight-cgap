@@ -7,6 +7,12 @@ foursight-cgap
 Change Log
 ----------
 
+
+4.1.0
+=====
+
+* New  Portal Reindex page.
+
 4.0.0
 =====
 
