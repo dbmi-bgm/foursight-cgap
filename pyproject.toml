@@ -42,6 +42,7 @@ pytest-cov = "^4.1.0"
 flaky = "3.6.1"
 
 [tool.poetry.scripts]
+local-check-execution = "chalicelib_cgap.scripts.local_check_execution:main"
 publish-to-pypi = "dcicutils.scripts.publish_to_pypi:main"
 
 [build-system]
