@@ -7,6 +7,12 @@ foursight-cgap
 Change Log
 ----------
 
+4.0.1
+=====
+
+* Update magma to bring in fixes for creating and running MWFR
+
+
 4.0.0
 =====
 
