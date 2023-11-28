@@ -7,12 +7,17 @@ foursight-cgap
 Change Log
 ----------
 
-
 4.1.0
 =====
-
 * New Portal Reindex page; foursight-core 5.1.0.
 * Update poetry to 1.4.2.
+
+
+4.0.1
+=====
+
+* Update magma to bring in fixes for creating and running MWFR
+
 
 4.0.0
 =====
