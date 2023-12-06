@@ -895,18 +895,18 @@ files = [
 
 [[package]]
 name = "magma-suite"
-version = "2.1.1"
+version = "3.0.0"
 description = "Collection of tools to manage meta-workflows automation."
 optional = false
 python-versions = ">=3.8,<3.12"
 files = [
-    {file = "magma_suite-2.1.1-py3-none-any.whl", hash = "sha256:c3cfeafe7fa8cc4e49ef8561333fe622215e0d22af8c808621576d6b1bf7a297"},
-    {file = "magma_suite-2.1.1.tar.gz", hash = "sha256:c2ebfc07dd58e9c6b5a9227dac988580248313f9b156d65cb98be7858f7aa4d0"},
+    {file = "magma_suite-3.0.0-py3-none-any.whl", hash = "sha256:cdf074d28b4fa2cecc2d4640db568c979ec3b5ea92d55c1053357026534059c2"},
+    {file = "magma_suite-3.0.0.tar.gz", hash = "sha256:18525c4cecab996f123f7db05a35176078424d29c7351a8428509af496004b7c"},
 ]
 
 [package.dependencies]
 dcicutils = "8.0.0"
-tibanna-ff = "3.1.1"
+tibanna-ff = "3.2.0"
 
 [[package]]
 name = "markupsafe"
@@ -1613,13 +1613,13 @@ tomlkit = ">=0.11.0,<0.12.0"
 
 [[package]]
 name = "tibanna-ff"
-version = "3.1.1"
+version = "3.2.0"
 description = "Tibanna runs portable pipelines (in CWL/WDL) on the AWS Cloud."
 optional = false
 python-versions = ">=3.8,<3.12"
 files = [
-    {file = "tibanna_ff-3.1.1-py3-none-any.whl", hash = "sha256:fac37cc31318dcc9f0fa6ce9dd9b1ce6347452c704f499939d054d51cab167b4"},
-    {file = "tibanna_ff-3.1.1.tar.gz", hash = "sha256:7801dface3e60ef6b867b8cda875238cf511bce3938d2f52f28ccb77a83c6e17"},
+    {file = "tibanna_ff-3.2.0-py3-none-any.whl", hash = "sha256:d793ff01c8e3bae03049345667cf2c60fe20c0f56b37a277b0da664424b60f71"},
+    {file = "tibanna_ff-3.2.0.tar.gz", hash = "sha256:8980b8f9d9cbead5413a872e5e29d27e8c799abb5f9468719d35e6a2221fd1f3"},
 ]
 
 [package.dependencies]
@@ -1845,4 +1845,4 @@ test = ["pytest (>=6.0.0)", "setuptools (>=65)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "5671c355c6a3507bef0686facce55582186e8b3c4c47eadbd94cf3e2f763374a"
+content-hash = "faffe8ea6eb0361036bf92942482ee66dc30e2c9e546be8feeab4686d5eb0941"
