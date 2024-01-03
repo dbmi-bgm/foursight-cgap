@@ -7,6 +7,11 @@ foursight-cgap
 Change Log
 ----------
 
+4.2.0
+=====
+* Added generation of a gitinfo.json file in GitHub Actions (.github/workflows/main-CI.yml).
+
+
 4.1.1
 =====
 * Minor UI fix to Ingestion page (foursight-core).
