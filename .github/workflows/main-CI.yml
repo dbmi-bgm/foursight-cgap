@@ -50,10 +50,10 @@ jobs:
 
       - name: Create the gitinfo file
         run: |
-          echo "{\"ref\": \"${GITHUB_REF}\", \"branch\": \"${GITHUB_REF##*/}\", \"commit\": \"${GITHUB_SHA}\"}" > gitinfo.json
+          echo "{\"ref\": \"${GITHUB_REF}\", \"branch\": \"${GITHUB_REF##*/}\", \"commit\": \"${GITHUB_SHA}\"}" > chalicelib_cgap/gitinfo.json
 
       - name: Upload the gitinfo.json file as an artifact
         uses: actions/upload-artifact@v2
         with:
           name: gitinfo
-          path: gitinfo.json
+          path: chalicelib_cgap/gitinfo.json

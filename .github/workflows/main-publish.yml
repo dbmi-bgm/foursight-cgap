@@ -31,12 +31,12 @@ jobs:
         run: python -m pip install dcicutils==8.6.0.1b2
       - name: Create the gitinfo file
         run: |
-          echo "{\"ref\": \"${GITHUB_REF}\", \"branch\": \"${GITHUB_REF##*/}\", \"commit\": \"${GITHUB_SHA}\"}" > foursight_core/gitinfo.json
+          echo "{\"ref\": \"${GITHUB_REF}\", \"branch\": \"${GITHUB_REF##*/}\", \"commit\": \"${GITHUB_SHA}\"}" > chalicelib_cgap/gitinfo.json
       - name: Upload the gitinfo.json file as an artifact
         uses: actions/upload-artifact@v2
         with:
           name: gitinfo
-          path: foursight_core/gitinfo.json
+          path: chalicelib_cgap/gitinfo.json
       - name: Publish
         env:
           PYPI_USER: ${{ secrets.PYPI_USER }}
