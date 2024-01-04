@@ -18,7 +18,7 @@ jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -28,15 +28,10 @@ jobs:
         with:
           python-version: 3.11
       - name: Install Python dependencies for publish
-        run: python -m pip install dcicutils==8.6.0.1b2
-      - name: Create the gitinfo file
+        run: python -m pip install dcicutils==8.7.0.1b2
+      - name: Update the gitinfo.json file with latest relevant git info
         run: |
-          echo "{\"repo\": \"https://github.com/${{ github.repository }}\", \"ref\": \"${GITHUB_REF}\", \"branch\": \"${GITHUB_REF##*/}\", \"commit\": \"${GITHUB_SHA}\"}" > chalicelib_cgap/gitinfo.json
-      - name: Upload the gitinfo.json file as an artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: gitinfo
-          path: chalicelib_cgap/gitinfo.json
+          echo "{\"repo\": \"https://github.com/${{ github.repository }}\", \"branch\": \"${GITHUB_REF##*/}\", \"commit\": \"${GITHUB_SHA}\"}" > chalicelib_cgap/gitinfo.json
       - name: Publish
         env:
           PYPI_USER: ${{ secrets.PYPI_USER }}
