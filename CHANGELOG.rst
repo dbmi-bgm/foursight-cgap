@@ -10,6 +10,7 @@ Change Log
 4.2.0
 =====
 * Added update of a gitinfo.json file in GitHub Actions (.github/workflows/main-publish.yml).
+* Update foursight-core with fix to Portal Reindex page (to not show initial deploy).
 
 
 4.1.1
