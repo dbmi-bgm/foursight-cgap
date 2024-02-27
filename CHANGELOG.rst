@@ -7,6 +7,13 @@ foursight-cgap
 Change Log
 ----------
 
+4.2.0
+=====
+* Added update of a gitinfo.json file in GitHub Actions (.github/workflows/main-publish.yml).
+* Update foursight-core with fix to Portal Reindex page (to not show initial deploy),
+  and straighten out blue/green staging/data dichotomy on Reindex and Redeploy pages. 
+
+
 4.1.1
 =====
 * Minor UI fix to Ingestion page (foursight-core).
