@@ -7,6 +7,11 @@ foursight-cgap
 Change Log
 ----------
 
+4.3.0
+=====
+* Update dependencies
+
+
 4.2.0
 =====
 * Added update of a gitinfo.json file in GitHub Actions (.github/workflows/main-publish.yml).
