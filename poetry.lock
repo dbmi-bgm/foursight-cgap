@@ -584,14 +584,14 @@ tls = ["cryptography (>=1.3.4)", "idna (>=2.0.0)", "pyOpenSSL (>=17.5.0)"]
 
 [[package]]
 name = "docutils"
-version = "0.20.1"
+version = "0.16"
 description = "Docutils -- Python Documentation Utilities"
 category = "main"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 files = [
-    {file = "docutils-0.20.1-py3-none-any.whl", hash = "sha256:96f387a2c5562db4476f09f13bbab2192e764cac08ebbf3a34a95d9b1e4a59d6"},
-    {file = "docutils-0.20.1.tar.gz", hash = "sha256:f08a4e276c3a1583a86dce3e34aba3fe04d02bba2dd51ed16106244e8a923e3b"},
+    {file = "docutils-0.16-py2.py3-none-any.whl", hash = "sha256:0c5b78adfbf7762415433f5515cd5c9e762339e23369dbe8000d84a4bf4ab3af"},
+    {file = "docutils-0.16.tar.gz", hash = "sha256:c2de3a60e9e7d07be26b7f2b00ca0309c207e06c100f9cc2a94931fc75a478fc"},
 ]
 
 [[package]]
@@ -1112,20 +1112,20 @@ referencing = ">=0.31.0"
 
 [[package]]
 name = "magma-suite"
-version = "3.4.1.1b1"
+version = "3.4.1.1b2"
 description = "Collection of tools to manage meta-workflows automation."
 category = "main"
 optional = false
 python-versions = "<3.13,>=3.8.1"
 files = [
-    {file = "magma_suite-3.4.1.1b1-py3-none-any.whl", hash = "sha256:293aa6ea8903dc75b7c27a813914f4c2ec77011ac5f9cc4e6afe2a80ae6067bc"},
-    {file = "magma_suite-3.4.1.1b1.tar.gz", hash = "sha256:64d879c24334c93a7527d636aa0bdb34c39fdfa770223f2ccad797f9a877d6a6"},
+    {file = "magma_suite-3.4.1.1b2-py3-none-any.whl", hash = "sha256:f327e03418fe40e17e363b4d04060288a7cea4bbdd3f5278f38eb4743a48bbd4"},
+    {file = "magma_suite-3.4.1.1b2.tar.gz", hash = "sha256:dbdcbd43e385292d52db6b724e5e07e9197e896d856e726054830681842edd8f"},
 ]
 
 [package.dependencies]
 click = ">=7.1.2,<8.0.0"
 dcicutils = "8.12.0.1b6"
-docutils = ">=0.20.1,<0.21.0"
+docutils = ">=0.10,<0.17"
 packaging = ">=23.0,<24.0"
 tibanna-ff = "3.4.1.1b1"
 
@@ -2647,4 +2647,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1,<3.13"
-content-hash = "5a7cb32190cb3c9bd71b4b07a29d6aa5e58eb0108a747cb72bc2372c78f12a0e"
+content-hash = "f5df437e70bd79b8ae306c0865463fde17effbd63d14d35d08ebc73a615b9dad"
