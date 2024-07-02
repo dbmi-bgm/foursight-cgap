@@ -508,14 +508,14 @@ tox = ["tox"]
 
 [[package]]
 name = "dcicutils"
-version = "8.12.0.1b10"
+version = "8.13.0"
 description = "Utility package for interacting with the 4DN Data Portal and other 4DN resources"
 category = "main"
 optional = false
 python-versions = "<3.13,>=3.8.1"
 files = [
-    {file = "dcicutils-8.12.0.1b10-py3-none-any.whl", hash = "sha256:a81c87926bf8c66dd224de00196a9c44301220068adc4ad81f9663fef9e88c1b"},
-    {file = "dcicutils-8.12.0.1b10.tar.gz", hash = "sha256:0185a44db043048559a686577ebe9718944651f793eebd98f01f6fcc67c8a10b"},
+    {file = "dcicutils-8.13.0-py3-none-any.whl", hash = "sha256:3a443d8f84d845151130b51ea276d4d04193fbbf2e98c91a92228da77ce15f39"},
+    {file = "dcicutils-8.13.0.tar.gz", hash = "sha256:34aa712026720626da2f6fa93c9c23a2888d6b6074c3b934daf509aa83220dd1"},
 ]
 
 [package.dependencies]
@@ -688,14 +688,14 @@ files = [
 
 [[package]]
 name = "foursight-core"
-version = "5.5.0.1b2"
+version = "5.5.0.1b3"
 description = "Serverless Chalice Application for Monitoring"
 category = "main"
 optional = false
 python-versions = "<3.13,>=3.8.1"
 files = [
-    {file = "foursight_core-5.5.0.1b2-py3-none-any.whl", hash = "sha256:765cf4a0dd89b055e7f5cb9e71b068ea0dd03d3f6f632d942b131c6080755bb2"},
-    {file = "foursight_core-5.5.0.1b2.tar.gz", hash = "sha256:8c02182cef66aac0f83859a3879bc9b513bc49d8652ab7598649cae80e96d53e"},
+    {file = "foursight_core-5.5.0.1b3-py3-none-any.whl", hash = "sha256:49b4fa669d0f52712000d33adbed1acd250d3a697d94fd2d1b213595699b29b0"},
+    {file = "foursight_core-5.5.0.1b3.tar.gz", hash = "sha256:ad7d5af27d0b7c38532eb6c363e63f009a081f6a7b967457dbe76f165c1f080c"},
 ]
 
 [package.dependencies]
@@ -704,7 +704,7 @@ botocore = ">=1.34.136,<2.0.0"
 click = ">=7.1.2,<8.0.0"
 cron-descriptor = ">=1.2.31,<2.0.0"
 cryptography = "39.0.2"
-dcicutils = "8.12.0.1b10"
+dcicutils = ">=8.13.0,<9.0.0"
 elasticsearch = "7.13.4"
 elasticsearch-dsl = ">=7.0.0,<8.0.0"
 geocoder = "1.38.1"
@@ -1112,22 +1112,22 @@ referencing = ">=0.31.0"
 
 [[package]]
 name = "magma-suite"
-version = "3.4.1.1b5"
+version = "3.4.1.1b6"
 description = "Collection of tools to manage meta-workflows automation."
 category = "main"
 optional = false
 python-versions = "<3.13,>=3.8.1"
 files = [
-    {file = "magma_suite-3.4.1.1b5-py3-none-any.whl", hash = "sha256:d735d96b28fc6813cd752380169b8bb8b74c7058d1f94330c5c92aa4e92d9f68"},
-    {file = "magma_suite-3.4.1.1b5.tar.gz", hash = "sha256:330d01da568ea11d7bb3c80aef0bf4e5aa703fe5af32b2786ff374758e2b6793"},
+    {file = "magma_suite-3.4.1.1b6-py3-none-any.whl", hash = "sha256:251bcaa46f8596e4e634c801b9125ce99e443d9f04c9781834f6d54572f048b0"},
+    {file = "magma_suite-3.4.1.1b6.tar.gz", hash = "sha256:31dce1efd6b194ef0f307d0c45ea7d1bdffc850d336149a11b098628e23c62d7"},
 ]
 
 [package.dependencies]
 click = ">=7.1.2,<8.0.0"
-dcicutils = "8.12.0.1b10"
+dcicutils = ">=8.13.0,<9.0.0"
 docutils = ">=0.10,<0.17"
 packaging = ">=23.0,<24.0"
-tibanna-ff = "3.4.1.1b4"
+tibanna-ff = "3.4.1.1b6"
 
 [[package]]
 name = "markupsafe"
@@ -2259,14 +2259,14 @@ tests = ["coverage", "freezegun (>=0.2.8)", "pretend", "pytest (>=3.3.0)", "pyth
 
 [[package]]
 name = "tibanna"
-version = "5.2.2.1b1"
+version = "5.2.2.1b3"
 description = "Tibanna runs portable pipelines (in CWL/WDL) on the AWS Cloud."
 category = "main"
 optional = false
 python-versions = "<3.13,>=3.8"
 files = [
-    {file = "tibanna-5.2.2.1b1-py3-none-any.whl", hash = "sha256:1db42c287d50638225381a0c2ca3d81ef3e9f063806f2222c8bcf7809fb468dc"},
-    {file = "tibanna-5.2.2.1b1.tar.gz", hash = "sha256:69095092bbbfa88bb5c498d1a3e24a0f819c9ebca3b98222f01b7651a6b40ffa"},
+    {file = "tibanna-5.2.2.1b3-py3-none-any.whl", hash = "sha256:f29206b03f763e06f565b920a5bd81aaead22e1788a4c924cdda6e54bc69acfe"},
+    {file = "tibanna-5.2.2.1b3.tar.gz", hash = "sha256:a2a1cb8841256c609b97a664447b33323c0ee3a2ac2e5ec37378b617a6a46b51"},
 ]
 
 [package.dependencies]
@@ -2278,23 +2278,23 @@ tomlkit = ">=0.11.0,<0.12.0"
 
 [[package]]
 name = "tibanna-ff"
-version = "3.4.1.1b4"
+version = "3.4.1.1b6"
 description = "Tibanna runs portable pipelines (in CWL/WDL) on the AWS Cloud."
 category = "main"
 optional = false
 python-versions = "<3.13,>=3.8.1"
 files = [
-    {file = "tibanna_ff-3.4.1.1b4-py3-none-any.whl", hash = "sha256:3b51548338fabf444dd9256f75e1dc6108f278fd5dc02d549f1b2c900ed5fe73"},
-    {file = "tibanna_ff-3.4.1.1b4.tar.gz", hash = "sha256:5425fb839da492ee5abee40fed285fe9350e69266c5dd2fa67c32c844722d9bf"},
+    {file = "tibanna_ff-3.4.1.1b6-py3-none-any.whl", hash = "sha256:5e857b9918c10546cc2b3660c201d483c682b6463b6e5077e03f357d16c586c5"},
+    {file = "tibanna_ff-3.4.1.1b6.tar.gz", hash = "sha256:059f374aae41a2c3197f73916b29867a81a4b17c4f3a6829a37a7da2edd7eea7"},
 ]
 
 [package.dependencies]
 boto3 = ">=1.34.136,<2.0.0"
 botocore = ">=1.34.136,<2.0.0"
-dcicutils = "8.12.0.1b10"
+dcicutils = ">=8.13.0,<9.0.0"
 pydantic = ">=2.4.2,<3.0.0"
 requests = "2.27.1"
-tibanna = "5.2.2.1b1"
+tibanna = "5.2.2.1b3"
 tomlkit = ">=0.11.0,<0.12.0"
 
 [[package]]
@@ -2647,4 +2647,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1,<3.13"
-content-hash = "81a8024d693ff89e72bfce6bd76ae30339c3d2240a078527bbd9af6db849da41"
+content-hash = "65e18f9fcf0f7876f97af9830228eaf7d116ae61a9b7d260732306f7beaf9955"
