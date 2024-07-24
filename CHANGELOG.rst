@@ -7,6 +7,11 @@ foursight-cgap
 Change Log
 ----------
 
+4.4.0
+=====
+* Support for Python 3.12.
+
+
 4.3.0
 =====
 * Update dependencies
