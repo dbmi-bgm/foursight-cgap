@@ -7,6 +7,12 @@ foursight-cgap
 Change Log
 ----------
 
+4.5.0
+=====
+* 2024-10-11/dmichaels
+* Updated dcicutils version (8.16.1) for vulnerabilities.
+
+
 4.4.0
 =====
 * Support for Python 3.12.
