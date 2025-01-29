@@ -7,6 +7,12 @@ foursight-cgap
 Change Log
 ----------
 
+4.6.0
+=====
+* 2024-11-26/dmichaels
+* Updated to foursight-core 5.8.0 for fix to portal deployment action for cgap-msa.
+
+
 4.5.0
 =====
 * 2024-10-11/dmichaels
