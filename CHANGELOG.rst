@@ -7,6 +7,12 @@ foursight-cgap
 Change Log
 ----------
 
+4.7.0
+=====
+* 2025-01-29/dmichaels
+  Thug commit to master branch with fix in main-publish.yml (dcicutils version to 8.17.0).
+
+
 4.6.0
 =====
 * 2024-11-26/dmichaels
