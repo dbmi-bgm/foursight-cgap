@@ -55,7 +55,7 @@ jobs:
           echo "{\"repo\": \"https://github.com/${{ github.repository }}\", \"ref\": \"${GITHUB_REF}\", \"branch\": \"${GITHUB_REF##*/}\", \"commit\": \"${GITHUB_SHA}\"}" > chalicelib_cgap/gitinfo.json
 
       - name: Upload the gitinfo.json file as an artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: gitinfo
           path: chalicelib_cgap/gitinfo.json
