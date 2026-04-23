@@ -38,7 +38,7 @@
       "api_gateway_stage": "api",
       "region": "us-east-1",
       "layers": [
-        "arn:aws:lambda:us-east-1:553035198032:layer:git:11"
+        "arn:aws:lambda:us-east-1:553035198032:layer:git-lambda2:8"
       ]
     },
     "dev": {
@@ -68,7 +68,7 @@
       "api_gateway_stage": "api",
       "region": "us-east-1",
       "layers": [
-        "arn:aws:lambda:us-east-1:553035198032:layer:git:11"
+        "arn:aws:lambda:us-east-1:553035198032:layer:git-lambda2:8"
       ]
     }
 }
